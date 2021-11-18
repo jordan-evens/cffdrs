@@ -25,8 +25,6 @@ hffmc <- cffdrs.core::hffmc
 .ISIcalc <- cffdrs.core:::.ISIcalc
 .LBcalc <- cffdrs.core:::.LBcalc
 .LBtcalc <- cffdrs.core:::.LBtcalc
-lros <- cffdrs.core::lros
-pros <- cffdrs.core::pros
 .ROScalc <- cffdrs.core:::.ROScalc
 .ROStcalc <- cffdrs.core:::.ROStcalc
 .ROSthetacalc <- cffdrs.core:::.ROSthetacalc
@@ -39,8 +37,6 @@ test_fbp <- cffdrs.core::test_fbp
 test_fwi <- cffdrs.core::test_fwi
 test_gfmc <- cffdrs.core::test_gfmc
 test_hffmc <- cffdrs.core::test_hffmc
-test_lros <- cffdrs.core::test_lros
-test_pros <- cffdrs.core::test_pros
 test_sdmc <- cffdrs.core::test_sdmc
 test_wDC_fs <- cffdrs.core::test_wDC_fs
 test_wDC <- cffdrs.core::test_wDC

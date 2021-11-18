@@ -41,14 +41,13 @@ major vegetation types in Canada.
 
 \tabular{ll}{ Package: \tab cffdrs.core\cr Type: \tab Package\cr Version: \tab
 1.8.16\cr Date: \tab 2020-05-26\cr License: \tab GPL-2\cr } This package
-includes nine functions. Five functions, \code{\link{fwi}},
+includes seven functions. Five functions, \code{\link{fwi}},
 \code{\link{hffmc}}, \code{\link{sdmc}}, \code{\link{gfmc}}, and
 \code{\link{wDC}} are used for FWI System calculation, whereas one function,
 \code{\link{fbp}} is used for FBP System calculation. One function,
 \code{\link{fireSeason}} determines fire season start and end dates based on
-weather. Two functions \code{\link{pros}} and \code{\link{lros}} are rate of
-spread and direction calculations across triangles. These functions are not
-fully independent: their inputs overlap greatly and the users will have to
+weather.
+These functions are not fully independent: their inputs overlap greatly and the users will have to
 provide FWI System outputs to calculate FBP System outputs. The fwi,
 and sdmc functions calculate the outputs based on daily noon
 local standard time (LST) weather observations of temperature, relative
@@ -176,8 +175,8 @@ Inf. Rep. NOR-X-417.
 }
 \seealso{
 \code{\link{fbp}}, \code{\link{fireSeason}}, \code{\link{fwi}},
-\code{\link{gfmc}}, \code{\link{hffmc}}, \code{\link{lros}},
-\code{\link{pros}}, \code{\link{sdmc}}, \code{\link{wDC}}
+\code{\link{gfmc}}, \code{\link{hffmc}}, \code{\link{sdmc}},
+\code{\link{wDC}}
 }
 \author{
 Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry

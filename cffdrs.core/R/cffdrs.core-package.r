@@ -36,14 +36,13 @@
 #' 
 #' \tabular{ll}{ Package: \tab cffdrs.core\cr Type: \tab Package\cr Version: \tab
 #' 1.8.16\cr Date: \tab 2020-05-26\cr License: \tab GPL-2\cr } This package
-#' includes nine functions. Five functions, \code{\link{fwi}},
+#' includes seven functions. Five functions, \code{\link{fwi}},
 #' \code{\link{hffmc}}, \code{\link{sdmc}}, \code{\link{gfmc}}, and
 #' \code{\link{wDC}} are used for FWI System calculation, whereas one function,
 #' \code{\link{fbp}} is used for FBP System calculation. One function,
 #' \code{\link{fireSeason}} determines fire season start and end dates based on
-#' weather. Two functions \code{\link{pros}} and \code{\link{lros}} are rate of
-#' spread and direction calculations across triangles. These functions are not
-#' fully independent: their inputs overlap greatly and the users will have to
+#' weather.
+#' These functions are not fully independent: their inputs overlap greatly and the users will have to
 #' provide FWI System outputs to calculate FBP System outputs. The fwi,
 #' and sdmc functions calculate the outputs based on daily noon
 #' local standard time (LST) weather observations of temperature, relative
@@ -64,8 +63,8 @@
 #' 
 #' Maintainer: Jordan Evens \email{jordan.evens@nrcan-rncan.gc.ca}
 #' @seealso \code{\link{fbp}}, \code{\link{fireSeason}}, \code{\link{fwi}},
-#' \code{\link{gfmc}}, \code{\link{hffmc}}, \code{\link{lros}},
-#' \code{\link{pros}}, \code{\link{sdmc}}, \code{\link{wDC}}
+#' \code{\link{gfmc}}, \code{\link{hffmc}}, \code{\link{sdmc}},
+#' \code{\link{wDC}}
 #' @references 1. Van Wagner, C.E. and T.L. Pickett. 1985. Equations and
 #' FORTRAN program for the Canadian Forest Fire Weather Index System. Can. For.
 #' Serv., Ottawa, Ont. For. Tech. Rep. 33. 18 p.
@@ -250,64 +249,6 @@ NULL
 #' @format A data frame containing 8 columns and 481 rows, including 1 header
 #' line
 #' @keywords datasets
-NULL
-
-
-
-
-
-#' Line-based Simard function Sample Data Set
-#' 
-#' This is a set of input data to test the lros function.
-#' 
-#' 
-#' @name test_lros
-#' @docType data
-#' @format A data frame containing 8 columns, 4 rows, including 1 header line.
-#' @references 1. Simard, A.J., Eenigenburg, J.E., Adams, K.B., Nissen, R.L.,
-#' Deacon, and Deacon, A.G. 1984. A general procedure for sampling and
-#' analyzing wildland fire spread.
-#' 
-#' 2. Byram, G.M. 1959. Combustion of forest fuels. In: Davis, K.P. Forest Fire
-#' Control and Use. McGraw-Hill, New York.
-#' 
-#' 3. Curry, J.R., and Fons, W.L. 1938. Rate of spread of surface fires in the
-#' Ponderosa Pine Type of California. Journal of Agricultural Research 57(4):
-#' 239-267.
-#' 
-#' 4. Simard, A.J., Deacon, A.G., and Adams, K.B. 1982. Nondirectional sampling
-#' wildland fire spread. Fire Technology: 221-228.
-#' @source no source
-#' @keywords datasets simard lros
-NULL
-
-
-
-
-
-#' Point-based Simard function Sample Data Set
-#' 
-#' This is a set of input data to test the pros function.
-#' 
-#' 
-#' @name test_pros
-#' @docType data
-#' @format A data frame containing 9 columns, 4 rows, including 1 header line.
-#' @references 1. Simard, A.J., Eenigenburg, J.E., Adams, K.B., Nissen, R.L.,
-#' Deacon, and Deacon, A.G. 1984. A general procedure for sampling and
-#' analyzing wildland fire spread.
-#' 
-#' 2. Byram, G.M. 1959. Combustion of forest fuels. In: Davis, K.P. Forest Fire
-#' Control and Use. McGraw-Hill, New York.
-#' 
-#' 3. Curry, J.R., and Fons, W.L. 1938. Rate of spread of surface fires in the
-#' Ponderosa Pine Type of California. Journal of Agricultural Research 57(4):
-#' 239-267.
-#' 
-#' 4. Simard, A.J., Deacon, A.G., and Adams, K.B. 1982. Nondirectional sampling
-#' wildland fire spread. Fire Technology: 221-228.
-#' @source no source
-#' @keywords datasets simard lros
 NULL
 
 
