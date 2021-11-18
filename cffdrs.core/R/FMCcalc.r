@@ -13,10 +13,7 @@
 #' @param D0     Date of minimum foliar moisture content. _If D0, date of min FMC, is not known then D0 = NULL._
 #' 
 #' @return FMC: Foliar Moisture Content value
-#' @noRd
-#' 
-
-
+#' @export .FMCcalc
 .FMCcalc <- function(LAT, LONG, ELV, DJ, D0) {                                                                                               
 
   #Initialize vectors

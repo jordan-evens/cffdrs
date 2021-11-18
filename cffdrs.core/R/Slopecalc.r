@@ -34,9 +34,7 @@
 #' 
 #' @returns  RAZ or WSV - Rate of spread azimuth (degrees) or Wind Slope speed (km/hr)
 #' 
-#' @noRd
-#'
-
+#' @export .Slopecalc
 .Slopecalc <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                        CC, CBH, ISI, output = "RAZ") {
   # output options include: RAZ and WSV

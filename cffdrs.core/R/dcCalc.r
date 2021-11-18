@@ -24,8 +24,7 @@
 #' @param lat.adjust Latitude adjustment (TRUE, FALSE, default=TRUE)
 #' 
 #' @return A single drought code value
-#' @noRd
-
+#' @export .dcCalc
 .dcCalc <- function(dc_yda, temp, rh, prec, lat, mon, lat.adjust=TRUE) {
 
   #Day length factor for DC Calculations

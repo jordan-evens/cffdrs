@@ -19,8 +19,7 @@
 #'  
 #' @returns Length to Breadth ratio value
 #' 
-#' @noRd
-
+#' @export .LBcalc
 .LBcalc <- function(FUELTYPE, WSV) {
   
   #calculation is depending on if fuel type is grass (O1) or other fueltype

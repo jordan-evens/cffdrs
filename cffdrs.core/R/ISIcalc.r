@@ -20,9 +20,7 @@
 #' 
 #' @returns ISI - Intial Spread Index
 #' 
-#' @noRd
-
-
+#' @export .ISIcalc
 .ISIcalc <- function(ffmc, ws, fbpMod=FALSE){
 
   #Eq. 10 - Moisture content

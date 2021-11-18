@@ -25,8 +25,7 @@
 #' @param option      Which variable to calculate(ROS, CFB, RSC, or RSI) _Default:_ "CFB"
 #' 
 #' @return ROS, CFB, RSC or RSI depending on which option was selected
-#' @noRd
-
+#' @export .C6calc
 .C6calc <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, 
                   option="CFB"){ 
 

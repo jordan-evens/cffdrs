@@ -12,8 +12,7 @@
 #' @param BUI The Buildup Index value
 #' 
 #' @return BE: Build up effect
-#' @noRd
-
+#' @export .BEcalc
 .BEcalc <- function(FUELTYPE, BUI) {
 
   #Fuel Type String represenations

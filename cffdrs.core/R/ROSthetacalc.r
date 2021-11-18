@@ -16,8 +16,7 @@
 #' 
 #' @returns ROSTHETA - Rate of spread at point theta(m/min)
 #' 
-#' @noRd
-
+#' @export .ROSthetacalc
 .ROSthetacalc <- function(ROS, FROS, BROS, THETA){
 
   c1 <- cos(THETA)

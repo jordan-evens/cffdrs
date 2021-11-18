@@ -9,8 +9,7 @@
 #' 
 #' @return DIR - a direction in degrees
 #' 
-#' @noRd
-
+#' @export .direction
 .direction <- function(bearingT1T2, bearingT1T3, ThetaAdeg){
 
   T1T2 <- bearingT1T2

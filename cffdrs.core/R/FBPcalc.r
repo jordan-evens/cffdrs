@@ -12,8 +12,7 @@
 #' 
 #' @return output: Either Primary, Secondary, or all FBP outputs in a data.frame
 #' 
-#' @noRd
-
+#' @export .FBPcalc
 .FBPcalc  <- function(input=NULL, output="Primary") {                                                                                           
 
   #  Quite often users will have a data frame called "input" already attached

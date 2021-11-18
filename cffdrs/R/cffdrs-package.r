@@ -185,27 +185,6 @@ NULL
 
 
 
-#' Fire Behaviour Prediction Sample Data Set
-#' 
-#' This data set is a set of input data for each of the test cases in the
-#' publication supplied below.
-#' 
-#' 
-#' @name test_fbp
-#' @docType data
-#' @format A data frame containing 24 columns, 21 rows, including 1 header line
-#' @references 1. Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and
-#' revisions to the 1992 Canadian forest fire behavior prediction system. Nat.
-#' Resour. Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie,
-#' Ontario, Canada. Information Report GLC-X-10, 45p.
-#' @source \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/31414.pdf}
-#' @keywords datasets
-NULL
-
-
-
-
-
 #' Raster Data for fbpRaster function
 #' 
 #' Test raster file to calculate fbp data.
@@ -214,58 +193,6 @@ NULL
 #' @name test_fbpRaster
 #' @docType data
 #' @format A raster (tif) file.
-#' @keywords datasets
-NULL
-
-
-
-
-
-#' Fire Weather Index Sample Input Data Set
-#' 
-#' This data set is the sample input data that was used in original FWI program
-#' calibration.
-#' 
-#' 
-#' @name test_fwi
-#' @docType data
-#' @format A data frame containing 9 columns and 49 rows, with 1 header line
-#' @references 1. Van Wagner, CE. and T.L. Pickett. 1985. Equations and FORTRAN
-#' program for the Canadian Forest Fire Weather Index System. Can. For. Serv.,
-#' Ottawa, Ont. For. Tech. Rep. 33. 18 p.
-#' @source \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/19973.pdf}
-#' @keywords datasets
-NULL
-
-
-
-
-
-#' Grass Fuel Moisture Code Sample Input Data Set
-#' 
-#' This data set is the sample input data that was used in original FWI program
-#' calibration.
-#' 
-#' 
-#' @name test_gfmc
-#' @docType data
-#' @format A data frame containing 9 columns and 199 rows, with 1 header line
-#' @keywords datasets
-NULL
-
-
-
-
-
-#' Hourly Fine Fuel Moisture Code Sample Input Data Set
-#' 
-#' Sample dataset for use with the \code{hffmc} function.
-#' 
-#' 
-#' @name test_hffmc
-#' @docType data
-#' @format A data frame containing 8 columns and 481 rows, including 1 header
-#' line
 #' @keywords datasets
 NULL
 
@@ -388,63 +315,5 @@ NULL
 #' @name test_rast_hour02
 #' @docType data
 #' @format A raster (tif) file.
-#' @keywords datasets
-NULL
-
-
-
-
-
-#' Sheltered Duff Moisture Code Sample Input Data Set
-#' 
-#' This data set is the sample input data that was used in original FWI program
-#' calibration, but with an initial dmc value populated.
-#' 
-#' 
-#' @name test_sdmc
-#' @docType data
-#' @format A data frame containing 10 columns and 49 rows, including 1 header
-#' line
-#' @references 1. Van Wagner, CE. and T.L. Pickett. 1985. Equations and FORTRAN
-#' program for the Canadian Forest Fire Weather Index System. Can. For. Serv.,
-#' Ottawa, Ont. For. Tech. Rep. 33. 18 p.
-#' @source \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/19973.pdf}
-#' @keywords datasets
-NULL
-
-
-
-
-
-#' Overwinter Drought Code Sample Input Data Set
-#' 
-#' This dataset has 2 ID values (weather stations), and each have 2 sequential
-#' years. This data can be used as an example to calculated overwintered DC.
-#' There are 10 columns and 1463 rows, including 1 header row.
-#' 
-#' 
-#' @name test_wDC
-#' @docType data
-#' @format A data frame containing 10 columns and 1463 rows, including 1 header
-#' line
-#' @keywords datasets
-NULL
-
-
-
-
-
-#' Fire Season Dataset to test Overwinter Drought Code
-#' 
-#' This dataset has pre-set start and end dates to the fire season for 2
-#' weather stations. The point of this dataset is to demonstrate that a data
-#' frame of start and end dates for the fire season can be calculated and
-#' applied to the program.
-#' 
-#' 
-#' @name test_wDC_fs
-#' @docType data
-#' @format A data frame containing 7 columns and 9 rows, including 1 header
-#' line
 #' @keywords datasets
 NULL

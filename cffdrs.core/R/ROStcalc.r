@@ -16,8 +16,7 @@
 #' 
 #' @returns ROSt - Rate of Spread at time since ignition value
 #' 
-#' @noRd
-
+#' @export .ROStcalc
 .ROStcalc <- function(FUELTYPE, ROSeq, HR, CFB){
 
   #Eq. 72 - alpha constant value, dependent on fuel type

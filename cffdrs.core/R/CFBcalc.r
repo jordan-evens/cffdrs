@@ -22,8 +22,7 @@
 #' @param option   Which variable to calculate(ROS, CFB, RSC, or RSI) 
 #' 
 #' @return CFB, CSI, RSO depending on which option was selected. _Default:_ "CFB"
-#' @noRd
-
+#' @export .CFBcalc
 .CFBcalc <- function(FUELTYPE, FMC, SFC, ROS, CBH, option="CFB"){
   
   CFB <- 0

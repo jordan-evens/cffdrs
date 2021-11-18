@@ -19,8 +19,7 @@
 #' @param CBH         Crown Base Height
 #' 
 #' @return BROS: Back Fire Rate of Spread
-#' @noRd
-
+#' @export .BROScalc
 .BROScalc <- function(FUELTYPE, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH){
 
   #Eq. 46 (FCFDG 1992)

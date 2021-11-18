@@ -21,8 +21,7 @@
 #'        
 #' @returns   SFC Surface Fuel Consumption (kg/m^2)
 #' 
-#' @noRd
-
+#' @export .SFCcalc
 .SFCcalc <- function(FUELTYPE, FFMC, BUI, PC, GFL) {
 
   SFC <- rep(-999,length(FFMC))

@@ -21,8 +21,7 @@
 #'  
 #' @returns Length to Breadth ratio at time since ignition
 #' 
-#' @noRd
-
+#' @export .LBtcalc
 .LBtcalc <- function(FUELTYPE, LB, HR, CFB) {
 
   #Eq. 72 (FCFDG 1992) - alpha constant value, dependent on fuel type

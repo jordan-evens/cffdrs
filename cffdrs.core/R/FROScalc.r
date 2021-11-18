@@ -13,8 +13,7 @@
 #' 
 #' @return FROS Flank Fire Spread Rate (m/min) value
 #' 
-#' @noRd
-
+#' @export .FROScalc
 .FROScalc <- function(ROS, BROS, LB){
 
   #Eq. 89 (FCFDG 1992)

@@ -24,8 +24,7 @@
 #' @param ws         Wind speed (km/h)
 #' 
 #' @return A single fine fuel moisture code value
-#' @noRd
-
+#' @export .ffmcCalc
 .ffmcCalc <- function(ffmc_yda, temp, rh, ws, prec) {
 
   #Eq. 1

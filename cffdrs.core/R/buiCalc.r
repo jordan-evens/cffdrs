@@ -18,8 +18,7 @@
 #' Development and structure of the Canadian Forest Fire Weather Index System. 
 #' 1987. Van Wagner, C.E. Canadian Forestry Service, Headquarters, Ottawa. 
 #' Forestry Technical Report 35. 35 p.
-#' @noRd
-
+#' @export .buiCalc
 .buiCalc <- function(dmc, dc) {
 
   #Eq. 27a

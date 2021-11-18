@@ -32,8 +32,7 @@
 #' 
 #' @return A single drought moisture code value
 #' 
-#' @noRd
-#' 
+#' @export .dmcCalc
 .dmcCalc <- function(dmc_yda, temp, rh, prec, lat, mon, lat.adjust=TRUE) {
 
   #Reference latitude for DMC day length adjustment

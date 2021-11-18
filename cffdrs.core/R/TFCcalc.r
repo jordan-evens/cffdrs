@@ -24,8 +24,7 @@
 #' @returns TFC Total (Surface + Crown) Fuel Consumption (kg/m^2) OR
 #' CFC Crown Fuel Consumption (kg/m^2)
 #' 
-#' @noRd
-
+#' @export .TFCcalc
 .TFCcalc <- function(FUELTYPE, CFL, CFB, SFC, PC, PDF, option = "TFC") {
 
   #Eq. 66a (Wotton 2009) - Crown Fuel Consumption (CFC)

@@ -11,8 +11,7 @@
 #' @param ROS Rate of Spread (m/min)
 #' 
 #' @return FI: Fire Intensity (kW/m)
-#' @noRd
-
+#' @export .FIcalc
 .FIcalc <- function(FC, ROS){
 
   #Eq. 69 (FCFDG 1992) Fire Intensity (kW/m)

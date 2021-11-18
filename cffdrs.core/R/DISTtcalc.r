@@ -14,8 +14,7 @@
 #' @param CFB      Crown Fraction Burned
 #' 
 #' @return DISTt - Head fire spread distance at time t
-#' @noRd
-
+#' @export .DISTtcalc
 .DISTtcalc <- function(FUELTYPE, ROSeq, HR, CFB) {
 
   #Eq. 72 (FCFDG 1992)

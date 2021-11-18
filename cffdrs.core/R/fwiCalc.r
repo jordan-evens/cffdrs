@@ -23,8 +23,7 @@
 #'  
 #' @return A single fwi value
 #'  
-#' @noRd
-
+#' @export .fwiCalc
 .fwiCalc <- function(isi, bui) {
 
   #Eqs. 28b, 28a, 29

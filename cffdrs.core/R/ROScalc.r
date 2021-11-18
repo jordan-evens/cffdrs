@@ -27,8 +27,7 @@
 #' 
 #' @returns ROS - Rate of Spread (m/min) value
 #' 
-#' @noRd
-
+#' @export .ROScalc
 .ROScalc <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
 
   #Set up some data vectors
