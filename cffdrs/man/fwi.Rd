@@ -142,10 +142,10 @@ different parts of the world.
 }
 \examples{
 
-# library(cffdrs)
+library(cffdrs)
 # The test data is a standard test
 # dataset for FWI system (Van Wagner and Pickett 1985) 
-# data("test_fwi")
+data("test_fwi")
 # Show the data, which is already sorted by time:
 # head(test_fwi)
 # long  lat	yr	mon	day	temp	rh	ws	prec
@@ -193,7 +193,7 @@ fwi(test_fwi)
 
 ## (4) Daylength adjustment:
 # Change latitude values where the monthly daylength adjustments
-are different from the standard ones
+# are different from the standard ones
 test_fwi$lat<-22
 # With daylength adjustment
 fwi(test_fwi)[1:3,]

@@ -148,10 +148,10 @@
 #' 
 #' @examples
 #' 
-#' # library(cffdrs)
+#' library(cffdrs)
 #' # The test data is a standard test
 #' # dataset for FWI system (Van Wagner and Pickett 1985) 
-#' # data("test_fwi")
+#' data("test_fwi")
 #' # Show the data, which is already sorted by time:
 #' # head(test_fwi)
 #' # long  lat	yr	mon	day	temp	rh	ws	prec
@@ -199,7 +199,7 @@
 #' 
 #' ## (4) Daylength adjustment:
 #' # Change latitude values where the monthly daylength adjustments
-#' are different from the standard ones
+#' # are different from the standard ones
 #' test_fwi$lat<-22
 #' # With daylength adjustment
 #' fwi(test_fwi)[1:3,]
@@ -392,34 +392,34 @@ fwi <- function(input, init = data.frame(ffmc = 85, dmc = 6, dc = 15, lat = 55),
     ###########################################################################
     # Fine Fuel Moisture Code (FFMC)
     ###########################################################################
-    ffmc1 = cffdrs.core::Ffmc(ffmc_yda, temp[k], rh[k], ws[k], prec[k])
+    ffmc1 = cffdrs.core::FineFuelMoistureCode(ffmc_yda, temp[k], rh[k], ws[k], prec[k])
     
     ###########################################################################
     # Duff Moisture Code (DMC)
     ###########################################################################
-    dmc1 = cffdrs.core::Dmc(dmc_yda, temp[k], rh[k], prec[k], lat[k], mon[k], 
+    dmc1 = cffdrs.core::DuffMoistureCode(dmc_yda, temp[k], rh[k], prec[k], lat[k], mon[k], 
                     lat.adjust)
     
     ###########################################################################
     # Drought Code (DC)
     ###########################################################################
-    dc1 <- cffdrs.core::Dc(dc_yda, temp[k], rh[k], prec[k], lat[k], mon[k],
+    dc1 <- cffdrs.core::DroughtCode(dc_yda, temp[k], rh[k], prec[k], lat[k], mon[k],
                    lat.adjust)
     
     ###########################################################################
     # Initial Spread Index (ISI)
     ###########################################################################
-    isi1 <- cffdrs.core::Isi(ffmc1, ws[k], FALSE)
+    isi1 <- cffdrs.core::InitialSpreadIndex(ffmc1, ws[k], FALSE)
     
     ###########################################################################
     # Buildup Index (BUI)
     ###########################################################################
-    bui1 <- cffdrs.core::Bui(dmc1, dc1)
+    bui1 <- cffdrs.core::BuildupIndex(dmc1, dc1)
     
     ###########################################################################
     # Fire Weather Index (FWI)
     ###########################################################################
-    fwi1 <- cffdrs.core::Fwi(isi1, bui1)
+    fwi1 <- cffdrs.core::FireWeatherIndex(isi1, bui1)
     ###########################################################################
     #                   Daily Severity Rating (DSR)
     ###########################################################################

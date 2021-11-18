@@ -277,7 +277,7 @@ fbp  <- function(input = NULL, output = "Primary", m = NULL, cores = 1){
   }
   #If input is not provided, then calculate FBP with default values
   if (is.null(input)){
-    fullList <- cffdrs.core::Fbp(input)
+    fullList <- cffdrs.core::FireBehaviourPrediction(input)
 
   } else {
     #determine optimal number of pixels to process at each iteration
@@ -293,13 +293,13 @@ fbp  <- function(input = NULL, output = "Primary", m = NULL, cores = 1){
       cl <- makeCluster(cores)
       registerDoParallel(cl)
       #process in parallel
-      ca <- foreach(i=1:n, .packages='cffdrs') %dopar% {
+      ca <- foreach(i=1:n, .packages='cffdrs.core') %dopar% {
         if (i==n){
           #Run FBP functions
-          to.ls<-cffdrs.core::Fbp(input[((i-1)*m+1):nrow(input),],output=output)
+          to.ls<-cffdrs.core::FireBehaviourPrediction(input[((i-1)*m+1):nrow(input),],output=output)
         }else {
           #Run FBP functions
-          to.ls<-cffdrs.core::Fbp(input[((i-1)*m+1):(i*m),],output=output)
+          to.ls<-cffdrs.core::FireBehaviourPrediction(input[((i-1)*m+1):(i*m),],output=output)
         }
         to.ls
       }
@@ -317,12 +317,12 @@ fbp  <- function(input = NULL, output = "Primary", m = NULL, cores = 1){
           foo <- input[((i - 1) * m + 1):(i * m), ]
         }
         #Run FBP functions
-        ca[[i]] <- cffdrs.core::Fbp(foo, output = output)
+        ca[[i]] <- cffdrs.core::FireBehaviourPrediction(foo, output = output)
       }    
     }
     #create a single keyed data table
-    fullList <- rbindlist(ca)
-    setkey(fullList, ID)
+    fullList <- data.table::rbindlist(ca)
+    data.table::setkey(fullList, ID)
     #convert to data frame
     fullList <- as.data.frame(fullList)
   }

@@ -5,70 +5,67 @@ library(cffdrs.core)
 .BEcalc <- cffdrs.core::BuildupEffect
 
 #' @noRd
-.BROScalc <- cffdrs.core::BackRos
+.BROScalc <- cffdrs.core::BackRateOfSpread
 
 #' @noRd
-.buiCalc <- cffdrs.core::Bui
+.buiCalc <- cffdrs.core::BuildupIndex
 
 #' @noRd
-.C6calc <- cffdrs.core::FbpC6
+.C6calc <- cffdrs.core::FireBehaviourPredictionC6
 
 #' @noRd
-.CFBcalc <- cffdrs.core::Cfb
+.CFBcalc <- cffdrs.core::CrownFractionBurned
 
 #' @noRd
-.dcCalc <- cffdrs.core::Dc
+.dcCalc <- cffdrs.core::DroughtCode
 
 #' @noRd
-.direction <- cffdrs.core::Direction
+.DISTtcalc <- cffdrs.core::DistanceAtTime
 
 #' @noRd
-.DISTtcalc <- cffdrs.core::DistT
+.dmcCalc <- cffdrs.core::DuffMoistureCode
 
 #' @noRd
-.dmcCalc <- cffdrs.core::Dmc
+.FBPcalc <- cffdrs.core::FireBehaviourPrediction
 
 #' @noRd
-.FBPcalc <- cffdrs.core::Fbp
+.ffmcCalc <- cffdrs.core::FineFuelMoistureCode
 
 #' @noRd
-.ffmcCalc <- cffdrs.core::Ffmc
+.FIcalc <- cffdrs.core::FireIntensity
 
 #' @noRd
-.FIcalc <- cffdrs.core::Fi
+.FMCcalc <- cffdrs.core::FoliarMoistureContent
 
 #' @noRd
-.FMCcalc <- cffdrs.core::Fmc
+.FROScalc <- cffdrs.core::FlankRateOfSpread
 
 #' @noRd
-.FROScalc <- cffdrs.core::FlankRos
+.fwiCalc <- cffdrs.core::FireWeatherIndex
 
 #' @noRd
-.fwiCalc <- cffdrs.core::Fwi
+.ISIcalc <- cffdrs.core::InitialSpreadIndex
 
 #' @noRd
-.ISIcalc <- cffdrs.core::Isi
+.LBcalc <- cffdrs.core::LengthToBreadthRatio
 
 #' @noRd
-.LBcalc <- cffdrs.core::Lb
+.LBtcalc <- cffdrs.core::LengthToBreadthRatioAtTime
 
 #' @noRd
-.LBtcalc <- cffdrs.core::LbT
+.ROScalc <- cffdrs.core::RateOfSpread
 
 #' @noRd
-.ROScalc <- cffdrs.core::Ros
+.ROStcalc <- cffdrs.core::RateOfSpreadAtTime
 
 #' @noRd
-.ROStcalc <- cffdrs.core::RosT
+.ROSthetacalc <- cffdrs.core::RateOfSpreadAtTheta
 
 #' @noRd
-.ROSthetacalc <- cffdrs.core::RosTheta
+.SFCcalc <- cffdrs.core::SurfaceFuelConsumption
 
 #' @noRd
-.SFCcalc <- cffdrs.core::Sfc
+.Slopecalc <- cffdrs.core::SlopeAdjust
 
 #' @noRd
-.Slopecalc <- cffdrs.core::Slope
-
-#' @noRd
-.TFCcalc <- cffdrs.core::Tfc
+.TFCcalc <- cffdrs.core::TotalFuelConsumption

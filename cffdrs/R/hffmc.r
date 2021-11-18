@@ -263,9 +263,9 @@ hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
       warning("Daily BUI is required to calculate hourly FWI")
     } else {
       #Calculate ISI
-      isi <- cffdrs.core::Isi(f, W, FALSE)
+      isi <- cffdrs.core::InitialSpreadIndex(f, W, FALSE)
       #Calculate FWI
-      fwi <- cffdrs.core::Fwi(isi, bui)
+      fwi <- cffdrs.core::FireWeatherIndex(isi, bui)
       #Calculate DSR
       dsr <- 0.0272 * (fwi^1.77)
       #Put all data into a data.frame to return
