@@ -2,73 +2,73 @@
 # the code that is now in cffdrs.core
 library(cffdrs.core)
 #' @noRd
-.BEcalc <- cffdrs.core::.BEcalc
+.BEcalc <- cffdrs.core::BuildupEffect
 
 #' @noRd
-.BROScalc <- cffdrs.core::.BROScalc
+.BROScalc <- cffdrs.core::BackRos
 
 #' @noRd
-.buiCalc <- cffdrs.core::.buiCalc
+.buiCalc <- cffdrs.core::Bui
 
 #' @noRd
-.C6calc <- cffdrs.core::.C6calc
+.C6calc <- cffdrs.core::FbpC6
 
 #' @noRd
-.CFBcalc <- cffdrs.core::.CFBcalc
+.CFBcalc <- cffdrs.core::Cfb
 
 #' @noRd
-.dcCalc <- cffdrs.core::.dcCalc
+.dcCalc <- cffdrs.core::Dc
 
 #' @noRd
-.direction <- cffdrs.core::.direction
+.direction <- cffdrs.core::Direction
 
 #' @noRd
-.DISTtcalc <- cffdrs.core::.DISTtcalc
+.DISTtcalc <- cffdrs.core::DistT
 
 #' @noRd
-.dmcCalc <- cffdrs.core::.dmcCalc
+.dmcCalc <- cffdrs.core::Dmc
 
 #' @noRd
-.FBPcalc <- cffdrs.core::.FBPcalc
+.FBPcalc <- cffdrs.core::Fbp
 
 #' @noRd
-.ffmcCalc <- cffdrs.core::.ffmcCalc
+.ffmcCalc <- cffdrs.core::Ffmc
 
 #' @noRd
-.FIcalc <- cffdrs.core::.FIcalc
+.FIcalc <- cffdrs.core::Fi
 
 #' @noRd
-.FMCcalc <- cffdrs.core::.FMCcalc
+.FMCcalc <- cffdrs.core::Fmc
 
 #' @noRd
-.FROScalc <- cffdrs.core::.FROScalc
+.FROScalc <- cffdrs.core::FlankRos
 
 #' @noRd
-.fwiCalc <- cffdrs.core::.fwiCalc
+.fwiCalc <- cffdrs.core::Fwi
 
 #' @noRd
-.ISIcalc <- cffdrs.core::.ISIcalc
+.ISIcalc <- cffdrs.core::Isi
 
 #' @noRd
-.LBcalc <- cffdrs.core::.LBcalc
+.LBcalc <- cffdrs.core::Lb
 
 #' @noRd
-.LBtcalc <- cffdrs.core::.LBtcalc
+.LBtcalc <- cffdrs.core::LbT
 
 #' @noRd
-.ROScalc <- cffdrs.core::.ROScalc
+.ROScalc <- cffdrs.core::Ros
 
 #' @noRd
-.ROStcalc <- cffdrs.core::.ROStcalc
+.ROStcalc <- cffdrs.core::RosT
 
 #' @noRd
-.ROSthetacalc <- cffdrs.core::.ROSthetacalc
+.ROSthetacalc <- cffdrs.core::RosTheta
 
 #' @noRd
-.SFCcalc <- cffdrs.core::.SFCcalc
+.SFCcalc <- cffdrs.core::Sfc
 
 #' @noRd
-.Slopecalc <- cffdrs.core::.Slopecalc
+.Slopecalc <- cffdrs.core::Slope
 
 #' @noRd
-.TFCcalc <- cffdrs.core::.TFCcalc
+.TFCcalc <- cffdrs.core::Tfc

@@ -16,11 +16,7 @@ Authors@R: c(
     )
 Maintainer: Jordan Evens <jordan.evens@nrcan-rncan.gc.ca>
 Depends:
-    R(>= 3.2.2),
-    foreach
-Imports:
-    data.table,
-    doParallel
+    R(>= 3.2.2)
 Description: This project provides a group of new functions to calculate the
     outputs of the two main components of the Canadian Forest Fire Danger Rating
     System (CFFDRS) Van Wagner and Pickett (1985) 

@@ -1,15 +1,14 @@
-#' Raster-based Fire Behavior Prediction System Calculations
+#' Fire Behavior Prediction System function
 #' 
-#' \code{fbpRaster} calculates the outputs from the Canadian Forest Fire
-#' Behavior Prediction (FBP) System (Forestry Canada Fire Danger Group 1992)
-#' based on raster format fire weather and fuel moisture conditions (from the
-#' Canadian Forest Fire Weather Index (FWI) System (Van Wagner 1987)), fuel
-#' type, date, and slope. Fire weather, for the purpose of FBP System
-#' calculation, comprises observations of 10 m wind speed and direction at the
-#' time of the fire, and two associated outputs from the Fire Weather Index
-#' System, the Fine Fuel Moisture Content (FFMC) and Buildup Index (BUI).
-#' Raster-based FWI System components can be calculated with the sister
-#' function \code{\link{fwiRaster}}.
+#' \code{fbp} calculates the outputs from the Canadian Forest Fire Behavior
+#' Prediction (FBP) System (Forestry Canada Fire Danger Group 1992) based on
+#' given fire weather and fuel moisture conditions (from the Canadian Forest
+#' Fire Weather Index (FWI) System (Van Wagner 1987)), fuel type, date, and
+#' slope. Fire weather, for the purpose of FBP System calculation, comprises
+#' observations of 10 m wind speed and direction at the time of the fire, and
+#' two associated outputs from the Fire Weather Index System, the Fine Fuel
+#' Moisture Content (FFMC) and Buildup Index (BUI). FWI System components can
+#' be calculated with the sister function \code{\link{fwi}}.
 #' 
 #' The Canadian Forest Fire Behavior Prediction (FBP) System (Forestry Canada
 #' Fire Danger Group 1992) is a subsystem of the Canadian Forest Fire Danger
@@ -59,46 +58,18 @@
 #' for instance theta=RAZ (the final spread azimuth of the fire) then the rate
 #' of spread at angle theta (TROS) will be equivalent to ROS.
 #' 
-#' Because raster format data cannot hold characters, we have to code these fuel
-#' types in numeric codes. In sequence, the codes are c(1:19). FuelType could 
-#' also be converted as factor and assigned to the raster layer, the function 
-#' will still work.
+#' @param input The input data, a data.frame containing fuel types, fire
+#' weather component, and slope (see below). Each vector of inputs defines a
+#' single FBP System prediction for a single fuel type and set of weather
+#' conditions. The data.frame can be used to evaluate the FBP System for a
+#' single fuel type and instant in time, or multiple records for a single point
+#' (e.g., one weather station, either hourly or daily for instance) or multiple
+#' points (multiple weather stations or a gridded surface). All input variables
+#' have to be named as listed below, but they are case insensitive, and do not
+#' have to be in any particular order. Fuel type is of type character; other
+#' arguments are numeric. Missing values in numeric variables could either be
+#' assigned as NA or leave as blank.\cr\cr
 #' 
-#' \tabular{ll}{
-#' \bold{Fuel Type} \tab \bold{code} \cr 
-#' \verb{C-1}       \tab 1           \cr 
-#' \verb{C-2}       \tab 2           \cr 
-#' \verb{C-3}       \tab 3           \cr
-#' \verb{C-4}       \tab 4           \cr 
-#' \verb{C-5}       \tab 5           \cr 
-#' \verb{C-6}       \tab 6           \cr 
-#' \verb{C-7}       \tab 7           \cr 
-#' \verb{D-1}       \tab 8           \cr 
-#' \verb{M-1}       \tab 9           \cr 
-#' \verb{M-2}       \tab 10          \cr 
-#' \verb{M-3}       \tab 11          \cr 
-#' \verb{M-4}       \tab 12          \cr 
-#' \verb{NF}        \tab 13          \cr 
-#' \verb{O-1a}      \tab 14          \cr 
-#' \verb{O-1b}      \tab 15          \cr 
-#' \verb{S-1}       \tab 16          \cr 
-#' \verb{S-2}       \tab 17          \cr 
-#' \verb{S-3}       \tab 18          \cr 
-#' \verb{WA}        \tab 19          \cr\cr}
-#' 
-#' @return Either Primary, Secondary, or all FBP outputs in a raster stack
-#' 
-#' @param input The input data, a RasterStack containing fuel types, fire
-#' weather component, and slope layers (see below). Each vector of inputs
-#' defines a single FBP System prediction for a single fuel type and set of
-#' weather conditions. The RasterStack can be used to evaluate the FBP System
-#' for a single fuel type and instant in time, or multiple records for a single
-#' point (e.g., one weather station, either hourly or daily for instance) or
-#' multiple points (multiple weather stations or a gridded surface). All input
-#' variables have to be named as listed below, but they are case insensitive,
-#' and do not have to be in any particular order. Fuel type is of type
-#' character; other arguments are numeric. Missing values in numeric variables
-#' could either be assigned as NA or leave as blank.
 #' 
 #' \tabular{lll}{ 
 #' \bold{Required Inputs:}\tab\tab\cr 
@@ -151,30 +122,32 @@
 #' \var{SH}    \tab C-6 Fuel Type Stand Height [m] \tab 0\cr 
 #' \var{SD}    \tab C-6 Fuel Type Stand Density [stems/ha] \tab 0\cr 
 #' \var{theta} \tab Elliptical direction of calculation [degrees] \tab 0\cr\cr }
+#' 
 #' @param output FBP output offers 3 options (see details in \bold{Values}
 #' section):
 #' 
-#' \tabular{lc}{ \bold{Outputs} \tab \bold{Number of outputs}\cr \var{Primary
-#' (\bold{default})} \tab 8\cr \var{Secondary} \tab 34\cr \var{All} \tab 42\cr
-#' }
-#' @param select Selected outputs
+#' \tabular{lc}{ \bold{Outputs} \tab \bold{Number of outputs}\cr 
+#' \var{Primary(\bold{default})} \tab 8\cr 
+#' \var{Secondary} \tab 34\cr 
+#' \var{All} \tab 42\cr\cr}
 #' 
 #' @param m Optimal number of pixels at each iteration of computation when
-#' \code{ncell(input) >= 1000}. Default m = NULL, where the function will
-#' assign m = 1000 when \code{ncell(input)} is between 1000 and 500,000, and
-#' m=3000 otherwise. By including this option, the function is able to process
-#' large dataset more efficiently. The optimal value may vary with different
-#' computers.
+#' \code{nrow(input) >= 1000}. Default \code{m = NULL}, where the function will
+#' assign \code{m = 1000} when \code{nrow(input)} is between 1000 and 500,000,
+#' and \code{m = 3000} otherwise. By including this option, the function is
+#' able to process large dataset more efficiently. The optimal value may vary
+#' with different computers.
 #' 
 #' @param cores Number of CPU cores (integer) used in the computation, default
 #' is 1.  By signing \code{cores > 1}, the function will apply parallel
 #' computation technique provided by the \code{foreach} package, which
 #' significantly reduces the computation time for large input data (over a
-#' million grid points). For small dataset, \code{cores=1} is actually faster.
+#' million records). For small dataset, \code{cores=1} is actually faster.
 #' 
-#' @return \code{fbpRaster} returns a RasterStack with primary, secondary, or 
-#' all output variables, a combination of the primary and secondary outputs. 
-#' Primary FBP output includes the following 8 raster layers: 
+#' @return \code{fbp} returns a dataframe with primary, secondary, or all
+#' output variables, a combination of the primary and secondary outputs.
+#' 
+#' \bold{Primary} FBP output includes the following 8 variables: 
 #' 
 #' \item{CFB}{Crown Fraction Burned by the head fire} 
 #' \item{CFC}{Crown Fuel Consumption [kg/m^2]} 
@@ -185,7 +158,7 @@
 #' \item{SFC}{Surface Fuel Consumption [kg/m^2]} 
 #' \item{TFC}{Total Fuel Consumption [kg/m^2]}
 #' 
-#' Secondary FBP System outputs include the following 34 raster layers. In order 
+#' \bold{Secondary} FBP System outputs include the following 34 raster layers. In order
 #' to calculate the reliable secondary outputs, depending on the outputs, 
 #' optional inputs may have to be provided.  
 #' 
@@ -232,10 +205,9 @@
 #' (spread direction) of the ellipse. This formulation is similar but not
 #' identical to methods presented in Wotton et al (2009) and Tymstra et al
 #' (2009).
-#' 
 #' @author Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
 #' Anderson, and Mike Flannigan
-#' @seealso \code{\link{fbp}, \link{fwiRaster}, \link{hffmcRaster}}
+#' @seealso \code{\link{fwi}, \link{fbpRaster}}
 #' @references 1.  Hirsch K.G. 1996. Canadian Forest Fire Behavior Prediction
 #' (FBP) System: user's guide. Nat. Resour. Can., Can. For. Serv., Northwest
 #' Reg., North. For. Cent., Edmonton, Alberta. Spec. Rep. 7. 122p.
@@ -258,165 +230,102 @@
 #' @keywords methods
 #' @examples
 #' 
-#' # The dataset is the standard test data for FBP system
-#' # provided by Wotton et al (2009), and randomly assigned
-#' # to a stack of raster layers
-#' test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
-#' input<-test_fbpRaster
-#' # Stack doesn't hold the raster layer names, we have to assign
-#' # them:
-#' names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
-#' "PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
-#' # Primary outputs:
-#' system.time(foo<-fbpRaster(input = input))
-#' # Using the "select" option:
-#' system.time(foo<-fbpRaster(input = input,select=c("HFI","TFC", "ROS")))
-#' # Secondary outputs:
-#' system.time(foo<-fbpRaster(input = input,output="S"))
-#' # All outputs:
-#' #system.time(foo<-fbpRaster(input = input,output="A"))
+#' library(cffdrs)
+#' # The dataset is the standard test data for FPB system
+#' # provided by Wotton et al (2009)
+#' data("test_fbp")
+#' head(test_fbp)
+#' #  id FuelType LAT LONG ELV FFMC BUI   WS WD GS  Dj  D0         hr PC PDF GFL cc theta Accel Aspect BUIEff CBH CFL ISI
+#' #1  1      C-1  55  110  NA   90 130 20.0  0 15 182  NA 0.33333333 NA  NA  NA  NA     0     1    270      1  NA  NA   0
+#' #2  2       C2  50   90  NA   97 119 20.4  0 75 121  NA 0.33333333 NA  NA  NA  NA     0     1    315      1  NA  NA   0
+#' #3  3      C-3  55  110  NA   95  30 50.0  0  0 182  NA 0.08333333 NA  NA  NA  NA     0     1    180      1  NA  NA   0
+#' #4  4      C-4  55  105 200   85  82  0.0 NA 75 182  NA 0.50000000 NA  NA  NA  NA     0     1    315      1  NA  NA   0
+#' #5  5       c5  55  105  NA   88  56  3.4  0 23 152 145 0.50000000 NA  NA  NA  NA     0     1    180      1  NA  NA   0
 #' 
-#' ### Additional, longer running examples  ###
-#' # Keep only the required input layers, the other layers would be
-#' # assigned with default values:
-#' # keep only the required inputs:
-#' dat0<-input[[c("FuelType","LAT","LONG","FFMC","BUI","WS","GS", "Dj","Aspect")]]
-#' system.time(foo<-fbpRaster(input = dat0,output="A"))
+#' #Primary output (default)
+#' fbp(test_fbp)
+#' #or
+#' fbp(test_fbp,output="Primary") 
+#' #or 
+#' fbp(test_fbp,"P")
+#' #Secondary output          
+#' fbp(test_fbp,"Secondary")
+#' #or
+#' fbp(test_fbp,"S")
+#' #All output          
+#' fbp(test_fbp,"All")
+#' #or
+#' fbp(test_fbp,"A")
+#' #For a single record:
+#' fbp(test_fbp[7,])  	
+#' #For a section of the records:
+#' fbp(test_fbp[8:13,])	
+#' #fbp function produces the default values if no data is fed to
+#' #the function:
+#' fbp()
 #' 
-#' @export fbpRaster
-#' 
-fbpRaster <- function(input, output = "Primary", select=NULL, m=NULL, cores=1){
+#' @export fbp
+fbp  <- function(input = NULL, output = "Primary", m = NULL, cores = 1){  
 
-  #  Quite often users will have a data frame called "input" already attached
-  #  to the workspace. To mitigate this, we remove that if it exists, and warn
-  #  the user of this case. This is also done in Fbp, but we require use
-  #  of this variable here before it gets to Fbp
+  #hack to avoid Note about no visible binding for global variable ID
+  #http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when
+  #look at the globalvariables() option or others in place of this issue
+  # do not remove this comment until resolved
+  ID <- NULL 
   if (!is.na(charmatch("input", search()))) {
-    warning("Attached dataset 'input' is being detached to use fbp() function.")
     detach(input)
   }
-  #split up large rasters to allow calculation. This will be used in the
-  #  parallel methods
-  if (is.null(m)){
-    m <- ifelse(ncell(input) > 500000, 3000, 1000)
-  }
-  #Setup correct output names
-  allNames <- c("CFB","CFC","FD","HFI","RAZ","ROS","SFC","TFC","BE","SF","ISI",
-                "FFMC", "FMC","D0", "RSO","CSI","FROS","BROS","HROSt","FROSt",
-                "BROSt","FCFB", "BCFB","FFI","BFI", "FTFC","BTFC","TI","FTI",
-                "BTI","LB","LBt","WSV", "DH","DB","DF","TROS","TROSt", "TCFB",
-                "TFI","TTFC","TTI")
-  primaryNames <- allNames[1:8]
-  secondaryNames <- allNames[9:length(allNames)]
-  #If outputs are specified, then check if they exist and stop with an error
-  #  if not.
-  if (!is.null(select)){
-    select <- toupper(select)
-    select <- select[!duplicated(select)]
-    if(output == "SECONDARY" | output == "S"){
-      if (!sort(select %in% secondaryNames)[1]){
-        stop("Selected variables are not in the outputs")}
-    }
-    if (output == "PRIMARY" | output == "P"){
-      if (!sort(select %in% primaryNames)[1]){
-        stop("Selected variables are not in the outputs")} 
-    }
-    if (output == "ALL" | output == "A"){
-      if (!sort(select %in% allNames)[1]){
-        stop("Selected variables are not in the outputs")} 
-    }
-  }
-  names(input) <- toupper(names(input))
-  output <- toupper(output)
-  if("LAT" %in% names(input)){
-    #register a sequential parallel backend
-    registerDoSEQ()
-    #Get the specified raster cell values
-    r <- .getValuesBlock_stackfix(input, nrows=nrow(input))
-    #convert to data.frame
-    r <- as.data.frame(r)
-    names(r) <- names(input)
-  }else{
-    #Convert the raster to points and insert into a data.frame
-    r <- as.data.frame(rasterToPoints(input))
-    #Rename the latitude field
-    names(r)[names(r) == "y"] <- "LAT"
-    #Check for valid latitude
-    if (max(r$LAT) > 90 | min(r$LAT) < -90){
-      warning("Input projection is not in lat/long, consider re-projection or 
-              include LAT as input")
-    }
-  }
-  #Unique IDs
-  r$ID <- 1:nrow(r)
-  #merge fuel codes with integer values
-  fuelCross <- data.frame(FUELTYPE0 = sort(c(paste("C", 1:7, sep="-"),
-                                             "D-1",
-                                             paste("M", 1:4, sep="-"),
-                                             paste("S", 1:3, sep="-"),
-                                             "O-1a", "O-1b", "WA", "NF")),
-                          code=1:19)
-  r <- merge(r, fuelCross, by.x="FUELTYPE", by.y="code", all.x=TRUE, all.y=FALSE)
+  #If input is not provided, then calculate FBP with default values
+  if (is.null(input)){
+    fullList <- cffdrs.core::Fbp(input)
 
-  r$FUELTYPE <- NULL
-  names(r)[names(r) == "FUELTYPE0"] <- "FUELTYPE"
-  r <- r[with(r, order(ID)), ]
-  names(r)[names(r) == "x"] <- "LONG"
-  #Calculate FBP through the fbp() function
-  FBP <- fbp(r, output = output, m = m, cores = cores)
-  #If secondary output selected then we need to reassign character
-  #  represenation of Fire Type S/I/C to a numeric value 1/2/3
-  if (!(output == "SECONDARY" | output == "S")){
-    FBP$FD <- ifelse(FBP$FD == "I", 2, FBP$FD)
-    FBP$FD <- ifelse(FBP$FD == "C", 3, FBP$FD)
-    FBP$FD <- ifelse(FBP$FD == "S", 1, FBP$FD)
-    FBP$FD <- as.numeric(FBP$FD)
-  }
-  #If caller specifies select outputs, then create a raster stack that contains
-  #  only those outputs
-  if (!is.null(select)){
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[, select[1]]
-    if (length(select) > 1){
-      for (i in 2:length(select)){
-        values(out0) <- FBP[,select[i]]
-        out <- stack(out, out0)
+  } else {
+    #determine optimal number of pixels to process at each iteration
+    if (is.null(m)){
+      m <- ifelse(nrow(input) > 500000, 3000, 1000)
+    }
+    m <- ifelse(nrow(input) >= m, m, nrow(input))
+    n0 <- round(nrow(input) / m)
+    n <- ifelse(m * n0 >= nrow(input), n0, n0 + 1)
+    #Set up parallel processing, if # of cores is entered
+    if (cores > 1){
+      #create and register a set of parallel R instances for foreach
+      cl <- makeCluster(cores)
+      registerDoParallel(cl)
+      #process in parallel
+      ca <- foreach(i=1:n, .packages='cffdrs') %dopar% {
+        if (i==n){
+          #Run FBP functions
+          to.ls<-cffdrs.core::Fbp(input[((i-1)*m+1):nrow(input),],output=output)
+        }else {
+          #Run FBP functions
+          to.ls<-cffdrs.core::Fbp(input[((i-1)*m+1):(i*m),],output=output)
+        }
+        to.ls
       }
+      #close the processes
+      stopCluster(cl)
+      registerDoSEQ()
+    #Run only a single process
+    } else {
+      ca <- vector('list',n)
+      
+      for(i in 1:n) {
+        if(i == n) {
+          foo <- input[((i - 1) * m + 1):nrow(input), ]
+        } else {
+          foo <- input[((i - 1) * m + 1):(i * m), ]
+        }
+        #Run FBP functions
+        ca[[i]] <- cffdrs.core::Fbp(foo, output = output)
+      }    
     }
-    names(out)<-select 
-  #If caller specified Primary outputs, then create raster stack that contains
-  #  only primary outputs
-  }else if (output == "PRIMARY" | output == "P") {
-    message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[,primaryNames[1]]
-    for (i in 2:length(primaryNames)){
-      values(out0) <- FBP[, primaryNames[i]]
-      out <- stack(out,out0)
-    }
-    names(out)<-primaryNames
-  #If caller specified Secondary outputs, then create raster stack that contains
-  #  only secondary outputs
-  }else if(output == "SECONDARY" | output == "S") {
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[, secondaryNames[1]]
-    for (i in 2:length(secondaryNames)){
-      values(out0) <- FBP[, secondaryNames[i]]
-      out <- stack(out, out0)
-    }
-    names(out)<-secondaryNames
-  #If caller specified All outputs, then create a raster stack that contains
-  #  both primary and secondary outputs
-  }else if(output == "ALL" | output == "A") {
-    message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[, allNames[1]]
-    for (i in 2:length(allNames)){
-      values(out0) <- FBP[, allNames[i]]
-      out <- stack(out, out0)
-    }
-    names(out) <- allNames
+    #create a single keyed data table
+    fullList <- rbindlist(ca)
+    setkey(fullList, ID)
+    #convert to data frame
+    fullList <- as.data.frame(fullList)
   }
-  #return the raster stack to the caller
-  return(out)
+  
+  return(fullList)
 }
