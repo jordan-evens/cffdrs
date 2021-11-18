@@ -10,6 +10,7 @@ library(cffdrs.core)
 .direction <- cffdrs.core:::.direction
 .DISTtcalc <- cffdrs.core:::.DISTtcalc
 .dmcCalc <- cffdrs.core:::.dmcCalc
+# \code{\link[pkg:func]{cffdrs.core:::fbp]}
 fbp <- cffdrs.core::fbp
 .FBPcalc <- cffdrs.core:::.FBPcalc
 .ffmcCalc <- cffdrs.core:::.ffmcCalc
