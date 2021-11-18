@@ -241,4 +241,3 @@ hffmcRaster <- function(weatherstream, ffmc_old = 85, time.step = 1,
     return(fo)
   }
 }
-

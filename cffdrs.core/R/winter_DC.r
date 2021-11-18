@@ -124,4 +124,3 @@ wDC <- function(DCf = 100, rw = 200, a = 0.75, b = 0.75) {
   DCs <- ifelse(DCs < 15, 15, DCs)
   return(DCs)
 }
-

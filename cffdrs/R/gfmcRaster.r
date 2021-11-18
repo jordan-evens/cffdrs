@@ -135,4 +135,3 @@ gfmcRaster <- function(input, GFMCold = 85, time.step = 1, roFL = 0.3,
     return(stack( GFMC, MC))
   }
 }
-

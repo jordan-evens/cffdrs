@@ -451,4 +451,3 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
   }
   return(new_FWI)
 }
-

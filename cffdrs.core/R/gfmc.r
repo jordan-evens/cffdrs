@@ -281,4 +281,3 @@ gfmc <- function(input, GFMCold = 85, batch = TRUE, time.step = 1, roFL = 0.3,
     return(data.frame(GFMC = GFMC, MC = MC))
   }
 }
-
