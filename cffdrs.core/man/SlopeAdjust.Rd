@@ -18,8 +18,7 @@ SlopeAdjust(
   PDF,
   CC,
   CBH,
-  ISI,
-  output = "RAZ"
+  ISI
 )
 }
 \arguments{
@@ -52,7 +51,7 @@ SlopeAdjust(
 \item{output}{Type of variable to output (RAZ/WSV, default=RAZ)}
 }
 \value{
-RAZ or WSV - Rate of spread azimuth (degrees) or Wind Slope speed (km/hr)
+list(RAZ, WSV) - Rate of spread azimuth (degrees) and Wind Slope speed (km/hr)
 }
 \description{
 Calculate the net effective windspeed (WSV), the net effective wind 

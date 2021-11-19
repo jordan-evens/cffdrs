@@ -32,20 +32,12 @@
 #' @param ISI       Initial Spread Index
 #' @param output    Type of variable to output (RAZ/WSV, default=RAZ)
 #' 
-#' @returns  RAZ or WSV - Rate of spread azimuth (degrees) or Wind Slope speed (km/hr)
+#' @returns  list(RAZ, WSV) - Rate of spread azimuth (degrees) and Wind Slope speed (km/hr)
 #' 
 #' @export SlopeAdjust
 SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                       CC, CBH, ISI, output = "RAZ") {
-  # output options include: RAZ and WSV
-
-  #check for valid output types
-  validOutTypes = c("RAZ", "WAZ", "WSV")
-  if(!(output %in% validOutTypes)){
-    stop(paste("In 'SlopeAdjust()', '",output, "' is an invalid 'output' type.", 
-               sep=""))
-  }
-  
+                       CC, CBH, ISI)
+{
   NoBUI <- rep(-1,length(FFMC))
   #Eq. 39 (FCFDG 1992) - Calculate Spread Factor
   SF <- ifelse (GS >= 70, 10, exp(3.533 * (GS / 100)^1.2))
@@ -230,13 +222,12 @@ SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   WSY <- WS * cos(WAZ) + WSE * cos(SAZ)
   #Eq. 49 (FCFDG 1992) - the net effective wind speed
   WSV <- sqrt(WSX * WSX + WSY * WSY)
-  #stop execution here and return WSV if requested
-  if (output=="WSV")
-    return(WSV)
   #Eq. 50 (FCFDG 1992) - the net effective wind direction (radians)
   RAZ <- acos(WSY / WSV)
   #Eq. 51 (FCFDG 1992) - convert possible negative RAZ into more understandable
   # directions
   RAZ <- ifelse(WSX < 0, 2 * pi - RAZ, RAZ)
-  return(RAZ)
+  result <- list(WSV, RAZ)
+  names(result) <- c("WSV", "RAZ")
+  return(result)
 }

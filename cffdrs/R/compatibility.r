@@ -133,8 +133,62 @@ library(cffdrs.core)
 #' @noRd
 .SFCcalc <- cffdrs.core::SurfaceFuelConsumption
 
+#' Slope Adjusted wind speed or slope direction of spread calculation
+#' 
+#'   Calculate the net effective windspeed (WSV), the net effective wind 
+#'   direction (RAZ) or the wind azimuth (WAZ).
+#'
+#'   All variables names are laid out in the same manner as FCFDG (1992) and
+#'   Wotton (2009).
+#'
+#'   
+#'   Forestry Canada Fire Danger Group (FCFDG) (1992). "Development and 
+#'   Structure of the Canadian Forest Fire Behavior Prediction System." 
+#'   Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
+#'
+#'   Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to
+#'   the 1992 Canadian forest fire behavior prediction system. Nat. Resour. 
+#'   Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, 
+#'   Canada. Information Report GLC-X-10, 45p.
+#'
+#' @param FUELTYPE  The Fire Behaviour Prediction FuelType
+#' @param FMC       Fine Fuel Moisture Code
+#' @param BUI       The Buildup Index value
+#' @param WS        Windspeed (km/h)
+#' @param WAZ       Wind Azimuth
+#' @param GS        Ground Slope (%)
+#' @param SAZ       Slope Azimuth
+#' @param FMC       Foliar Moisture Content
+#' @param SFC       Surface Fuel Consumption (kg/m^2)
+#' @param PC        Percent Conifer (%)
+#' @param PDF       Percent Dead Balsam Fir (%)
+#' @param CC        Constant
+#' @param CBH       Crown Base Height (m)
+#' @param ISI       Initial Spread Index
+#' @param output    Type of variable to output (RAZ/WSV, default=RAZ)
+#' 
+#' @returns  RAZ or WSV - Rate of spread azimuth (degrees) or Wind Slope speed (km/hr)
 #' @noRd
-.Slopecalc <- cffdrs.core::SlopeAdjust
+.Slopecalc <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                        CC, CBH, ISI, output = "RAZ")
+{
+  # output options include: RAZ and WSV
+  
+  #check for valid output types
+  validOutTypes = c("RAZ", "WAZ", "WSV")
+  if(!(output %in% validOutTypes)){
+    stop(paste("In 'SlopeAdjust()', '",output, "' is an invalid 'output' type.", 
+               sep=""))
+  }
+  result <- cffdrs.core::SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC,
+                                     PC, PDF, CC, CBH, ISI)
+  if (output=="WSV")
+  {
+    return(result$WSV)
+  }
+  return(result$RAZ)
+  
+}
 
 #' Total Fuel Consumption calculation
 #' 

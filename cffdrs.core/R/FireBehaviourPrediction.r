@@ -247,13 +247,13 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   SFC <- SurfaceFuelConsumption(FUELTYPE, FFMC, BUI, PC, GFL)
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
+  SLOPE_ADJUST <- SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
+                              FMC, SFC, PC, PDF, CC, CBH, ISI)
   #Calculate the net effective windspeed (WSV)
-  WSV0 <- SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
-                     FMC, SFC, PC, PDF, CC, CBH, ISI, output = "WSV")
+  WSV0 <- SLOPE_ADJUST["WSV"]
   WSV <- ifelse(GS > 0 & FFMC > 0, WSV0, WS)
   #Calculate the net effective wind direction (RAZ)
-  RAZ0 <- SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
-                     FMC, SFC, PC, PDF, CC, CBH, ISI, output = "RAZ")
+  RAZ0 <- SLOPE_ADJUST["RAZ"]
   RAZ <- ifelse(GS > 0 & FFMC > 0, RAZ0, WAZ)
   #Calculate or keep Initial Spread Index (ISI)
   ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))

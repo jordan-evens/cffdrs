@@ -14,7 +14,7 @@ InitialSpreadIndex(ffmc, ws, fbpMod = FALSE)
 \item{fbpMod}{TRUE/FALSE if using the fbp modification at the extreme end}
 }
 \value{
-ISI - Intial Spread Index
+ISI - Initial Spread Index
 }
 \description{
 Computes the Initial Spread Index From the FWI System. Equations are from
