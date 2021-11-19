@@ -52,7 +52,13 @@ FireBehaviourPredictionC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CF
     return(RSC)
   }
   #Crown Fraction Burned
-  CFB    <- ifelse(RSC > RSS, CrownFractionBurned(FUELTYPE, FMC, SFC, RSS, CBH),0)
+  CFB <- 0
+  if (RSC > RSS)
+  {
+    CSI <- CriticalSurfaceIntensity(FMC, CBH)
+    RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
+    CFB <- CrownFractionBurned(RSS, RSO)
+  }
   #Return at this point, if specified by caller
   if (option == "CFB") {
     return(CFB)

@@ -14,7 +14,22 @@ library(cffdrs.core)
 .C6calc <- cffdrs.core::FireBehaviourPredictionC6
 
 #' @noRd
-.CFBcalc <- cffdrs.core::CrownFractionBurned
+.CFBcalc <- function(FUELTYPE, FMC, SFC, ROS, CBH, option="CFB")
+{
+  CSI <- cffdrs.core::CriticalSurfaceIntensity(FUELTYPE, FMC, SFC, ROS, CBH)
+  #Return at this point, if specified by caller
+  if(option=="CSI"){
+    return(CSI)
+  }
+  RSO <- cffdrs.core::CriticalSurfaceRateOfSpread(CSI, SFC)
+  #Return at this point, if specified by caller
+  if(option=="RSO"){
+    return(RSO)
+  }
+  CFB <- cffdrs.core::CrownFractionBurned(ROS, RSO)
+  return(CFB)
+}
+
 
 #' @noRd
 .dcCalc <- cffdrs.core::DroughtCode

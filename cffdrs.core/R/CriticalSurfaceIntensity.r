@@ -1,6 +1,6 @@
-#' Crown Fraction Burned Calculator
+#' Critical Surface Intensity Calculator
 #' 
-#' Calculate Calculate Crown Fraction Burned.
+#' Calculate Critical surface intensity (CSI).
 #' 
 #' All variables names are laid out in the same manner as Forestry Canada Fire 
 #' Danger Group (FCFDG) (1992). Development and Structure of the Canadian Forest
@@ -11,14 +11,14 @@
 #' Development and Structure of the Canadian Forest Fire Behavior Prediction 
 #' System." Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
 #' 
-#' @param ROS      Rate of Spread
-#' @param RSO      Critical Surface Rate of Spread
+#' @param FMC      Foliar Moisture Content 
+#' @param CBH      Crown Base Height
 #' 
-#' @return CFB
-#' @export CrownFractionBurned
-CrownFractionBurned <- function(ROS, RSO)
+#' @return CSI
+#' @export CriticalSurfaceIntensity
+CriticalSurfaceIntensity <- function(FMC, CBH)
 {
-  #Eq. 58 (FCFDG 1992) Crown fraction burned 
-  CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), 0)
-  return(CFB)
+  #Eq. 56 (FCFDG 1992) Critical surface intensity
+  CSI <- 0.001 * (CBH**1.5) * (460 + 25.9 * FMC)**1.5
+  return (CSI)
 }

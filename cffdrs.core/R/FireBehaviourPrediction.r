@@ -257,14 +257,25 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   RAZ <- ifelse(GS > 0 & FFMC > 0, RAZ0, WAZ)
   #Calculate or keep Initial Spread Index (ISI)
   ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
-  #Calculate the Rate of Spread (ROS), C6 has different calculations
-  ROS <- ifelse(FUELTYPE %in% c("C6"),
-                FireBehaviourPredictionC6(FUELTYPE, ISI, BUI, FMC, SFC, CBH, option = "ROS"),
-                RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH))
-  #Calculate Crown Fraction Burned (CFB), C6 has different calculations
-  CFB <- ifelse(FUELTYPE %in% c("C6"), FireBehaviourPredictionC6(FUELTYPE, ISI, 
-          BUI, FMC, SFC, CBH, option = "CFB"), ifelse(CFL > 0, 
-          CrownFractionBurned(FUELTYPE, FMC, SFC, ROS, CBH), 0))
+  #Calculate Critical Surface Intensity
+  CSI <- CriticalSurfaceIntensity(FMC, CBH)
+  #Calculate Surface fire rate of spread (m/min)
+  # FIX: C6 was using the same function as other things
+  RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
+  # Calculate the Rate of Spread (ROS) and Crown Fraction Burned (CFB)
+  # C6 has different calculations
+  if ("C6" == FUELTYPE)
+  {
+    ROS <- FireBehaviourPredictionC6(FUELTYPE, ISI, BUI, FMC, SFC, CBH, option = "ROS")
+    CFB <- FireBehaviourPredictionC6(FUELTYPE, ISI, BUI, FMC, SFC, CBH, option = "CFB")
+  }
+  else
+  {
+    ROS <- RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+    CFB <- ifelse(CFL > 0, 
+                  CrownFractionBurned(ROS, RSO),
+                  0)
+  }
   #Calculate Total Fuel Consumption (TFC)
   TFC <- TotalFuelConsumption(FUELTYPE, CFL, CFB, SFC, PC, PDF)
   #Calculate Head Fire Intensity(HFI)
@@ -285,10 +296,6 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
       output == "A") {
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     SF <- ifelse(GS >= 70, 10, exp(3.533 * (GS/100)^1.2))
-    #Calculate Critical Surface Intensity
-    CSI <- CrownFractionBurned(FUELTYPE, FMC, SFC, ROS, CBH, option = "CSI")
-    #Calculate Surface fire rate of spread (m/min)
-    RSO <- CrownFractionBurned(FUELTYPE, FMC, SFC, ROS, CBH, option = "RSO")
     #Calculate The Buildup Effect
     BE <- BuildupEffect(FUELTYPE, BUI)
     #Calculate length to breadth ratio
@@ -311,13 +318,17 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
     TROSt <- ifelse(ACCEL == 0, TROS, 
                     ROSt * (1 - sqrt(1 - 1 / LBt / LBt)) / 
                     (1 - sqrt(1 - 1 / LBt / LBt) * cos(THETA - RAZ)))
+    # FIX: C6 is always 0
     #Calculate Crown Fraction Burned for Flank, Back of fire and at angle theta.
-    FCFB <- ifelse(CFL == 0, 0, ifelse(FUELTYPE %in% c("C6"), 
-             0, CrownFractionBurned(FUELTYPE, FMC, SFC, FROS, CBH)))
-    BCFB <- ifelse(CFL == 0, 0, ifelse(FUELTYPE %in% c("C6"), 
-             0, CrownFractionBurned(FUELTYPE, FMC, SFC, BROS, CBH)))
-    TCFB <- ifelse(CFL == 0, 0, ifelse(FUELTYPE %in% c("C6"), 
-             0, CrownFractionBurned(FUELTYPE, FMC, SFC, TROS, CBH)))
+    FCFB <- 0
+    BCFB <- 0
+    TCFB <- 0
+    if (CFL != 0 && !(FUELTYPE %in% c("C6")))
+    {
+      FCFB <- CrownFractionBurned(FROS, RSO)
+      BCFB <- CrownFractionBurned(BROS, RSO)
+      TCFB <- CrownFractionBurned(TROS, RSO)
+    }
     #Calculate Total fuel consumption for the Flank fire, Back fire and at
     #  angle theta
     FTFC <- TotalFuelConsumption(FUELTYPE, CFL, FCFB, SFC, PC, PDF)

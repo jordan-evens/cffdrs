@@ -1,6 +1,7 @@
-#' Crown Fraction Burned Calculator
+#' Critical Surface Rate of Spread Calculator
 #' 
-#' Calculate Calculate Crown Fraction Burned.
+#' Calculate Critical Surface fire rate of spread (RSO). The value of each of these equations can be returned to the calling 
+#' function without unecessary additional calculations.
 #' 
 #' All variables names are laid out in the same manner as Forestry Canada Fire 
 #' Danger Group (FCFDG) (1992). Development and Structure of the Canadian Forest
@@ -11,14 +12,13 @@
 #' Development and Structure of the Canadian Forest Fire Behavior Prediction 
 #' System." Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
 #' 
-#' @param ROS      Rate of Spread
-#' @param RSO      Critical Surface Rate of Spread
+#' @param CSI      Critical Surface Intensity
+#' @param SFC      Surface Fuel Consumption
 #' 
-#' @return CFB
-#' @export CrownFractionBurned
-CrownFractionBurned <- function(ROS, RSO)
+#' @return RSO
+#' @export CriticalSurfaceRateOfSpread
+CriticalSurfaceRateOfSpread <- function(CSI, SFC)
 {
-  #Eq. 58 (FCFDG 1992) Crown fraction burned 
-  CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), 0)
-  return(CFB)
+  #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
+  return (CSI / (300 * SFC))
 }

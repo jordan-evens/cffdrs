@@ -3,6 +3,8 @@
 export(BackRateOfSpread)
 export(BuildupEffect)
 export(BuildupIndex)
+export(CriticalSurfaceIntensity)
+export(CriticalSurfaceRateOfSpread)
 export(CrownFractionBurned)
 export(DistanceAtTime)
 export(DroughtCode)
