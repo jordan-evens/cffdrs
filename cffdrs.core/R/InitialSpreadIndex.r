@@ -18,7 +18,7 @@
 #' @param ws Wind Speed (km/h)
 #' @param fbpMod TRUE/FALSE if using the fbp modification at the extreme end
 #' 
-#' @returns ISI - Intial Spread Index
+#' @returns ISI - Initial Spread Index
 #' 
 #' @export InitialSpreadIndex
 InitialSpreadIndex <- function(ffmc, ws, fbpMod=FALSE){
