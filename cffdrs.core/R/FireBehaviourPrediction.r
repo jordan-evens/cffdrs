@@ -266,8 +266,11 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   # C6 has different calculations
   if ("C6" == FUELTYPE)
   {
-    ROS <- FireBehaviourPredictionC6(FUELTYPE, ISI, BUI, FMC, SFC, CBH, option = "ROS")
-    CFB <- FireBehaviourPredictionC6(FUELTYPE, ISI, BUI, FMC, SFC, CBH, option = "CFB")
+    RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+    RSS <- SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)
+    RSC <- CrownRateOfSpreadC6(ISI)
+    CFB <- CrownFractionBurned(RSS, RSO)
+    ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   }
   else
   {

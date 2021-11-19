@@ -101,10 +101,18 @@ RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
       a[FUELTYPE] * ((1 - exp(-b[FUELTYPE] * ISI))**c0[FUELTYPE]) * CF,
     RSI)
   #Calculate C6 separately
-  ROS <- 
-    ifelse(FUELTYPE %in% c("C6"),
-      FireBehaviourPredictionC6(FUELTYPE, ISI, BUI, FMC, SFC, CBH, option = "ROS"),
-      BuildupEffect(FUELTYPE, BUI) * RSI)
+  if ("C6" == FUELTYPE)
+  {
+    RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+    RSS <- SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)
+    RSC <- CrownRateOfSpreadC6(ISI)
+    CFB <- CrownFractionBurned(RSS, RSO)
+    ROS <- RateOfSpreadC6(RSC, RSS, CFB)
+  }
+  else
+  {
+    ROS <- BuildupEffect(FUELTYPE, BUI) * RSI
+  }
   #add a constraint
   ROS <- ifelse(ROS <= 0,0.000001,ROS)
   return(ROS)
