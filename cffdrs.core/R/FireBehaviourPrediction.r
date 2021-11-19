@@ -258,9 +258,9 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   #Calculate or keep Initial Spread Index (ISI)
   ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
   #Calculate the Rate of Spread (ROS), C6 has different calculations
-  ROS <- ifelse(FUELTYPE %in% c("C6"), FireBehaviourPredictionC6(FUELTYPE, ISI, 
-          BUI, FMC, SFC, CBH, option = "ROS"), FireBehaviourPredictionC6(FUELTYPE, 
-          ISI, BUI, FMC, SFC, PC, PDF, CC, CBH))
+  ROS <- ifelse(FUELTYPE %in% c("C6"),
+                FireBehaviourPredictionC6(FUELTYPE, ISI, BUI, FMC, SFC, CBH, option = "ROS"),
+                RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH))
   #Calculate Crown Fraction Burned (CFB), C6 has different calculations
   CFB <- ifelse(FUELTYPE %in% c("C6"), FireBehaviourPredictionC6(FUELTYPE, ISI, 
           BUI, FMC, SFC, CBH, option = "CFB"), ifelse(CFL > 0, 
