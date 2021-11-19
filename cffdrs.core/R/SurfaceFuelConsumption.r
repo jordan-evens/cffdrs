@@ -62,13 +62,23 @@
     #Eq. 23, 24, 25 (FCFDG 1992) - S3 Fuel Type
     return (12.0 * (1 - exp(-0.0166 * BUI)) + 20.0 * (1-exp(-0.0210 * BUI)))
   }
-  result <- list(sfcC1, sfcC2M3M4, sfcC3C4, sfcC3C4, sfcC5C6, sfcC5C6, sfcC7,
-                 sfcD1, sfcM1M2, sfcM1M2, sfcC2M3M4, sfcC2M3M4, sfcO1, sfcO1,
-                 sfcS1, sfcS2, sfcS3)
-  names(result) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7",
-                     "D1", "M1", "M2", "M3", "M4", "O1A", "O1B",
-                     "S1", "S2", "S3")
-  return (result)
+  return(list(C1=sfcC1,
+              C2=sfcC2M3M4,
+              C3=sfcC3C4,
+              C4=sfcC3C4,
+              C5=sfcC5C6,
+              C6=sfcC5C6,
+              C7=sfcC7,
+              D1=sfcD1,
+              M1=sfcM1M2,
+              M2=sfcM1M2,
+              M3=sfcC2M3M4,
+              M4=sfcC2M3M4,
+              O1A=sfcO1,
+              O1B=sfcO1,
+              S1=sfcS1,
+              S2=sfcS2,
+              S3=sfcS3))
 })()
 
 #' Surface Fuel Consumption Calculator

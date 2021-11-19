@@ -14,14 +14,25 @@
     alpha <- 0.115 - 18.8 * (CFB**2.5) * exp(-8* CFB)
     return (alpha)
   }
-  result <- list(a1, a2, a2, a2, a2, a2, a2,
-                 a1, a2, a2, a2, a2, a1, a1,
-                 a1, a1, a1)
-  names(result) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7",
-                     "D1", "M1", "M2", "M3", "M4", "O1A", "O1B",
-                     "S1", "S2", "S3")
-  return (result)
+  return (list(C1=a1,
+               C2=a2,
+               C3=a2,
+               C4=a2,
+               C5=a2,
+               C6=a2,
+               C7=a2,
+               D1=a1,
+               M1=a2,
+               M2=a2,
+               M3=a2,
+               M4=a2,
+               O1A=a1,
+               O1B=a1,
+               S1=a1,
+               S2=a1,
+               S3=a1))
 })()
+
 #' Distance at time t calculator
 #' 
 #' Calculate the Head fire spread distance at time t. In the documentation this 
