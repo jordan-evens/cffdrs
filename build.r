@@ -1,0 +1,8 @@
+library(devtools)
+pkg <- basename(getwd())
+devtools::uninstall()
+devtools::load_all()
+devtools::document(roclets = c('rd', 'collate', 'namespace', 'vignette'))
+file.remove(paste0(pkg, '.pdf'))
+system(paste(shQuote(file.path(R.home("bin"), "R")),"CMD", "Rd2pdf", shQuote(find.package(pkg))))
+devtools::install()
