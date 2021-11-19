@@ -13,22 +13,29 @@
 #' 
 #' @return BE: Build up effect
 #' @export BuildupEffect
-BuildupEffect <- function(FUELTYPE, BUI) {
-
-  #Fuel Type String represenations
-  d <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "D1", "M1", "M2", "M3",
-         "M4","S1", "S2", "S3", "O1A", "O1B")
-  #The average BUI for the fuel type - as referenced by the "d" list above
-  BUIo <- c(72, 64, 62, 66, 56, 62, 106, 32, 50, 50, 50, 50, 38, 63, 31, 01, 
-            01)
-  #Proportion of maximum possible spread rate that is reached at a standard BUI
-  Q <- c(0.9, 0.7, 0.75, 0.8, 0.8, 0.8, 0.85, 0.9, 0.8, 0.8, 0.8, 0.8, 0.75, 
-         0.75, 0.75, 1.0, 1.0)
-  names(BUIo) <- names(Q)<-d
-  
+BuildupEffect <- function(FUELTYPE, BUI)
+{
+  BE <- list(C1=list(BUIo=72, Q=0.9),
+             C2=list(BUIo=64, Q=0.7),
+             C3=list(BUIo=62, Q=0.75),
+             C4=list(BUIo=66, Q=0.8),
+             C5=list(BUIo=56, Q=0.8),
+             C6=list(BUIo=62, Q=0.8),
+             C7=list(BUIo=106, Q=0.85),
+             D1=list(BUIo=32, Q=0.9),
+             M1=list(BUIo=50, Q=0.8),
+             M2=list(BUIo=50, Q=0.8),
+             M3=list(BUIo=50, Q=0.8),
+             M4=list(BUIo=50, Q=0.8),
+             S1=list(BUIo=38, Q=0.75),
+             S2=list(BUIo=63, Q=0.75),
+             S3=list(BUIo=31, Q=0.75),
+             O1A=list(BUIo=01, Q=1.0),
+             O1B=list(BUIo=01, Q=1.0))
+  f <- BE[FUELTYPE][[1]]
   #Eq. 54 (FCFDG 1992) The Buildup Effect
-  BE<- ifelse(BUI > 0 & BUIo[FUELTYPE] > 0,
-    exp(50 * log(Q[FUELTYPE]) * (1 / BUI - 1 / BUIo[FUELTYPE])), 1)
-  
+  BE<- ifelse(BUI > 0 & f$BUIo > 0,
+              exp(50 * log(f$Q) * (1 / BUI - 1 / f$BUIo)),
+              1)
   return(as.numeric(BE))
 }
