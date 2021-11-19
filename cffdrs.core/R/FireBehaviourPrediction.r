@@ -280,7 +280,7 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
                   0)
   }
   #Calculate Total Fuel Consumption (TFC)
-  TFC <- TotalFuelConsumption(FUELTYPE, CFL, CFB, SFC, PC, PDF)
+  TFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF), SFC)
   #Calculate Head Fire Intensity(HFI)
   HFI <- FireIntensity(TFC, ROS)
   #Adjust Crown Fraction Burned
@@ -293,7 +293,7 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   FD <- ifelse(CFB < 0.1, "S", FD)
   FD <- ifelse(CFB >= 0.9, "C", FD)
   #Calculate Crown Fuel Consumption(CFC)
-  CFC <- TotalFuelConsumption(FUELTYPE, CFL, CFB, SFC, PC, PDF, option = "CFC")
+  CFC <- CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF)
   #Calculate the Secondary Outputs
   if (output == "SECONDARY" | output == "ALL" | output == "S" | 
       output == "A") {
@@ -334,9 +334,9 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
     }
     #Calculate Total fuel consumption for the Flank fire, Back fire and at
     #  angle theta
-    FTFC <- TotalFuelConsumption(FUELTYPE, CFL, FCFB, SFC, PC, PDF)
-    BTFC <- TotalFuelConsumption(FUELTYPE, CFL, BCFB, SFC, PC, PDF)
-    TTFC <- TotalFuelConsumption(FUELTYPE, CFL, TCFB, SFC, PC, PDF)
+    FTFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, FCFB, PC, PDF), SFC)
+    BTFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, BCFB, PC, PDF), SFC)
+    TTFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, TCFB, PC, PDF), SFC)
     #Calculate the Fire Intensity at the Flank, Back and at angle theta fire
     FFI <- FireIntensity(FTFC, FROS)
     BFI <- FireIntensity(BTFC, BROS)

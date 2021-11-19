@@ -136,5 +136,39 @@ library(cffdrs.core)
 #' @noRd
 .Slopecalc <- cffdrs.core::SlopeAdjust
 
+#' Total Fuel Consumption calculation
+#' 
+#'   Computes the Total (Surface + Crown) Fuel Consumption by Fuel Type.
+#'   All variables names are laid out in the same manner as FCFDG (1992) or
+#'   Wotton et. al (2009) 
+#'   
+#'   Forestry Canada Fire Danger Group (FCFDG) (1992). "Development and 
+#'   Structure of the Canadian Forest Fire Behavior Prediction System." 
+#'   Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
+#'
+#'   Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to
+#'   the 1992 Canadian forest fire behavior prediction system. Nat. Resour. 
+#'   Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, 
+#'   Canada. Information Report GLC-X-10, 45p.
+#'
+#' @param FUELTYPE The Fire Behaviour Prediction FuelType
+#' @param CFL      Crown Fuel Load (kg/m^2)
+#' @param CFB      Crown Fraction Burned (0-1)
+#' @param SFC      Surface Fuel Consumption (kg/m^2)
+#' @param  PC      Percent Conifer (%)
+#' @param PDF      Percent Dead Balsam Fir (%)
+#' @param option   Type of output (TFC, CFC, default=TFC)
+#' 
+#' @returns TFC Total (Surface + Crown) Fuel Consumption (kg/m^2) OR
+#' CFC Crown Fuel Consumption (kg/m^2)
+#' 
 #' @noRd
-.TFCcalc <- cffdrs.core::TotalFuelConsumption
+.TFCcalc <- function(FUELTYPE, CFL, CFB, SFC, PC, PDF, option = "TFC")
+{
+  CFC <- cffdrs.core::CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF)
+  #Return CFC if requested
+  if (option=="CFC")
+    return(CFC)
+  TFC <- cffdrs.core::TotalFuelConsumption(CFC, SFC)
+  return(TFC)
+}
