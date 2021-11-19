@@ -101,7 +101,7 @@ RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
       a[FUELTYPE] * ((1 - exp(-b[FUELTYPE] * ISI))**c0[FUELTYPE]) * CF,
     RSI)
   #Calculate C6 separately
-  if ("C6" == FUELTYPE)
+  if (FUELTYPE %in% c("C6"))
   {
     RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
     RSS <- SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)

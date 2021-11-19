@@ -250,10 +250,10 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   SLOPE_ADJUST <- SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
                               FMC, SFC, PC, PDF, CC, CBH, ISI)
   #Calculate the net effective windspeed (WSV)
-  WSV0 <- SLOPE_ADJUST["WSV"]
+  WSV0 <- SLOPE_ADJUST$WSV
   WSV <- ifelse(GS > 0 & FFMC > 0, WSV0, WS)
   #Calculate the net effective wind direction (RAZ)
-  RAZ0 <- SLOPE_ADJUST["RAZ"]
+  RAZ0 <- SLOPE_ADJUST$RAZ
   RAZ <- ifelse(GS > 0 & FFMC > 0, RAZ0, WAZ)
   #Calculate or keep Initial Spread Index (ISI)
   ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
@@ -264,7 +264,7 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
   # Calculate the Rate of Spread (ROS) and Crown Fraction Burned (CFB)
   # C6 has different calculations
-  if ("C6" == FUELTYPE)
+  if (FUELTYPE %in% c("C6"))
   {
     RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
     RSS <- SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)
