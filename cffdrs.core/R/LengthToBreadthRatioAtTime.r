@@ -25,9 +25,7 @@
 LengthToBreadthRatioAtTime <- function(FUELTYPE, LB, HR, CFB) {
 
   #Eq. 72 (FCFDG 1992) - alpha constant value, dependent on fuel type
-  alpha <- ifelse(FUELTYPE %in% c("C1", "O1A", "O1B", "S1", "S2", "S3", "D1"),
-              0.115,
-              0.115 - 18.8 * (CFB**2.5) * exp(-8* CFB))  
+  alpha <- .DistanceAtTimeFunctions[FUELTYPE][[1]](CFB)
   #Eq. 81 (Wotton et.al. 2009) - LB at time since ignition
 	LBt <- (LB - 1) * (1 - exp(-alpha * HR)) + 1
   return(LBt)

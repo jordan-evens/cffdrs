@@ -351,14 +351,12 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
     #Calculate the elapsed time to crown fire initiation for Head, Flank, Back
     # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
     # Back and at angle theta used in the *TI equations)
-    a1 <- 0.115 - (18.8 * CFB^2.5 * exp(-8 * CFB))
-    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-a1)
-    a2 <- 0.115 - (18.8 * FCFB^2.5 * exp(-8 * FCFB))
-    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-a2)
-    a3 <- 0.115 - (18.8 * BCFB^2.5 * exp(-8 * BCFB))
-    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-a3)
-    a4 <- 0.115 - (18.8 * TCFB^2.5 * exp(-8 * TCFB))
-    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-a4)
+    # NOTE: old version used non-constant equation for every FUELTYPE
+    fctAlpha <- .DistanceAtTimeFunctions[FUELTYPE][[1]]
+    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-fctAlpha(CFB))
+    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-fctAlpha(FCFB))
+    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-fctAlpha(BCFB))
+    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-fctAlpha(TCFB))
     
     #Fire spread distance for Head, Back, and Flank of fire
     DH <- ifelse(ACCEL == 1, DistanceAtTime(FUELTYPE, ROS, HR, CFB), ROS * HR)
