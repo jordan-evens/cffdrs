@@ -4,7 +4,7 @@
 \alias{CrownRateOfSpreadC6}
 \title{C-6 Crown Fire Spread Calculator}
 \usage{
-CrownRateOfSpreadC6(ISI)
+CrownRateOfSpreadC6(ISI, FMC)
 }
 \arguments{
 \item{ISI}{Initial Spread Index}

@@ -15,7 +15,7 @@
 #' 
 #' @return RSC
 #' @export CrownRateOfSpreadC6
-CrownRateOfSpreadC6 <- function(ISI)
+CrownRateOfSpreadC6 <- function(ISI, FMC)
 {
   #Average foliar moisture effect
   FMEavg <- 0.778                                                                                                                   

@@ -7,6 +7,8 @@
 RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 }
 \arguments{
+\item{FUELTYPE}{The Fire Behaviour Prediction FuelType}
+
 \item{ISI}{Intiial Spread Index}
 
 \item{BUI}{Buildup Index}
@@ -22,8 +24,6 @@ RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 \item{CC}{Constant}
 
 \item{CBH}{Crown to base height(m)}
-
-\item{FUELTYPEThe}{Fire Behaviour Prediction FuelType}
 }
 \value{
 ROS - Rate of Spread (m/min) value

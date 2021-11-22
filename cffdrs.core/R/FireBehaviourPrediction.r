@@ -264,21 +264,20 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
   # Calculate the Rate of Spread (ROS) and Crown Fraction Burned (CFB)
   # C6 has different calculations
-  if (FUELTYPE %in% c("C6"))
-  {
-    RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
-    RSS <- SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)
-    RSC <- CrownRateOfSpreadC6(ISI)
-    CFB <- CrownFractionBurned(RSS, RSO)
-    ROS <- RateOfSpreadC6(RSC, RSS, CFB)
-  }
-  else
-  {
-    ROS <- RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
-    CFB <- ifelse(CFL > 0, 
-                  CrownFractionBurned(ROS, RSO),
-                  0)
-  }
+  # HACK: use ifelse for now to keep old behaviour
+  isC6 <- FUELTYPE %in% c("C6")
+  RSI <- ifelse(isC6, IntermediateSurfaceRateOfSpreadC6(ISI, FMC), rep(0, n0))
+  RSS <- ifelse(isC6, SurfaceRateOfSpreadC6(RSI, BUI), rep(0, n0))
+  RSC <- ifelse(isC6, CrownRateOfSpreadC6(ISI, FMC), rep(0, n0))
+  CFB <- ifelse(isC6, CrownFractionBurned(RSS, RSO), CFB)
+  ROS <- ifelse(isC6,
+                RateOfSpreadC6(RSC, RSS, CFB),
+                RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH))
+  CFB <- ifelse(!isC6,
+                ifelse(CFL > 0,
+                       CrownFractionBurned(ROS, RSO),
+                       0),
+                CFB)
   #Calculate Total Fuel Consumption (TFC)
   TFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF), SFC)
   #Calculate Head Fire Intensity(HFI)

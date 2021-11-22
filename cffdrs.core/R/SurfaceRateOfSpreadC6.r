@@ -17,9 +17,9 @@
 #' 
 #' @return RSS
 #' @export SurfaceRateOfSpreadC6
-SurfaceRateOfSpreadC6 <- function(FUELTYPE, RSI, BUI)
+SurfaceRateOfSpreadC6 <- function(RSI, BUI)
 {
   #Eq. 63 (FCFDG 1992) Surface fire spread rate (m/min)
-  RSS <- RSI * BuildupEffect(FUELTYPE, BUI)
+  RSS <- RSI * BuildupEffect("C6", BUI)
   return (RSS)
 }

@@ -15,7 +15,7 @@
 #' Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, 
 #' Canada. Information Report GLC-X-10, 45p.
 #' 
-#' @param FUELTYPEThe Fire Behaviour Prediction FuelType      
+#' @param FUELTYPE    The Fire Behaviour Prediction FuelType
 #' @param ISI         Intiial Spread Index 
 #' @param BUI         Buildup Index 
 #' @param FMC         Foliar Moisture Content 
@@ -110,18 +110,16 @@ RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
            fuel$a * ((1 - exp(-fuel$b * ISI))**fuel$c0) * CF,
     RSI)
   #Calculate C6 separately
-  if (FUELTYPE %in% c("C6"))
-  {
-    RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
-    RSS <- SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)
-    RSC <- CrownRateOfSpreadC6(ISI)
-    CFB <- CrownFractionBurned(RSS, RSO)
-    ROS <- RateOfSpreadC6(RSC, RSS, CFB)
-  }
-  else
-  {
-    ROS <- BuildupEffect(FUELTYPE, BUI) * RSI
-  }
+  isC6 <- FUELTYPE %in% c("C6")
+  RSI <- ifelse(isC6, IntermediateSurfaceRateOfSpreadC6(ISI, FMC), rep(0, length(ISI)))
+  RSS <- ifelse(isC6, SurfaceRateOfSpreadC6(RSI, BUI), rep(0, length(ISI)))
+  RSC <- ifelse(isC6, CrownRateOfSpreadC6(ISI, FMC), rep(0, length(ISI)))
+  CSI <- ifelse(isC6, CriticalSurfaceIntensity(FMC, CBH), rep(0, length(ISI)))
+  RSO <- ifelse(isC6, CriticalSurfaceRateOfSpread(CSI, SFC), rep(0, length(ISI)))
+  CFB <- ifelse(isC6, CrownFractionBurned(RSS, RSO), rep(0, length(ISI)))
+  ROS <- ifelse(isC6,
+                RateOfSpreadC6(RSC, RSS, CFB),
+                BuildupEffect(FUELTYPE, BUI) * RSI)
   #add a constraint
   ROS <- ifelse(ROS <= 0,0.000001,ROS)
   return(ROS)

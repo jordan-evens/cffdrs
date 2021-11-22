@@ -4,14 +4,14 @@
 \alias{SurfaceRateOfSpreadC6}
 \title{C-6 Conifer Plantation Fire Spread Calculator}
 \usage{
-SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)
+SurfaceRateOfSpreadC6(RSI, BUI)
 }
 \arguments{
-\item{FUELTYPE}{The Fire Behaviour Prediction FuelType}
-
 \item{RSI}{Intermediate Surface Fire Rate of Spread}
 
 \item{BUI}{Buildup Index}
+
+\item{FUELTYPE}{The Fire Behaviour Prediction FuelType}
 }
 \value{
 RSS
