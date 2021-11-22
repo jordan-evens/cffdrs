@@ -32,22 +32,31 @@ RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
 
   #Set up some data vectors
   NoBUI <- rep(-1,length(ISI))
-  d <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "D1", "M1", "M2", "M3", "M4",
-         "S1", "S2", "S3", "O1A", "O1B")
-  a <- c(90, 110, 110, 110, 30, 30, 45, 30, 0, 0, 120, 100, 75, 40, 55, 190, 
-         250)
-  b <- c(0.0649, 0.0282, 0.0444, 0.0293, 0.0697, 0.0800, 0.0305, 0.0232, 0, 0, 
-         0.0572, 0.0404, 0.0297, 0.0438, 0.0829, 0.0310, 0.0350)
-  c0 <- c(4.5, 1.5, 3.0, 1.5, 4.0, 3.0, 2.0, 1.6, 0, 0, 1.4, 1.48, 1.3, 1.7, 
-          3.2, 1.4, 1.7)
-  names(a) <- names(b) <- names(c0) <- d
+  FUELS <- list(C1=list(a=90, b=0.0649, c0=4.5),
+                C2=list(a=110, b=0.0282, c0=1.5),
+                C3=list(a=110, b=0.0444, c0=3.0),
+                C4=list(a=110, b=0.0293, c0=1.5),
+                C5=list(a=30, b=0.0697, c0=4.0),
+                C6=list(a=30, b=0.0800, c0=3.0),
+                C7=list(a=45, b=0.0305, c0=2.0),
+                D1=list(a=30, b=0.0232, c0=1.6),
+                M1=list(a=0, b=0, c0=0),
+                M2=list(a=0, b=0, c0=0),
+                M3=list(a=120, b=0.0572, c0=1.4),
+                M4=list(a=100, b=0.0404, c0=1.48),
+                S1=list(a=75, b=0.0297, c0=1.3),
+                S2=list(a=40, b=0.0438, c0=1.7),
+                S3=list(a=55, b=0.0829, c0=3.2),
+                O1A=list(a=190, b=0.0310, c0=1.4),
+                O1B=list(a=250, b=0.0350, c0=1.7))
+  fuel <- FUELS[FUELTYPE][[1]]
 
   #Calculate RSI (set up data vectors first)
   #Eq. 26 (FCFDG 1992) - Initial Rate of Spread for Conifer and Slash types
   RSI <- rep(-1,length(ISI))
   RSI <- ifelse(FUELTYPE %in% c("C1", "C2", "C3", "C4", "C5", "C7", "D1", "S1", 
                                 "S2", "S3"),
-          as.numeric(a[FUELTYPE] * (1 - exp(-b[FUELTYPE] * ISI))**c0[FUELTYPE]),
+          as.numeric(fuel$a * (1 - exp(-fuel$b * ISI))**fuel$c0),
           RSI)
   #Eq. 27 (FCFDG 1992) - Initial Rate of Spread for M1 Mixedwood type
   RSI <- ifelse(FUELTYPE %in% c("M1"), 
@@ -68,7 +77,7 @@ RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
   #Eq. 30 (Wotton et. al 2009)
   RSI_m3 <- 
     ifelse(FUELTYPE %in% c("M3"), 
-      as.numeric(a[["M3"]] * ((1 - exp(-b[["M3"]] * ISI))**c0[["M3"]])), RSI_m3)
+      as.numeric(fuel$a * ((1 - exp(-fuel$b * ISI))**fuel$c0)), RSI_m3)
   #Eq. 29 (Wotton et. al 2009)
   RSI <- 
     ifelse(FUELTYPE %in% c("M3"),
@@ -80,7 +89,7 @@ RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
   #Eq. 30 (Wotton et. al 2009)  
   RSI_m4 <- 
     ifelse(FUELTYPE %in% c("M4"), 
-      as.numeric(a[["M4"]] * ((1 - exp(-b[["M4"]] * ISI))**c0[["M4"]])), RSI_m4)
+      as.numeric(fuel$a * ((1 - exp(-fuel$b * ISI))**fuel$c0)), RSI_m4)
   #Eq. 33 (Wotton et. al 2009)
   RSI <- 
     ifelse(FUELTYPE %in% c("M4"),
@@ -98,7 +107,7 @@ RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
   #Eq. 36 (FCFDG 1992) - Calculate Initial Rate of Spread for Grass
   RSI <- 
     ifelse(FUELTYPE %in% c("O1A", "O1B"),
-      a[FUELTYPE] * ((1 - exp(-b[FUELTYPE] * ISI))**c0[FUELTYPE]) * CF,
+           fuel$a * ((1 - exp(-fuel$b * ISI))**fuel$c0) * CF,
     RSI)
   #Calculate C6 separately
   if (FUELTYPE %in% c("C6"))
