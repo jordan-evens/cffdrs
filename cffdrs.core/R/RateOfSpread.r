@@ -21,7 +21,7 @@
   rsiBase <- function(fuel, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   {
     #Eq. 26 (FCFDG 1992) - Initial Rate of Spread for Conifer and Slash types
-    return(as.numeric(fuel$a * (1 - exp(-fuel$b * ISI))**fuel$c0))
+    return(fuel$a * (1 - exp(-fuel$b * ISI))**fuel$c0)
   }
   rsiM1 <- function(fuel, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   {
@@ -44,7 +44,7 @@
     NoBUI <- rep(-1, length(ISI))
     #Initial Rate of Spread for M3 Mixedwood
     #Eq. 30 (Wotton et. al 2009)
-    RSI_m3 <- as.numeric(fuel$a * ((1 - exp(-fuel$b * ISI)) ** fuel$c0))
+    RSI_m3 <- fuel$a * ((1 - exp(-fuel$b * ISI)) ** fuel$c0)
     #Eq. 29 (Wotton et. al 2009)
     RSI <- PDF / 100 * RSI_m3
       + (1 - PDF / 100) * .RateOfSpreadFunctions[["D1"]](ISI, NoBUI, FMC, SFC, PC, PDF, CC, CBH)
@@ -55,7 +55,7 @@
     NoBUI <- rep(-1, length(ISI))
     #Initial Rate of Spread for M4 Mixedwood
     #Eq. 30 (Wotton et. al 2009)
-    RSI_m4 <- as.numeric(fuel$a * ((1 - exp(-fuel$b * ISI))**fuel$c0))
+    RSI_m4 <- fuel$a * ((1 - exp(-fuel$b * ISI))**fuel$c0)
     #Eq. 33 (Wotton et. al 2009)
     RSI <- PDF / 100* RSI_m4
       + 0.2 * (1 - PDF / 100)* .RateOfSpreadFunctions[["D1"]](ISI, NoBUI, FMC, SFC, PC, PDF, CC,CBH)
@@ -143,14 +143,14 @@
 RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   {
     ROS <- (.RateOfSpreadFunctions[[FUELTYPE]](
-      as.numeric(ISI),
-      as.numeric(BUI),
-      as.numeric(FMC),
-      as.numeric(SFC),
-      as.numeric(PC),
-      as.numeric(PDF),
-      as.numeric(CC),
-      as.numeric(CBH)))
+      ISI,
+      BUI,
+      FMC,
+      SFC,
+      PC,
+      PDF,
+      CC,
+      CBH))
   #add a constraint
   ROS <- ifelse(ROS <= 0,0.000001,ROS)
   return(ROS)

@@ -108,10 +108,10 @@
 SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
 {
     SFC <- (.SurfaceFuelConsumptionFunctions[[FUELTYPE]](
-      as.numeric(FFMC),
-      as.numeric(BUI),
-      as.numeric(PC),
-      as.numeric(GFL)))
+      FFMC,
+      BUI,
+      PC,
+      GFL))
     SFC <- ifelse(SFC <= 0, 0.000001, SFC)
     return(SFC)
 })

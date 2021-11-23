@@ -68,8 +68,8 @@
 CrownFuelConsumption <- Vectorize(function(FUELTYPE, CFL, CFB, PC, PDF)
 {
   return(.CrownFuelConsumptionFunctions[[FUELTYPE]](
-    as.numeric(CFL),
-    as.numeric(CFB),
-    as.numeric(PC),
-    as.numeric(PDF)))
+    CFL,
+    CFB,
+    PC,
+    PDF))
 })

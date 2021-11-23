@@ -34,8 +34,8 @@ BuildupEffect <- Vectorize(function(FUELTYPE, BUI)
 {
   f <- .BuildupEffectCoefficients[[FUELTYPE]]
   #Eq. 54 (FCFDG 1992) The Buildup Effect
-  BE<- ifelse(as.numeric(BUI) > 0 & f$BUIo > 0,
-              exp(50 * log(f$Q) * (1 / as.numeric(BUI) - 1 / f$BUIo)),
+  BE<- ifelse(BUI > 0 & f$BUIo > 0,
+              exp(50 * log(f$Q) * (1 / BUI - 1 / f$BUIo)),
               1)
-  return(as.numeric(BE))
+  return(BE)
 })
