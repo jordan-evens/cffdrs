@@ -20,7 +20,7 @@
 RateOfSpreadAtTime <- function(FUELTYPE, ROSeq, HR, CFB){
 
   #Eq. 72 - alpha constant value, dependent on fuel type
-  alpha <- .DistanceAtTimeFunctions[FUELTYPE][[1]](CFB)
+  alpha <- .DistanceAtTimeFunctions[[FUELTYPE]](CFB)
   #Eq. 70 - Rate of Spread at time since ignition
   ROSt <- ROSeq * (1 - exp(-alpha * HR))
   return(ROSt)

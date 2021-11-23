@@ -15,7 +15,7 @@
 #' @export BuildupEffect
 BuildupEffect <- function(FUELTYPE, BUI)
 {
-  BE <- list(C1=list(BUIo=72, Q=0.9),
+  coeffsBE <- list(C1=list(BUIo=72, Q=0.9),
              C2=list(BUIo=64, Q=0.7),
              C3=list(BUIo=62, Q=0.75),
              C4=list(BUIo=66, Q=0.8),
@@ -32,10 +32,15 @@ BuildupEffect <- function(FUELTYPE, BUI)
              S3=list(BUIo=31, Q=0.75),
              O1A=list(BUIo=01, Q=1.0),
              O1B=list(BUIo=01, Q=1.0))
-  f <- BE[FUELTYPE][[1]]
-  #Eq. 54 (FCFDG 1992) The Buildup Effect
-  BE<- ifelse(BUI > 0 & f$BUIo > 0,
-              exp(50 * log(f$Q) * (1 / BUI - 1 / f$BUIo)),
-              1)
+  fct <- function(v)
+  {
+    f <- coeffsBE[[v["FUELTYPE"]]]
+    #Eq. 54 (FCFDG 1992) The Buildup Effect
+    BE<- ifelse(as.numeric(v["BUI"]) > 0 & f$BUIo > 0,
+                exp(50 * log(f$Q) * (1 / as.numeric(v["BUI"]) - 1 / f$BUIo)),
+                1)
+    return(BE)
+  }
+  BE <- apply(data.frame(FUELTYPE, BUI), MARGIN=1, FUN=fct)
   return(as.numeric(BE))
 }

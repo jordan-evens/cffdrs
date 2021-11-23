@@ -351,7 +351,7 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
     # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
     # Back and at angle theta used in the *TI equations)
     # NOTE: old version used non-constant equation for every FUELTYPE
-    fctAlpha <- .DistanceAtTimeFunctions[FUELTYPE][[1]]
+    fctAlpha <- .DistanceAtTimeFunctions[[FUELTYPE]]
     TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-fctAlpha(CFB))
     FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-fctAlpha(FCFB))
     BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-fctAlpha(BCFB))

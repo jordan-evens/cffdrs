@@ -67,6 +67,14 @@
 #' @export TotalFuelConsumption
 CrownFuelConsumption <- function(FUELTYPE, CFL, CFB, PC, PDF)
 {
-  CFC <- .CrownFuelConsumptionFunctions[FUELTYPE][[1]](CFL, CFB, PC, PDF)
+  fct <- function(v)
+  {
+    return(.CrownFuelConsumptionFunctions[[v["FUELTYPE"]]](
+      as.numeric(v["CFL"]),
+      as.numeric(v["CFB"]),
+      as.numeric(v["PC"]),
+      as.numeric(v["PDF"])))
+  }
+  CFC <- apply(data.frame(FUELTYPE, CFL, CFB, PC, PDF), MARGIN=1, FUN=fct)
   return (CFC)
 }
