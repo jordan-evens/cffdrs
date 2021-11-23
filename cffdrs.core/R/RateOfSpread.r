@@ -140,22 +140,18 @@
 #' @returns ROS - Rate of Spread (m/min) value
 #' 
 #' @export RateOfSpread
-RateOfSpread <- function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH){
-  fct <- function(v)
+RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   {
-    return(.RateOfSpreadFunctions[[v["FUELTYPE"]]](
-      as.numeric(v["ISI"]),
-      as.numeric(v["BUI"]),
-      as.numeric(v["FMC"]),
-      as.numeric(v["SFC"]),
-      as.numeric(v["PC"]),
-      as.numeric(v["PDF"]),
-      as.numeric(v["CC"]),
-      as.numeric(v["CBH"])))
-  }
-  ROS <- apply(data.frame(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH), MARGIN=1, FUN=fct)
-  stopifnot(length(ROS) == length(ISI))
+    ROS <- (.RateOfSpreadFunctions[[FUELTYPE]](
+      as.numeric(ISI),
+      as.numeric(BUI),
+      as.numeric(FMC),
+      as.numeric(SFC),
+      as.numeric(PC),
+      as.numeric(PDF),
+      as.numeric(CC),
+      as.numeric(CBH)))
   #add a constraint
   ROS <- ifelse(ROS <= 0,0.000001,ROS)
   return(ROS)
-}
+})

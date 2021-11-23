@@ -65,16 +65,11 @@
 #' @returns CFC Crown Fuel Consumption (kg/m^2)
 #' 
 #' @export TotalFuelConsumption
-CrownFuelConsumption <- function(FUELTYPE, CFL, CFB, PC, PDF)
+CrownFuelConsumption <- Vectorize(function(FUELTYPE, CFL, CFB, PC, PDF)
 {
-  fct <- function(v)
-  {
-    return(.CrownFuelConsumptionFunctions[[v["FUELTYPE"]]](
-      as.numeric(v["CFL"]),
-      as.numeric(v["CFB"]),
-      as.numeric(v["PC"]),
-      as.numeric(v["PDF"])))
-  }
-  CFC <- apply(data.frame(FUELTYPE, CFL, CFB, PC, PDF), MARGIN=1, FUN=fct)
-  return (CFC)
-}
+  return(.CrownFuelConsumptionFunctions[[FUELTYPE]](
+    as.numeric(CFL),
+    as.numeric(CFB),
+    as.numeric(PC),
+    as.numeric(PDF)))
+})

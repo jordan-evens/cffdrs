@@ -105,17 +105,13 @@
 #' @returns   SFC Surface Fuel Consumption (kg/m^2)
 #' 
 #' @export SurfaceFuelConsumption
-SurfaceFuelConsumption <- function(FUELTYPE, FFMC, BUI, PC, GFL) {
-  fct <- function(v)
-  {
-    return(.SurfaceFuelConsumptionFunctions[[v["FUELTYPE"]]](
-      as.numeric(v["FFMC"]),
-      as.numeric(v["BUI"]),
-      as.numeric(v["PC"]),
-      as.numeric(v["GFL"])))
-  }
-  SFC <- apply(data.frame(FUELTYPE, FFMC, BUI, PC, GFL), MARGIN=1, FUN=fct)
-  #Constrain SFC value
-  SFC <- ifelse(SFC <= 0, 0.000001, SFC)
-  return(SFC)
-}
+SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
+{
+    SFC <- (.SurfaceFuelConsumptionFunctions[[FUELTYPE]](
+      as.numeric(FFMC),
+      as.numeric(BUI),
+      as.numeric(PC),
+      as.numeric(GFL)))
+    SFC <- ifelse(SFC <= 0, 0.000001, SFC)
+    return(SFC)
+})
