@@ -17,11 +17,18 @@
 #' @returns ROSt - Rate of Spread at time since ignition value
 #' 
 #' @export RateOfSpreadAtTime
-RateOfSpreadAtTime <- Vectorize(function(FUELTYPE, ROSeq, HR, CFB){
-
-  #Eq. 72 - alpha constant value, dependent on fuel type
-  alpha <- .DistanceAtTimeFunctions[[FUELTYPE]](CFB)
-  #Eq. 70 - Rate of Spread at time since ignition
-  ROSt <- ROSeq * (1 - exp(-alpha * HR))
-  return(ROSt)
+RateOfSpreadAtTime <- Vectorize(function(FUELTYPE, ROSeq, HR, CFB)
+{
+  return(.RateOfSpreadAtTime(FUELS[[FUELTYPE]], ROSeq, HR, CFB))
 })
+setMethod(".RateOfSpreadAtTime",
+          "Fuel",
+          function(this, ROSeq, HR, CFB)
+          {
+            #Eq. 72 - alpha constant value, dependent on fuel type
+            alpha <- .Alpha(this, CFB)
+            #Eq. 70 - Rate of Spread at time since ignition
+            ROSt <- ROSeq * (1 - exp(-alpha * HR))
+            return(ROSt)
+          }
+)

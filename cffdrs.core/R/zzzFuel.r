@@ -4,11 +4,21 @@ makeFuel <- function(FUELTYPE)
              name=FUELTYPE,
              a=.FUELS[[FUELTYPE]]$a,
              b=.FUELS[[FUELTYPE]]$b,
-             c0=.FUELS[[FUELTYPE]]$c0
+             c0=.FUELS[[FUELTYPE]]$c0,
+             BUIo=.FUELS[[FUELTYPE]]$BUIo,
+             Q=.FUELS[[FUELTYPE]]$Q,
+             sfcA=.FUELS[[FUELTYPE]]$sfcA,
+             sfcB=.FUELS[[FUELTYPE]]$sfcB,
+             sfcC=.FUELS[[FUELTYPE]]$sfcC,
+             sfcD=.FUELS[[FUELTYPE]]$sfcD,
+             CBH=.FUELS[[FUELTYPE]]$CBH,
+             CFL=.FUELS[[FUELTYPE]]$CFL
   ))
 }
 
-FUELS <- list(C1=makeFuel("C1"),
+FUELS <- list(NF=new(".FuelNF", name="NF"),
+              WA=new(".FuelNF", name="WA"),
+              C1=makeFuel("C1"),
               C2=makeFuel("C2"),
               C3=makeFuel("C3"),
               C4=makeFuel("C4"),

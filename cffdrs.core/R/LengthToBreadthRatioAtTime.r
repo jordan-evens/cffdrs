@@ -24,9 +24,16 @@
 #' @export LengthToBreadthRatioAtTime
 LengthToBreadthRatioAtTime <- Vectorize(function(FUELTYPE, LB, HR, CFB)
 {
-  #Eq. 72 (FCFDG 1992) - alpha constant value, dependent on fuel type
-  alpha <- .DistanceAtTimeFunctions[[FUELTYPE]](CFB)
-  #Eq. 81 (Wotton et.al. 2009) - LB at time since ignition
-	LBt <- (LB - 1) * (1 - exp(-alpha * HR)) + 1
-  return(LBt)
+  return(.LengthToBreadthRatioAtTime(FUELS[[FUELTYPE]], LB, HR, CFB))
 })
+setMethod(".LengthToBreadthRatioAtTime",
+          "Fuel",
+          function(this, LB, HR, CFB)
+          {
+            #Eq. 72 (FCFDG 1992) - alpha constant value, dependent on fuel type
+            alpha <- .Alpha(this, CFB)
+            #Eq. 81 (Wotton et.al. 2009) - LB at time since ignition
+            LBt <- (LB - 1) * (1 - exp(-alpha * HR)) + 1
+            return(LBt)
+          }
+)
