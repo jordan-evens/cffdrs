@@ -37,13 +37,12 @@ fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, C
   ############################################################################
   #                         END
   ############################################################################
-  
+  fuel <- FUELS[[FUELTYPE]]
   #Calculate Surface fuel consumption (SFC)
-  SFC <- SurfaceFuelConsumption(FUELTYPE, FFMC, BUI, PC, GFL)
+  SFC <- .SurfaceFuelConsumption(fuel, FFMC, BUI, PC, GFL)
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
-  SLOPE_ADJUST <- SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
-                              FMC, SFC, PC, PDF, CC, CBH, ISI)
+  SLOPE_ADJUST <- .SlopeAdjust(fuel, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
   #Calculate the net effective windspeed (WSV)
   WSV0 <- SLOPE_ADJUST$WSV
   WSV <- ifelse(GS > 0 & FFMC > 0, WSV0, WS)
@@ -87,19 +86,19 @@ fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, C
   FD <- ifelse(CFB < 0.1, "S", FD)
   FD <- ifelse(CFB >= 0.9, "C", FD)
   #Calculate Crown Fuel Consumption(CFC)
-  CFC <- CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF)
+  CFC <- .CrownFuelConsumption(fuel, CFL, CFB, PC, PDF)
   #Calculate the Secondary Outputs
   if (output == "SECONDARY" | output == "ALL" | output == "S" | 
       output == "A") {
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     SF <- ifelse(GS >= 70, 10, exp(3.533 * (GS/100)^1.2))
     #Calculate The Buildup Effect
-    BE <- BuildupEffect(FUELTYPE, BUI)
+    BE <- .BuildupEffect(fuel, BUI)
     #Calculate length to breadth ratio
-    LB <- LengthToBreadthRatio(FUELTYPE, WSV)
-    LBt <- ifelse(ACCEL == 0, LB, LengthToBreadthRatioAtTime(FUELTYPE, LB, HR, CFB))
+    LB <- .LengthToBreadthRatio(fuel, WSV)
+    LBt <- ifelse(ACCEL == 0, LB, .LengthToBreadthRatioAtTime(fuel, LB, HR, CFB))
     #Calculate Back fire rate of spread (BROS)
-    BROS <- BackRateOfSpread(FUELTYPE, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
+    BROS <- .BackRateOfSpread(fuel, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
     #Calculate Flank fire rate of spread (FROS) 
     FROS <- FlankRateOfSpread(ROS, BROS, LB)
     #Calculate the eccentricity  
@@ -108,8 +107,8 @@ fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, C
     TROS <- ROS * (1 - E)/(1 - E * cos(THETA - RAZ))
     #Calculate rate of spread at time t for Flank, Back of fire and at angle 
     #  theta.
-    ROSt <- ifelse(ACCEL == 0, ROS, RateOfSpreadAtTime(FUELTYPE, ROS, HR, CFB))
-    BROSt <- ifelse(ACCEL == 0, BROS, RateOfSpreadAtTime(FUELTYPE, BROS, HR, CFB))
+    ROSt <- ifelse(ACCEL == 0, ROS, .RateOfSpreadAtTime(fuel, ROS, HR, CFB))
+    BROSt <- ifelse(ACCEL == 0, BROS, .RateOfSpreadAtTime(fuel, BROS, HR, CFB))
     FROSt <- ifelse(ACCEL == 0, FROS, FlankRateOfSpread(ROSt, BROSt, LBt))
     #Calculate rate of spread towards angle theta at time t (TROSt)
     TROSt <- ifelse(ACCEL == 0, TROS, 
@@ -128,9 +127,9 @@ fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, C
     }
     #Calculate Total fuel consumption for the Flank fire, Back fire and at
     #  angle theta
-    FTFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, FCFB, PC, PDF), SFC)
-    BTFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, BCFB, PC, PDF), SFC)
-    TTFC <- TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, TCFB, PC, PDF), SFC)
+    FTFC <- TotalFuelConsumption(.CrownFuelConsumption(fuel, CFL, FCFB, PC, PDF), SFC)
+    BTFC <- TotalFuelConsumption(.CrownFuelConsumption(fuel, CFL, BCFB, PC, PDF), SFC)
+    TTFC <- TotalFuelConsumption(.CrownFuelConsumption(fuel, CFL, TCFB, PC, PDF), SFC)
     #Calculate the Fire Intensity at the Flank, Back and at angle theta fire
     FFI <- FireIntensity(FTFC, FROS)
     BFI <- FireIntensity(BTFC, BROS)

@@ -64,7 +64,7 @@
 #' 
 #' @returns CFC Crown Fuel Consumption (kg/m^2)
 #' 
-#' @export TotalFuelConsumption
+#' @export CrownFuelConsumption
 CrownFuelConsumption <- Vectorize(function(FUELTYPE, CFL, CFB, PC, PDF)
 {
   return(.CrownFuelConsumptionFunctions[[FUELTYPE]](
