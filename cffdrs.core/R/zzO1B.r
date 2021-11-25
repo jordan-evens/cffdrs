@@ -16,3 +16,4 @@
 {
   return(SlopeAdjust("O1B", FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
 }
+.O1B$SlopeAdjust <- .SlopeAdjust..O1B

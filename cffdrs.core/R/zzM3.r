@@ -27,3 +27,5 @@
 {
   return(SlopeAdjust("M3", FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
 }
+.M3$RateOfSpread <- .RateOfSpread..M3
+.M3$SlopeAdjust <- .SlopeAdjust..M3

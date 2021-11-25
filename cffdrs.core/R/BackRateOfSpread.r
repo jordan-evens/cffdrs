@@ -24,7 +24,6 @@ BackRateOfSpread <- function(FUELTYPE, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CB
 {
   return(.BackRateOfSpread(FUELS[[FUELTYPE]], FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH))
 }
-
 .BackRateOfSpread.Fuel <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Eq. 46 (FCFDG 1992)
@@ -40,6 +39,7 @@ BackRateOfSpread <- function(FUELTYPE, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CB
   BISI <- 0.208 * BfW * fF
   #Eq. 77 (FCFDG 1992)
   #Calculate final Back fire spread rate
-  BROS <- .RateOfSpread(this, BISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+  BROS <- this$RateOfSpread(this, BISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   return(BROS)
 }
+Fuel$BackRateOfSpread <- .BackRateOfSpread.Fuel

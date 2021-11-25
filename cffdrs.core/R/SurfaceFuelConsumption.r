@@ -53,3 +53,7 @@ SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
   return (this[["sfcA"]] * (1 - exp(this[["sfcB"]] * BUI))
           + this[["sfcC"]] * (1 - exp(this[["sfcD"]] * BUI)))
 }
+Fuel$SurfaceFuelConsumption <- .SurfaceFuelConsumption.Fuel
+.FuelMixedwood$SurfaceFuelConsumption <- .SurfaceFuelConsumption..FuelMixedwood
+.FuelGrass$SurfaceFuelConsumption <- .SurfaceFuelConsumption..FuelGrass
+.FuelSlash$SurfaceFuelConsumption <- .SurfaceFuelConsumption..FuelSlash

@@ -75,3 +75,35 @@
   }
   return(list(FBP))
 }
+.FuelNF$Alpha <- .Alpha..FuelNF
+.FuelNF$BackRateOfSpread <- .BackRateOfSpread..FuelNF
+.FuelNF$BuildupEffect <- .BuildupEffect..FuelNF
+.FuelNF$CriticalSurfaceIntensity <- .CriticalSurfaceIntensity..FuelNF
+.FuelNF$CrownBaseHeight <- .CrownBaseHeight..FuelNF
+.FuelNF$CrownFuelConsumption <- .CrownFuelConsumption..FuelNF
+.FuelNF$DistanceAtTime <- .DistanceAtTime..FuelNF
+.FuelNF$FireBehaviourPrediction <- .FireBehaviourPrediction..FuelNF
+.FuelNF$FoliarMoistureContent <- .FoliarMoistureContent..FuelNF
+.FuelNF$LengthToBreadthRatio <- .LengthToBreadthRatio..FuelNF
+.FuelNF$LengthToBreadthRatioAtTime <- .LengthToBreadthRatioAtTime..FuelNF
+.FuelNF$RateOfSpread <- .RateOfSpread..FuelNF
+.FuelNF$RateOfSpreadAtTime <- .RateOfSpreadAtTime..FuelNF
+.FuelNF$SlopeAdjust <- .SlopeAdjust..FuelNF
+.FuelNF$SurfaceFuelConsumption <- .SurfaceFuelConsumption..FuelNF
+.FuelNF$FireBehaviourPrediction <- .FireBehaviourPrediction..FuelNF
+.FuelWA$Alpha <- .Alpha..FuelNF
+.FuelWA$BackRateOfSpread <- .BackRateOfSpread..FuelNF
+.FuelWA$BuildupEffect <- .BuildupEffect..FuelNF
+.FuelWA$CriticalSurfaceIntensity <- .CriticalSurfaceIntensity..FuelNF
+.FuelWA$CrownBaseHeight <- .CrownBaseHeight..FuelNF
+.FuelWA$CrownFuelConsumption <- .CrownFuelConsumption..FuelNF
+.FuelWA$DistanceAtTime <- .DistanceAtTime..FuelNF
+.FuelWA$FireBehaviourPrediction <- .FireBehaviourPrediction..FuelNF
+.FuelWA$FoliarMoistureContent <- .FoliarMoistureContent..FuelNF
+.FuelWA$LengthToBreadthRatio <- .LengthToBreadthRatio..FuelNF
+.FuelWA$LengthToBreadthRatioAtTime <- .LengthToBreadthRatioAtTime..FuelNF
+.FuelWA$RateOfSpread <- .RateOfSpread..FuelNF
+.FuelWA$RateOfSpreadAtTime <- .RateOfSpreadAtTime..FuelNF
+.FuelWA$SlopeAdjust <- .SlopeAdjust..FuelNF
+.FuelWA$SurfaceFuelConsumption <- .SurfaceFuelConsumption..FuelNF
+.FuelWA$FireBehaviourPrediction <- .FireBehaviourPrediction..FuelNF

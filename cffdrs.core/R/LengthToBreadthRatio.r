@@ -38,3 +38,5 @@ LengthToBreadthRatio <- function(FUELTYPE, WSV)
                 1.1 * (WSV**0.464),
                 1.0))
 }
+Fuel$LengthToBreadthRatio <- .LengthToBreadthRatio.Fuel
+.FuelGrass$LengthToBreadthRatio <- .LengthToBreadthRatio..FuelGrass

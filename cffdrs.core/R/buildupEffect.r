@@ -17,7 +17,6 @@ BuildupEffect <- Vectorize(function(FUELTYPE, BUI)
 {
   return(.BuildupEffect(FUELS[[FUELTYPE]], BUI))
 })
-
 .BuildupEffect.Fuel <- function(this, BUI)
 {
   #Eq. 54 (FCFDG 1992) The Buildup Effect
@@ -26,3 +25,4 @@ BuildupEffect <- Vectorize(function(FUELTYPE, BUI)
               1)
   return(BE)
 }
+Fuel$BuildupEffect <- .BuildupEffect.Fuel

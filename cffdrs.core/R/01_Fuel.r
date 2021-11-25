@@ -1,4 +1,4 @@
-.FuelBase <- structure(.Data=c(name=".FuelBase"), class=(".FuelBase"))
+.FuelBase <- structure(.Data=list(name=".FuelBase"), class=(".FuelBase"))
 .Alpha <- function(this, ...) UseMethod(".Alpha", this)
 .BackRateOfSpread <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH) UseMethod(".BackRateOfSpread", this)
 .BuildupEffect <- function(this, BUI) UseMethod(".BuildupEffect", this)
@@ -43,8 +43,8 @@ Fuel <- structure(.Data=list(
 {
   return(FoliarMoistureContent(LAT, LONG, ELV, DJ, D0))
 }
-.FuelClosed <- structure(.Data=c(name=".FuelClosed"), class=c(".FuelClosed", "Fuel", ".FuelBase"))
-.FuelOpen <- structure(.Data=c(name=".FuelOpen"), class=c(".FuelOpen", "Fuel", ".FuelBase"))
+.FuelClosed <- structure(.Data=list(name=".FuelClosed"), class=c(".FuelClosed", "Fuel", ".FuelBase"))
+.FuelOpen <- structure(.Data=list(name=".FuelOpen"), class=c(".FuelOpen", "Fuel", ".FuelBase"))
 
 .Alpha..FuelClosed <- function(this, CBH)
 {
@@ -60,12 +60,18 @@ Fuel <- structure(.Data=list(
   alpha <- 0.115
   return (alpha)
 }
-.FoliarMoistureContent.FuelOpen <- function(this, LAT, LONG, ELV, DJ, D0)
+.FoliarMoistureContent..FuelOpen <- function(this, LAT, LONG, ELV, DJ, D0)
 {
   return(0)
 }
 
-.FuelGrass <- structure(.Data=c(name=".FuelGrass"), class=c(".FuelGrass", ".FuelOpen", "Fuel", ".FuelBase"))
-.FuelSlash <- structure(.Data=c(name=".FuelSlash"), class=c(".FuelSlash", ".FuelOpen", "Fuel", ".FuelBase"))
-.FuelMixedwood <- structure(.Data=c(name=".FuelMixedwood"), class=c(".FuelMixedwood", ".FuelClosed", "Fuel", ".FuelBase"))
-.FuelMixedDead <- structure(.Data=c(name=".FuelMixedDead"), class=c(".FuelMixedDead", ".FuelClosed", "Fuel", ".FuelBase"))
+.FuelGrass <- structure(.Data=list(name=".FuelGrass"), class=c(".FuelGrass", ".FuelOpen", "Fuel", ".FuelBase"))
+.FuelSlash <- structure(.Data=list(name=".FuelSlash"), class=c(".FuelSlash", ".FuelOpen", "Fuel", ".FuelBase"))
+.FuelMixedwood <- structure(.Data=list(name=".FuelMixedwood"), class=c(".FuelMixedwood", ".FuelClosed", "Fuel", ".FuelBase"))
+.FuelMixedDead <- structure(.Data=list(name=".FuelMixedDead"), class=c(".FuelMixedDead", ".FuelClosed", "Fuel", ".FuelBase"))
+
+Fuel$CrownBaseHeight <- .CrownBaseHeight.Fuel
+Fuel$FoliarMoistureContent <- .FoliarMoistureContent.Fuel
+.FuelClosed$Alpha <- .Alpha..FuelClosed
+.FuelOpen$Alpha <- .Alpha..FuelOpen
+.FuelOpen$FoliarMoistureContent <- .FoliarMoistureContent..FuelOpen

@@ -24,3 +24,5 @@
                  0) + 1.5 * (1 - exp(-0.0201 * BUI)))
   
 }
+.C7$SlopeAdjust <- .SlopeAdjust..C7
+.C7$SurfaceFuelConsumption <- .SurfaceFuelConsumption..C7
