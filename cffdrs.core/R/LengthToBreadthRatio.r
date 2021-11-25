@@ -20,27 +20,21 @@
 #' @returns Length to Breadth ratio value
 #' 
 #' @export LengthToBreadthRatio
-LengthToBreadthRatio <- function(FUELTYPE, WSV) {
-  
+LengthToBreadthRatio <- function(FUELTYPE, WSV)
+{
   return(.LengthToBreadthRatio(FUELS[[FUELTYPE]], WSV))
 }
-setMethod(".LengthToBreadthRatio",
-          "Fuel",
-          function(this, WSV)
-          {
-            #Eq. 79
-            return(1.0 + 8.729 * (1-exp(-0.030 * WSV))**(2.155))
-          }
-          )
-setMethod(".LengthToBreadthRatio",
-          ".FuelGrass",
-          function(this, WSV)
-          {
-            #Correction to orginal Equation 80 is made here
-            #Eq. 80a / 80b from Wotton 2009
-            #Eq. 80/81
-            return(ifelse(WSV >= 1.0,
-                          1.1 * (WSV**0.464),
-                          1.0))
-          }
-)
+.LengthToBreadthRatio.Fuel <- function(this, WSV)
+{
+  #Eq. 79
+  return(1.0 + 8.729 * (1-exp(-0.030 * WSV))**(2.155))
+}
+.LengthToBreadthRatio..FuelGrass <- function(this, WSV)
+{
+  #Correction to orginal Equation 80 is made here
+  #Eq. 80a / 80b from Wotton 2009
+  #Eq. 80/81
+  return(ifelse(WSV >= 1.0,
+                1.1 * (WSV**0.464),
+                1.0))
+}

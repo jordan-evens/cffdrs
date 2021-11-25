@@ -27,34 +27,25 @@ CrownFuelConsumption <- Vectorize(function(FUELTYPE, CFL, CFB, PC, PDF)
   return(.CrownFuelConsumption(FUELS[[FUELTYPE]], CFL, CFB, PC, PDF))
 })
 
-setMethod(".CrownFuelConsumption",
-          "Fuel",
-          function(this, CFL, CFB, PC, PDF)
-          {
-            #Eq. 66a (Wotton 2009) - Crown Fuel Consumption (CFC)
-            CFC <- CFL * CFB
-            return (CFC)
-          }
-)
-setMethod(".CrownFuelConsumption",
-          ".FuelMixedwood",
-          function(this, CFL, CFB, PC, PDF)
-          {
-            #Eq. 66a (Wotton 2009) - Crown Fuel Consumption (CFC)
-            CFC <- CFL * CFB
-            #Eq. 66b (Wotton 2009) - CFC for M1/M2 types
-            CFC <- PC / 100 * CFC
-            return (CFC)
-          }
-)
-setMethod(".CrownFuelConsumption",
-          ".FuelMixedDead",
-          function(this, CFL, CFB, PC, PDF)
-          {
-            #Eq. 66a (Wotton 2009) - Crown Fuel Consumption (CFC)
-            CFC <- CFL * CFB
-            #Eq. 66c (Wotton 2009) - CFC for M3/M4 types
-            CFC <- PDF / 100 * CFC
-            return (CFC)
-          }
-)
+.CrownFuelConsumption.Fuel <- function(this, CFL, CFB, PC, PDF)
+{
+  #Eq. 66a (Wotton 2009) - Crown Fuel Consumption (CFC)
+  CFC <- CFL * CFB
+  return (CFC)
+}
+.CrownFuelConsumption..FuelMixedwood <- function(this, CFL, CFB, PC, PDF)
+{
+  #Eq. 66a (Wotton 2009) - Crown Fuel Consumption (CFC)
+  CFC <- CFL * CFB
+  #Eq. 66b (Wotton 2009) - CFC for M1/M2 types
+  CFC <- PC / 100 * CFC
+  return (CFC)
+}
+.CrownFuelConsumption..FuelMixedDead <- function(this, CFL, CFB, PC, PDF)
+{
+  #Eq. 66a (Wotton 2009) - Crown Fuel Consumption (CFC)
+  CFC <- CFL * CFB
+  #Eq. 66c (Wotton 2009) - CFC for M3/M4 types
+  CFC <- PDF / 100 * CFC
+  return (CFC)
+}

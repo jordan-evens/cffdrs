@@ -18,14 +18,11 @@ BuildupEffect <- Vectorize(function(FUELTYPE, BUI)
   return(.BuildupEffect(FUELS[[FUELTYPE]], BUI))
 })
 
-setMethod(".BuildupEffect",
-          "Fuel",
-          function(this, BUI)
-          {
-            #Eq. 54 (FCFDG 1992) The Buildup Effect
-            BE<- ifelse(BUI > 0 & this@BUIo > 0,
-                        exp(50 * log(this@Q) * (1 / BUI - 1 / this@BUIo)),
-                        1)
-            return(BE)
-          }
-)
+.BuildupEffect.Fuel <- function(this, BUI)
+{
+  #Eq. 54 (FCFDG 1992) The Buildup Effect
+  BE<- ifelse(BUI > 0 & this[["BUIo"]] > 0,
+              exp(50 * log(this[["Q"]]) * (1 / BUI - 1 / this[["BUIo"]])),
+              1)
+  return(BE)
+}
