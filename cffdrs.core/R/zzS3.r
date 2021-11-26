@@ -12,7 +12,3 @@
                             CFL=0),
                  class=c(".S3", ".FuelSlash", ".FuelOpen", "Fuel", ".FuelBase")
 )
-.SlopeAdjust..S3 <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
-{
-  return(SlopeAdjust("S3", FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
-}

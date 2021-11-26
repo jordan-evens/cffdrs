@@ -12,10 +12,6 @@
                             CFL=0.5),
                  class=c(".C7", ".FuelClosed", "Fuel", ".FuelBase")
 )
-.SlopeAdjust..C7 <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
-{
-  return(SlopeAdjust("C7", FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
-}
 .SurfaceFuelConsumption..C7 <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eqs. 13, 14, 15 (FCFDG 1992) - C7 Fuel Types

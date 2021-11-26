@@ -12,7 +12,3 @@
                             CFL=0.8),
                  class=c(".C2", ".FuelClosed", "Fuel", ".FuelBase")
 )
-.SlopeAdjust..C2 <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
-{
-  return(SlopeAdjust("C2", FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
-}

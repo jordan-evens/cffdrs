@@ -13,6 +13,7 @@
 .RateOfSpread <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) UseMethod(".RateOfSpread", this)
 .RateOfSpreadAtTime <- function(this, ROSeq, HR, CFB) UseMethod(".RateOfSpreadAtTime", this)
 .SlopeAdjust <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) UseMethod(".SlopeAdjust", this)
+.SlopeEquivalentInitialSpreadIndex <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) UseMethod(".SlopeEquivalentInitialSpreadIndex", this)
 .SurfaceFuelConsumption <- function(this, FFMC, BUI, PC, GFL) UseMethod(".SurfaceFuelConsumption", this)
 Fuel <- structure(.Data=list(
                    name="Fuel",

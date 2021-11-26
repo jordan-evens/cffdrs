@@ -23,7 +23,16 @@
   + 0.2 * (1 - PDF / 100)* .RateOfSpread(FUELS[["D1"]], ISI, NoBUI, FMC, SFC, PC, PDF, CC,CBH)
   return(RSI)
 }
-.SlopeAdjust..M4 <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+.SlopeEquivalentInitialSpreadIndex..M4 <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
-  return(SlopeAdjust("M4", FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
+  #Set % Dead Balsam Fir to 100%
+  PDF100 <- 100
+  #Eq. 41a (Wotton 2009) - Calculate the slope equivalent ISI
+  #Eq. 41b (Wotton 2009) - Calculate the slope equivalent ISI
+  # HACK: call superclass function
+  ISF_M4 <- .SlopeEquivalentInitialSpreadIndex.Fuel(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
+  ISF_D1 <- .SlopeEquivalentInitialSpreadIndex(.D1, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
+  #Eq. 42b (Wotton 2009) - Calculate weighted average for the M3 type
+  ISF <- PDF / 100 * ISF_M4 + (1 - PDF / 100) * ISF_D1
+  return(ISF)
 }
