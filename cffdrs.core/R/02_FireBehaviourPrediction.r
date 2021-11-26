@@ -363,7 +363,6 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   ############################################################################
   #                         END
   ############################################################################
-  FBP <- data.frame(do.call(rbind, fctFBP(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)))
-  row.names(FBP) <- NULL
+  FBP <- data.frame(do.call(rbind, fctFBP(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)), row.names=NULL)
   return(FBP)
 }
