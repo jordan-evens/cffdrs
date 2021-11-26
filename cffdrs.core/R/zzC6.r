@@ -159,28 +159,28 @@
   }
   #if Primary is selected, wrap the primary outputs into a data frame and
   #  return them
+  #if Primary is selected, wrap the primary outputs into a data frame and
+  #  return them
   if (output == "PRIMARY" | output == "P") {
-    FBP <- data.frame(ID, CFB, CFC, FD, HFI, RAZ, ROS, SFC, 
-                      TFC)
-    FBP[, "FD"] <- as.character(FBP[, "FD"])
+    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC, 
+                TFC=SFC)
   }
   #If Secondary is selected, wrap the secondary outputs into a data frame
   #  and return them.
   else if (output == "SECONDARY" | output == "S") {
-    FBP <- data.frame(ID, BE, SF, ISI, FFMC, FMC, D0, RSO, 
-                      CSI, FROS, BROS, HROSt, FROSt, BROSt, FCFB, BCFB, 
-                      FFI, BFI, FTFC, BTFC, TI, FTI, BTI, LB, LBt, WSV, 
-                      DH, DB, DF, TROS, TROSt, TCFB, TFI, TTFC, TTI)
+    FBP <- list(ID=ID, BE=BE, SF=SF, ISI=ISI, FFMC=FFMC, FMC=FMC, D0=D0, RSO=RSO,
+                CSI=CSI, FROS=FROS, BROS=BROS, HROSt=HROSt, FROSt=FROSt, BROSt=BROSt, FCFB=FCFB, BCFB=BCFB,
+                FFI=FFI, BFI=BFI, FTFC=FTFC, BTFC=BTFC, TI=TI, FTI=FTI, BTI=BTI, LB=LB, LBt=LBt, WSV=WSV,
+                DH=DH, DB=DB, DF=DF, TROS=TROS, TROSt=TROSt, TCFB=TCFB, TFI=TFI, TTFC=TTFC, TTI=TTI)
   }
   #If all outputs are selected, then wrap all outputs into a data frame and
   #  return it.
   else if (output == "ALL" | output == "A") {
-    FBP <- data.frame(ID, CFB, CFC, FD, HFI, RAZ, ROS, SFC, 
-                      TFC, BE, SF, ISI, FFMC, FMC, D0, RSO, CSI, FROS, 
-                      BROS, HROSt, FROSt, BROSt, FCFB, BCFB, FFI, BFI, 
-                      FTFC, BTFC, TI, FTI, BTI, LB, LBt, WSV, DH, DB, DF, 
-                      TROS, TROSt, TCFB, TFI, TTFC, TTI)
-    FBP[, "FD"] <- as.character(FBP[, "FD"])
+    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC,
+                TFC=TFC, BE=BE, SF=SF, ISI=ISI, FFMC=FFMC, FMC=FMC, D0=D0, RSO=RSO, CSI=CSI, FROS=FROS,
+                BROS=BROS, HROSt=HROSt, FROSt=FROSt, BROSt=BROSt, FCFB=FCFB, BCFB=BCFB, FFI=FFI, BFI=BFI,
+                FTFC=FTFC, BTFC=BTFC, TI=TI, FTI=FTI, BTI=BTI, LB=LB, LBt=LBt, WSV=WSV, DH=DH, DB=DB, DF=DF,
+                TROS=TROS, TROSt=TROSt, TCFB=TCFB, TFI=TFI, TTFC=TTFC, TTI=TTI)
   }
   return(list(FBP))
 }

@@ -24,7 +24,7 @@
 #' @export SurfaceFuelConsumption
 SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
 {
-  SFC <- .SurfaceFuelConsumption(FUEL[[FUELTYPE]], FFMC, BUI, PC, GFL)
+  SFC <- .SurfaceFuelConsumption(FUELS[[FUELTYPE]], FFMC, BUI, PC, GFL)
   SFC <- ifelse(SFC <= 0, 0.000001, SFC)
   return(SFC)
 })
