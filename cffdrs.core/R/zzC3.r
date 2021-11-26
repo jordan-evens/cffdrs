@@ -16,4 +16,3 @@
 {
   return(SlopeAdjust("C3", FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
 }
-.C3$SlopeAdjust <- .SlopeAdjust..C3

@@ -69,9 +69,3 @@ Fuel <- structure(.Data=list(
 .FuelSlash <- structure(.Data=list(name=".FuelSlash"), class=c(".FuelSlash", ".FuelOpen", "Fuel", ".FuelBase"))
 .FuelMixedwood <- structure(.Data=list(name=".FuelMixedwood"), class=c(".FuelMixedwood", ".FuelClosed", "Fuel", ".FuelBase"))
 .FuelMixedDead <- structure(.Data=list(name=".FuelMixedDead"), class=c(".FuelMixedDead", ".FuelClosed", "Fuel", ".FuelBase"))
-
-Fuel$CrownBaseHeight <- .CrownBaseHeight.Fuel
-Fuel$FoliarMoistureContent <- .FoliarMoistureContent.Fuel
-.FuelClosed$Alpha <- .Alpha..FuelClosed
-.FuelOpen$Alpha <- .Alpha..FuelOpen
-.FuelOpen$FoliarMoistureContent <- .FoliarMoistureContent..FuelOpen

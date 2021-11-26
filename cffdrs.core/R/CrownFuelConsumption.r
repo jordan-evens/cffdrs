@@ -48,7 +48,3 @@ CrownFuelConsumption <- Vectorize(function(FUELTYPE, CFL, CFB, PC, PDF)
   CFC <- PDF / 100 * CFC
   return (CFC)
 }
-
-Fuel$CrownFuelConsumption <- .CrownFuelConsumption.Fuel
-.FuelMixedwood$CrownFuelConsumption <- .CrownFuelConsumption..FuelMixedwood
-.FuelMixedDead$CrownFuelConsumption <- .CrownFuelConsumption..FuelMixedDead

@@ -50,5 +50,3 @@ RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CB
   RSI <- this[["a"]] * ((1 - exp(-this[["b"]] * ISI))**this[["c0"]]) * CF
   return(RSI)
 }
-Fuel$RateOfSpread <- .RateOfSpread.Fuel
-.FuelGrass$RateOfSpread <- .RateOfSpread..FuelGrass

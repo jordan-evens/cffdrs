@@ -26,4 +26,3 @@ CriticalSurfaceIntensity <- function(FMC, CBH)
   CSI <- 0.001 * (CBH**1.5) * (460 + 25.9 * FMC)**1.5
   return (CSI)
 }
-Fuel$CriticalSurfaceIntensity <- .CriticalSurfaceIntensity.Fuel

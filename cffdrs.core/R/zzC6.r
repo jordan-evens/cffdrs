@@ -18,7 +18,7 @@
   RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
   RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
   RSC <- CrownRateOfSpreadC6(ISI, FMC)
-  CSI <- this$CriticalSurfaceIntensity(this, FMC, CBH)
+  CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
   RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
   CFB <- CrownFractionBurned(RSS, RSO)
   ROS <- RateOfSpreadC6(RSC, RSS, CFB)
@@ -42,19 +42,19 @@
       BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
-  CBH <- this$CrownBaseHeight(this, CBH, SD, SH)
+  CBH <- .CrownBaseHeight(this, CBH, SD, SH)
   CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), this[["CFL"]], CFL)
   FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
-                this$FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
+                .FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
                 FMC)
   ############################################################################
   #                         END
   ############################################################################
   #Calculate Surface fuel consumption (SFC)
-  SFC <- this$SurfaceFuelConsumption(this, FFMC, BUI, PC, GFL)
+  SFC <- .SurfaceFuelConsumption(this, FFMC, BUI, PC, GFL)
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
-  SLOPE_ADJUST <- this$SlopeAdjust(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+  SLOPE_ADJUST <- .SlopeAdjust(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
   #Calculate the net effective windspeed (WSV)
   WSV0 <- SLOPE_ADJUST$WSV
   WSV <- ifelse(GS > 0 & FFMC > 0, WSV0, WS)
@@ -64,7 +64,7 @@
   #Calculate or keep Initial Spread Index (ISI)
   ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
   #Calculate Critical Surface Intensity
-  CSI <- this$CriticalSurfaceIntensity(this, FMC, CBH)
+  CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
   #Calculate Surface fire rate of spread (m/min)
   # FIX: C6 was using the same function as other things
   RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
@@ -77,7 +77,7 @@
   CFB <- CrownFractionBurned(RSS, RSO)
   ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   #Calculate Total Fuel Consumption (TFC)
-  TFC <- TotalFuelConsumption(this$CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
+  TFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
   #Calculate Head Fire Intensity(HFI)
   HFI <- FireIntensity(TFC, ROS)
   #Adjust Crown Fraction Burned
@@ -88,19 +88,19 @@
   #Calculate Fire Type (S = Surface, C = Crowning, I = Intermittent Crowning)
   FD <- ifelse(CFB < 0.1, "S", ifelse(CFB >= 0.9, "C", "I"))
   #Calculate Crown Fuel Consumption(CFC)
-  CFC <- this$CrownFuelConsumption(this, CFL, CFB, PC, PDF)
+  CFC <- .CrownFuelConsumption(this, CFL, CFB, PC, PDF)
   #Calculate the Secondary Outputs
   if (output == "SECONDARY" | output == "ALL" | output == "S" | 
       output == "A") {
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     SF <- ifelse(GS >= 70, 10, exp(3.533 * (GS/100)^1.2))
     #Calculate The Buildup Effect
-    BE <- this$BuildupEffect(this, BUI)
+    BE <- .BuildupEffect(this, BUI)
     #Calculate length to breadth ratio
-    LB <- this$LengthToBreadthRatio(this, WSV)
-    LBt <- ifelse(ACCEL == 0, LB, this$LengthToBreadthRatioAtTime(this, LB, HR, CFB))
+    LB <- .LengthToBreadthRatio(this, WSV)
+    LBt <- ifelse(ACCEL == 0, LB, .LengthToBreadthRatioAtTime(this, LB, HR, CFB))
     #Calculate Back fire rate of spread (BROS)
-    BROS <- this$BackRateOfSpread(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
+    BROS <- .BackRateOfSpread(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
     #Calculate Flank fire rate of spread (FROS) 
     FROS <- FlankRateOfSpread(ROS, BROS, LB)
     #Calculate the eccentricity  
@@ -109,8 +109,8 @@
     TROS <- ROS * (1 - E)/(1 - E * cos(THETA - RAZ))
     #Calculate rate of spread at time t for Flank, Back of fire and at angle 
     #  theta.
-    ROSt <- ifelse(ACCEL == 0, ROS, this$RateOfSpreadAtTime(this, ROS, HR, CFB))
-    BROSt <- ifelse(ACCEL == 0, BROS, this$RateOfSpreadAtTime(this, BROS, HR, CFB))
+    ROSt <- ifelse(ACCEL == 0, ROS, .RateOfSpreadAtTime(this, ROS, HR, CFB))
+    BROSt <- ifelse(ACCEL == 0, BROS, .RateOfSpreadAtTime(this, BROS, HR, CFB))
     FROSt <- ifelse(ACCEL == 0, FROS, FlankRateOfSpread(ROSt, BROSt, LBt))
     #Calculate rate of spread towards angle theta at time t (TROSt)
     TROSt <- ifelse(ACCEL == 0, TROS, 
@@ -129,9 +129,9 @@
     # }
     #Calculate Total fuel consumption for the Flank fire, Back fire and at
     #  angle theta
-    FTFC <- TotalFuelConsumption(this$CrownFuelConsumption(this, CFL, FCFB, PC, PDF), SFC)
-    BTFC <- TotalFuelConsumption(this$CrownFuelConsumption(this, CFL, BCFB, PC, PDF), SFC)
-    TTFC <- TotalFuelConsumption(this$CrownFuelConsumption(this, CFL, TCFB, PC, PDF), SFC)
+    FTFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, FCFB, PC, PDF), SFC)
+    BTFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, BCFB, PC, PDF), SFC)
+    TTFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, TCFB, PC, PDF), SFC)
     #Calculate the Fire Intensity at the Flank, Back and at angle theta fire
     FFI <- FireIntensity(FTFC, FROS)
     BFI <- FireIntensity(BTFC, BROS)
@@ -147,14 +147,14 @@
     # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
     # Back and at angle theta used in the *TI equations)
     # NOTE: old version used non-constant equation for every FUELTYPE
-    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-this$Alpha(this, CFB))
-    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-this$Alpha(this, FCFB))
-    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-this$Alpha(this, BCFB))
-    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-this$Alpha(this, TCFB))
+    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(this, CFB))
+    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha(this, FCFB))
+    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha(this, BCFB))
+    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha(this, TCFB))
     
     #Fire spread distance for Head, Back, and Flank of fire
-    DH <- ifelse(ACCEL == 1, this$DistanceAtTime(this, ROS, HR, CFB), ROS * HR)
-    DB <- ifelse(ACCEL == 1, this$DistanceAtTime(this, BROS, HR, CFB), BROS * HR)
+    DH <- ifelse(ACCEL == 1, .DistanceAtTime(this, ROS, HR, CFB), ROS * HR)
+    DB <- ifelse(ACCEL == 1, .DistanceAtTime(this, BROS, HR, CFB), BROS * HR)
     DF <- ifelse(ACCEL == 1, (DH + DB)/(LBt * 2), (DH + DB)/(LB * 2))
   }
   #if Primary is selected, wrap the primary outputs into a data frame and
@@ -184,6 +184,3 @@
   }
   return(list(FBP))
 }
-.C6$RateOfSpread <- .RateOfSpread..C6
-.C6$SlopeAdjust <- .SlopeAdjust..C6
-.C6$FireBehaviourPrediction <- .FireBehaviourPrediction..C6
