@@ -16,12 +16,13 @@
 #' 
 #' @return CSI
 #' @export CriticalSurfaceIntensity
-CriticalSurfaceIntensity <- function(FMC, CBH)
+CriticalSurfaceIntensity <- function(FUELTYPE, FMC, CBH)
 {
   return(.CriticalSurfaceIntensity(FUELS[[FUELTYPE]], FMC, CBH))
 }
-.CriticalSurfaceIntensity.Fuel <- function(this, FMC, CBH)
+.CriticalSurfaceIntensity..FuelBase <- function(this, FMC, CBH)
 {
+  # FIX: .FuelNF returns non-NA values from this
   #Eq. 56 (FCFDG 1992) Critical surface intensity
   CSI <- 0.001 * (CBH**1.5) * (460 + 25.9 * FMC)**1.5
   return (CSI)

@@ -11,7 +11,7 @@
                             CFL=1.8),
                  class=c(".C6", ".FuelClosed", "Fuel", ".FuelBase")
 )
-.BaseRateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+.RateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Calculate C6 separately
   RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
@@ -19,7 +19,7 @@
   RSC <- CrownRateOfSpreadC6(ISI, FMC)
   CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
   RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
-  CFB <- CrownFractionBurned(RSS, RSO)
+  CFB <- .CrownFractionBurned(this, RSS, RSO)
   ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   return(ROS)
 }
@@ -69,7 +69,7 @@
   RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
   RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
   RSC <- CrownRateOfSpreadC6(ISI, FMC)
-  CFB <- CrownFractionBurned(RSS, RSO)
+  CFB <- .CrownFractionBurned(this, RSS, RSO)
   ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   #Calculate Total Fuel Consumption (TFC)
   TFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)

@@ -1,4 +1,4 @@
-fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
+fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
 {
   return(.FireBehaviourPrediction(FUELS[[FUELTYPE]], output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA))
 }
@@ -45,7 +45,7 @@ fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, C
   # Calculate the Rate of Spread (ROS) and Crown Fraction Burned (CFB)
   ROS <- .RateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   CFB <- ifelse(CFL > 0,
-                CrownFractionBurned(ROS, RSO),
+                .CrownFractionBurned(this, ROS, RSO),
                 0)
   #Calculate Total Fuel Consumption (TFC)
   TFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
@@ -93,9 +93,9 @@ fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, C
     TCFB <- 0
     if (CFL != 0)
     {
-      FCFB <- CrownFractionBurned(FROS, RSO)
-      BCFB <- CrownFractionBurned(BROS, RSO)
-      TCFB <- CrownFractionBurned(TROS, RSO)
+      FCFB <- .CrownFractionBurned(this, FROS, RSO)
+      BCFB <- .CrownFractionBurned(this, BROS, RSO)
+      TCFB <- .CrownFractionBurned(this, TROS, RSO)
     }
     #Calculate Total fuel consumption for the Flank fire, Back fire and at
     #  angle theta
@@ -116,11 +116,17 @@ fctFBP <- Vectorize(function(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, C
     #Calculate the elapsed time to crown fire initiation for Head, Flank, Back
     # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
     # Back and at angle theta used in the *TI equations)
-    # NOTE: old version used non-constant equation for every FUELTYPE
-    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(this, CFB))
-    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha(this, FCFB))
-    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha(this, BCFB))
-    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha(this, TCFB))
+    # HACK: old version used non-constant equation for every FUELTYPE
+    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha..FuelClosed(this, CFB))
+    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha..FuelClosed(this, FCFB))
+    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha..FuelClosed(this, BCFB))
+    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha..FuelClosed(this, TCFB))
+    
+    # FIX: shouldn't it be this?
+    # TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(this, CFB))
+    # FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha(this, FCFB))
+    # BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha(this, BCFB))
+    # TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha(this, TCFB))
     
     #Fire spread distance for Head, Back, and Flank of fire
     DH <- ifelse(ACCEL == 1, .DistanceAtTime(this, ROS, HR, CFB), ROS * HR)
@@ -363,6 +369,6 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   ############################################################################
   #                         END
   ############################################################################
-  FBP <- data.frame(do.call(rbind, fctFBP(output, ID, FUELTYPE, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)), row.names=NULL)
+  FBP <- data.frame(do.call(rbind, fctFBP(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)), row.names=NULL)
   return(FBP)
 }

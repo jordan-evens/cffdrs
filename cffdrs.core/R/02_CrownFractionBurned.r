@@ -16,7 +16,11 @@
 #' 
 #' @return CFB
 #' @export CrownFractionBurned
-CrownFractionBurned <- function(ROS, RSO)
+CrownFractionBurned <- function(FUELTYPE, ROS, RSO)
+{
+  return(.CrownFractionBurned(FUELS[[FUELTYPE]], ROS, RSO))
+}
+.CrownFractionBurned.Fuel <- function(this, ROS, RSO)
 {
   #Eq. 58 (FCFDG 1992) Crown fraction burned 
   CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), 0)

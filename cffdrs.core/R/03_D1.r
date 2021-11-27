@@ -11,3 +11,7 @@
                       CFL=0),
                  class=c(".D1", ".FuelOpen", "Fuel", ".FuelBase")
 )
+.FoliarMoistureContent..D1 <- function(this, LAT, LONG, ELV, DJ, D0)
+{
+  return(0)
+}

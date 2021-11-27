@@ -5,6 +5,7 @@
 .BuildupEffect <- function(this, BUI) UseMethod(".BuildupEffect", this)
 .CriticalSurfaceIntensity <- function(this, FMC, CBH) UseMethod(".CriticalSurfaceIntensity", this)
 .CrownBaseHeight <- function(this, CBH, SD, SH) UseMethod(".CrownBaseHeight", this)
+.CrownFractionBurned <- function(this, ROS, RSO) UseMethod(".CrownFractionBurned", this)
 .CrownFuelConsumption <- function(this, CFL, CFB, PC, PDF) UseMethod(".CrownFuelConsumption", this)
 .DistanceAtTime <- function(this, ROSeq, HR, CFB) UseMethod(".DistanceAtTime", this)
 .FireBehaviourPrediction <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA) UseMethod(".FireBehaviourPrediction", this)
@@ -41,7 +42,7 @@ Fuel <- structure(.Data=list(
   CBH <- ifelse(CBH < 0, 1e-07, CBH)
   return(CBH)
 }
-.FoliarMoistureContent.Fuel <- function(this, LAT, LONG, ELV, DJ, D0)
+.FoliarMoistureContent..FuelBase <- function(this, LAT, LONG, ELV, DJ, D0)
 {
   return(FoliarMoistureContent(LAT, LONG, ELV, DJ, D0))
 }
@@ -62,12 +63,16 @@ Fuel <- structure(.Data=list(
   alpha <- 0.115
   return (alpha)
 }
-.FoliarMoistureContent..FuelOpen <- function(this, LAT, LONG, ELV, DJ, D0)
-{
-  return(0)
-}
 
 .FuelGrass <- structure(.Data=list(name=".FuelGrass"), class=c(".FuelGrass", ".FuelOpen", "Fuel", ".FuelBase"))
 .FuelSlash <- structure(.Data=list(name=".FuelSlash"), class=c(".FuelSlash", ".FuelOpen", "Fuel", ".FuelBase"))
 .FuelMixedwood <- structure(.Data=list(name=".FuelMixedwood"), class=c(".FuelMixedwood", ".FuelClosed", "Fuel", ".FuelBase"))
 .FuelMixedDead <- structure(.Data=list(name=".FuelMixedDead"), class=c(".FuelMixedDead", ".FuelClosed", "Fuel", ".FuelBase"))
+.FoliarMoistureContent..FuelGrass <- function(this, LAT, LONG, ELV, DJ, D0)
+{
+  return(0)
+}
+.FoliarMoistureContent..FuelSlash <- function(this, LAT, LONG, ELV, DJ, D0)
+{
+  return(0)
+}
