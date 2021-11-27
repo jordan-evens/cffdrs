@@ -37,8 +37,16 @@ SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
 .SurfaceFuelConsumption..FuelMixedwood <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eq. 17 (FCFDG 1992) - M1 and M2 Fuel Types
-  return (PC / 100 * .SurfaceFuelConsumption(FUELS[["C2"]], FFMC, BUI, PC, GFL))
-  + ((100 - PC) / 100 * .SurfaceFuelConsumption(FUELS[["D2"]], FFMC, BUI, PC, GFL))
+  SFC_C2 <- (PC / 100 * .SurfaceFuelConsumption(.C2, FFMC, BUI, PC, GFL))
+  SFC_D1 <- ((100 - PC) / 100 * .SurfaceFuelConsumption(.D1, FFMC, BUI, PC, GFL))
+  SFC_C2_check <- PC / 100 * (5.0 * (1 - exp(-0.0115 * BUI)))
+  SFC_D1_check <- ((100 - PC) / 100 * (1.5 * (1 - exp(-0.0183 * BUI))))
+  stopifnot(SFC_C2 == SFC_C2_check)
+  stopifnot(SFC_D1 == SFC_D1_check)
+  SFC <- SFC_C2 + SFC_D1
+  SFC_check <- SFC_C2_check + SFC_D1_check
+  stopifnot(SFC == SFC_check)
+  return(SFC)
 }
 .SurfaceFuelConsumption..FuelGrass <- function(this, FFMC, BUI, PC, GFL)
 {

@@ -4,10 +4,6 @@
                              c0=1.7,
                              BUIo=01,
                              Q=1.0,
-                             sfcA=as.numeric(NA),
-                             sfcB=as.numeric(NA),
-                             sfcC=as.numeric(NA),
-                             sfcD=as.numeric(NA),
                              CBH=0,
                              CFL=0),
                   class=c(".O1B", ".FuelGrass", ".FuelOpen", "Fuel", ".FuelBase")

@@ -12,22 +12,12 @@
                                 CFL=as.numeric(NA)),
                      class=c(".FuelNF", ".FuelBase")
 )
-.FuelNF <- structure(.Data=list(name="NF",
-                                a=as.numeric(NA),
-                                b=as.numeric(NA),
-                                c0=as.numeric(NA),
-                                BUIo=as.numeric(NA),
-                                Q=as.numeric(NA),
-                                sfcA=as.numeric(NA),
-                                sfcB=as.numeric(NA),
-                                sfcC=as.numeric(NA),
-                                sfcD=as.numeric(NA),
-                                CBH=as.numeric(NA),
-                                CFL=as.numeric(NA)),
+.FuelNF <- structure(.Data=list(name="NF"),
                      class=c(".FuelNF", ".FuelBase")
 )
 .Alpha..FuelNF <- function(this, CBH) { return(0) }
 .BackRateOfSpread..FuelNF <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
+.BaseRateOfSpread..FuelNF <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
 .BuildupEffect..FuelNF <- function(this, BUI) { return(0) }
 .CriticalSurfaceIntensity..FuelNF <- function(this, FMC, CBH) { return(0) }
 .CrownBaseHeight..FuelNF <- function(this, CBH, SD, SH) { return(0) }

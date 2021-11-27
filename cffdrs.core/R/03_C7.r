@@ -4,10 +4,6 @@
                             c0=2.0,
                             BUIo=106,
                             Q=0.85,
-                            sfcA=as.numeric(NA),
-                            sfcB=as.numeric(NA),
-                            sfcC=as.numeric(NA),
-                            sfcD=as.numeric(NA),
                             CBH=10,
                             CFL=0.5),
                  class=c(".C7", ".FuelClosed", "Fuel", ".FuelBase")

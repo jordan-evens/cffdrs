@@ -7,12 +7,11 @@
                             sfcA=5.0,
                             sfcB=-0.0149,
                             sfcC=2.48,
-                            sfcD=as.numeric(NA),
                             CBH=7,
                             CFL=1.8),
                  class=c(".C6", ".FuelClosed", "Fuel", ".FuelBase")
 )
-.RateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+.BaseRateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Calculate C6 separately
   RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)

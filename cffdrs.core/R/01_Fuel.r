@@ -1,6 +1,7 @@
 .FuelBase <- structure(.Data=list(name=".FuelBase"), class=(".FuelBase"))
 .Alpha <- function(this, ...) UseMethod(".Alpha", this)
 .BackRateOfSpread <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH) UseMethod(".BackRateOfSpread", this)
+.BaseRateOfSpread <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) UseMethod(".BaseRateOfSpread", this)
 .BuildupEffect <- function(this, BUI) UseMethod(".BuildupEffect", this)
 .CriticalSurfaceIntensity <- function(this, FMC, CBH) UseMethod(".CriticalSurfaceIntensity", this)
 .CrownBaseHeight <- function(this, CBH, SD, SH) UseMethod(".CrownBaseHeight", this)

@@ -7,7 +7,6 @@
                             sfcA=5.0,
                             sfcB=-0.0149,
                             sfcC=2.48,
-                            sfcD=as.numeric(NA),
                             CBH=18,
                             CFL=1.2),
                  class=c(".C5", ".FuelClosed", "Fuel", ".FuelBase")

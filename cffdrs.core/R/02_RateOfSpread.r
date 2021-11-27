@@ -35,12 +35,13 @@ RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CB
   ROS <- ifelse(ROS <= 0,0.000001,ROS)
   return(ROS)
 })
-.RateOfSpread.Fuel <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+.BaseRateOfSpread.Fuel <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Eq. 26 (FCFDG 1992) - Initial Rate of Spread for Conifer and Slash types
-  return(this[["a"]] * (1 - exp(-this[["b"]] * ISI))**this[["c0"]])
+  RSI <- (this[["a"]] * (1 - exp(-this[["b"]] * ISI))**this[["c0"]])
+  return(RSI)
 }
-.RateOfSpread..FuelGrass <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+.BaseRateOfSpread..FuelGrass <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Eq. 35b (Wotton et. al. 2009) - Calculate Curing function for grass
   CF <- ifelse(CC < 58.8,
@@ -49,4 +50,10 @@ RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CB
   #Eq. 36 (FCFDG 1992) - Calculate Initial Rate of Spread for Grass
   RSI <- this[["a"]] * ((1 - exp(-this[["b"]] * ISI))**this[["c0"]]) * CF
   return(RSI)
+}
+.RateOfSpread.Fuel <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+{
+  RSI <- .BaseRateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+  ROS <- .BuildupEffect(this, BUI) * RSI
+  return(ROS)
 }
