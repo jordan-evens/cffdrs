@@ -2,8 +2,11 @@ library(data.table)
 PATH <- '../data/'
 MAX_ROWS <- 1000
 
+ACCEL <- list(0, 1)
+ASPECT <- seq(-370, 370, by=0.1)
 BOOL <- c(TRUE, FALSE)
 BUI <- seq(-10, 1000, by=0.1)
+BUIEFF <- list(0, 1)
 CBH <- seq(-10, 200, by=0.1)
 CC <- seq(-10, 110)
 CFB <- seq(-1, 2, by=0.01)
@@ -33,8 +36,11 @@ PREC <- seq(-10, 300, by=0.01)
 RH <- seq(-10, 110, by=0.01)
 ROS <- seq(-10, 600, by=0.01)
 SAZ <- seq(-370, 370, by=0.1)
+SD <- seq(-10, 1e+05)
 SFC <- seq(-10, 20000)
+SH <- seq(-10, 110)
 TEMP <- seq(-30, 60, by=0.1)
+WD <- seq(-370, 370, by=0.1)
 WS <- seq(-10, 500, by=0.1)
 THETA <- seq(-360, 360, by=0.01)
 WSV <- seq(-10, 500, by=0.1)
@@ -85,13 +91,28 @@ makeData <- function(name, fct, arguments)
   i <- makeInput(arguments)
   #i[, c(name)] <- do.call(fct, i)
   r <- list(do.call(fct, i[1, ]))
-  for (n in 2:nrow(i))
+  isRow <- length(r[[1]]) > 1
+  if (isRow)
   {
-    r <- append(r, do.call(fct, i[n, ]))
+    r <- r[[1]]
+    for (n in 2:nrow(i))
+    {
+      r2 <- do.call(fct, i[n, ])
+      r <- rbind(r, r2)
+    }
+    return(r)
   }
-  i[, c(name)] <- unlist(r)
-  return(i)
+  else
+  {
+    for (n in 2:nrow(i))
+    {
+      r <- append(r, do.call(fct, i[n, ]))
+    }
+    i[, c(name)] <- unlist(r)
+    return(i)
+  }
 }
+
 
 checkResults <- function(name, df1)
 {
