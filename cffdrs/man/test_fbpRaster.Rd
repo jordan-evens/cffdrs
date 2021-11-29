@@ -5,9 +5,8 @@
 \alias{test_fbpRaster}
 \title{Raster Data for fbpRaster function}
 \format{
-A raster (tif) file.
+A raster (tif) file.#'
 }
 \description{
 Test raster file to calculate fbp data.
 }
-\keyword{datasets}

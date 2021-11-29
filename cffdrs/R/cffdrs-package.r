@@ -1,5 +1,3 @@
-
-
 #' Canadian Forest Fire Danger Rating System
 #' 
 #' The cffdrs package allows R users to calculate the outputs of the two main
@@ -192,7 +190,36 @@ NULL
 #' 
 #' @name test_fbpRaster
 #' @docType data
-#' @format A raster (tif) file.
+#' @format A raster (tif) file.#'
+NULL
+
+
+
+#' Grass Fuel Moisture Code Sample Input Data Set
+#' 
+#' This data set is the sample input data that was used in original FWI program
+#' calibration.
+#' 
+#' 
+#' @name test_gfmc
+#' @docType data
+#' @format A data frame containing 9 columns and 199 rows, with 1 header line
+#' @keywords datasets
+NULL
+
+
+
+
+
+#' Hourly Fine Fuel Moisture Code Sample Input Data Set
+#' 
+#' Sample dataset for use with the \code{hffmc} function.
+#' 
+#' 
+#' @name test_hffmc
+#' @docType data
+#' @format A data frame containing 8 columns and 481 rows, including 1 header
+#' line
 #' @keywords datasets
 NULL
 
@@ -208,6 +235,35 @@ NULL
 #' @name test_lros
 #' @docType data
 #' @format A data frame containing 8 columns, 4 rows, including 1 header line.
+#' @references 1. Simard, A.J., Eenigenburg, J.E., Adams, K.B., Nissen, R.L.,
+#' Deacon, and Deacon, A.G. 1984. A general procedure for sampling and
+#' analyzing wildland fire spread.
+#' 
+#' 2. Byram, G.M. 1959. Combustion of forest fuels. In: Davis, K.P. Forest Fire
+#' Control and Use. McGraw-Hill, New York.
+#' 
+#' 3. Curry, J.R., and Fons, W.L. 1938. Rate of spread of surface fires in the
+#' Ponderosa Pine Type of California. Journal of Agricultural Research 57(4):
+#' 239-267.
+#' 
+#' 4. Simard, A.J., Deacon, A.G., and Adams, K.B. 1982. Nondirectional sampling
+#' wildland fire spread. Fire Technology: 221-228.
+#' @source no source
+#' @keywords datasets simard lros
+NULL
+
+
+
+
+
+#' Point-based Simard function Sample Data Set
+#' 
+#' This is a set of input data to test the pros function.
+#' 
+#' 
+#' @name test_pros
+#' @docType data
+#' @format A data frame containing 9 columns, 4 rows, including 1 header line.
 #' @references 1. Simard, A.J., Eenigenburg, J.E., Adams, K.B., Nissen, R.L.,
 #' Deacon, and Deacon, A.G. 1984. A general procedure for sampling and
 #' analyzing wildland fire spread.
