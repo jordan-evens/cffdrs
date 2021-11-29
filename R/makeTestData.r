@@ -1,6 +1,6 @@
 library(data.table)
 PATH <- '../nrcan-cfs-fire/cffdrs.core/tests/data/'
-MAX_ROWS <- 1000
+DESIRED_ROWS <- 5000
 
 ACCEL <- list(0, 1)
 ASPECT <- seq(-370, 370, by=0.1)
@@ -46,7 +46,7 @@ THETA <- seq(-360, 360, by=0.01)
 WSV <- seq(-10, 500, by=0.1)
 WAZ <- seq(-370, 370, by=0.1)
 
-pickRows <- function(d1, num_rows=MAX_ROWS)
+pickRows <- function(d1, num_rows=DESIRED_ROWS)
 {
   d1 <- data.table(d1)
   #print(d1)
@@ -79,7 +79,7 @@ makeInput <- function(arguments)
     {
       #print(n)
       #print(arguments[[n]])
-      d2 <- pickRows(arguments[[n]])
+      d2 <- pickRows(arguments[[n]], ceiling(3 * DESIRED_ROWS / nrow(d1)))
       d1 <- pickRows(merge(data.frame(d1), data.frame(d2), by=NULL))
     }
   }
@@ -278,13 +278,6 @@ saveData('FireWeatherIndex',
          cffdrs:::.fwiCalc,
          list(data.table(isi=ISI),
               data.table(bui=BUI)))
-saveData('FoliarMoistureContent',
-         cffdrs:::.FMCcalc,
-         list(data.table(LAT=LAT),
-              data.table(LONG=LONG),
-              data.table(ELV=ELV),
-              data.table(DJ=DJ),
-              data.table(D0=D0)))
 saveData('FineFuelMoistureCode',
          cffdrs:::.ffmcCalc,
          list(data.table(ffmc_yda=FFMC),
@@ -297,6 +290,13 @@ saveData('FlankRateOfSpread',
          list(data.table(ROS=ROS),
               data.table(BROS=ROS),
               data.table(LB=LB)))
+saveData('FoliarMoistureContent',
+         cffdrs:::.FMCcalc,
+         list(data.table(LAT=LAT),
+              data.table(LONG=LONG),
+              data.table(ELV=ELV),
+              data.table(DJ=DJ),
+              data.table(D0=D0)))
 saveData('InitialSpreadIndex',
          cffdrs:::.ISIcalc,
          list(data.table(ffmc=FFMC),
