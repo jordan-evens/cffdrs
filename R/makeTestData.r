@@ -2,8 +2,11 @@ library(data.table)
 PATH <- '../nrcan-cfs-fire/cffdrs.core/tests/data/'
 MAX_ROWS <- 1000
 
+ACCEL <- list(0, 1)
+ASPECT <- seq(-370, 370, by=0.1)
 BOOL <- c(TRUE, FALSE)
 BUI <- seq(-10, 1000, by=0.1)
+BUIEFF <- list(0, 1)
 CBH <- seq(-10, 200, by=0.1)
 CC <- seq(-10, 110)
 CFB <- seq(-1, 2, by=0.01)
@@ -33,8 +36,11 @@ PREC <- seq(-10, 300, by=0.01)
 RH <- seq(-10, 110, by=0.01)
 ROS <- seq(-10, 600, by=0.01)
 SAZ <- seq(-370, 370, by=0.1)
+SD <- seq(-10, 1e+05)
 SFC <- seq(-10, 20000)
+SH <- seq(-10, 110)
 TEMP <- seq(-30, 60, by=0.1)
+WD <- seq(-370, 370, by=0.1)
 WS <- seq(-10, 500, by=0.1)
 THETA <- seq(-360, 360, by=0.01)
 WSV <- seq(-10, 500, by=0.1)
@@ -85,12 +91,26 @@ makeData <- function(name, fct, arguments)
   i <- makeInput(arguments)
   #i[, c(name)] <- do.call(fct, i)
   r <- list(do.call(fct, i[1, ]))
-  for (n in 2:nrow(i))
+  isRow <- length(r[[1]]) > 1
+  if (isRow)
   {
-    r <- append(r, do.call(fct, i[n, ]))
+    r <- r[[1]]
+    for (n in 2:nrow(i))
+    {
+      r2 <- do.call(fct, i[n, ])
+      r <- rbind(r, r2)
+    }
+    return(r)
   }
-  i[, c(name)] <- unlist(r)
-  return(i)
+  else
+  {
+    for (n in 2:nrow(i))
+    {
+      r <- append(r, do.call(fct, i[n, ]))
+    }
+    i[, c(name)] <- unlist(r)
+    return(i)
+  }
 }
 
 saveResults <- function(name, data)
@@ -186,10 +206,70 @@ test_fbp$WS <- as.numeric(test_fbp$WS)
 test_fbp$GFL <- as.numeric(test_fbp$GFL)
 test_fbp$CBH <- as.numeric(test_fbp$CBH)
 test_fbp$CFL <- as.numeric(test_fbp$CFL)
-
-print(test_fbp)
-saveResults('FireBehaviourPrediction',
+saveResults('FireBehaviourPrediction_test_fbp',
             cffdrs:::.FBPcalc(test_fbp, "A"))
+fctFBP <- function(ID, FUELTYPE, FFMC, BUI, WS, WD, FMC, GS, LAT, LONG, ELV, DJ, D0,
+                   SD, SH, HR, PC, PDF, GFL, CC, THETA, ACCEL, ASPECT, BUIEFF,
+                   CBH, CFL, ISI)
+{
+  input <- data.frame(ID=ID,
+                      FUELTYPE=FUELTYPE,
+                      FFMC=FFMC,
+                      BUI=BUI,
+                      WS=WS,
+                      WD=WD,
+                      FMC=FMC,
+                      GS=GS,
+                      LAT=LAT,
+                      LONG=LONG,
+                      ELV=ELV,
+                      DJ=DJ,
+                      D0=D0,
+                      SD=SD,
+                      SH=SH,
+                      HR=HR,
+                      PC=PC,
+                      PDF=PDF,
+                      GFL=GFL,
+                      CC=CC,
+                      THETA=THETA,
+                      ACCEL=ACCEL,
+                      ASPECT=ASPECT,
+                      BUIEFF=BUIEFF,
+                      CBH=CBH,
+                      CFL=CFL,
+                      ISI=ISI)
+  return(cffdrs:::.FBPcalc(input=input, output="S"))
+}
+saveData('FireBehaviourPrediction',
+         fctFBP,
+         list(data.table(ID=1),
+              data.table(FUELTYPE=FUELTYPE),
+              data.table(FFMC=FFMC),
+              data.table(BUI=BUI),
+              data.table(WS=WS),
+              data.table(WD=WD),
+              data.table(FMC=FMC),
+              data.table(GS=GS),
+              data.table(LAT=LAT),
+              data.table(LONG=LONG),
+              data.table(ELV=ELV),
+              data.table(DJ=DJ),
+              data.table(D0=D0),
+              data.table(SD=SD),
+              data.table(SH=SH),
+              data.table(HR=HR),
+              data.table(PC=PC),
+              data.table(PDF=PDF),
+              data.table(GFL=GFL),
+              data.table(CC=CC),
+              data.table(THETA=THETA),
+              data.table(ACCEL=ACCEL),
+              data.table(ASPECT=ASPECT),
+              data.table(BUIEFF=BUIEFF),
+              data.table(CBH=CBH),
+              data.table(CFL=CFL),
+              data.table(ISI=ISI)))
 saveData('FireIntensity',
          cffdrs:::.FIcalc,
          list(data.table(FC=FC),
