@@ -1,7 +1,13 @@
 test_that("SlopeAdjust", {
-  expect_warning({
-    checkData('SlopeAdjust',
-            cffdrs:::.Slopecalc,
+  fctSlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC,
+                             PC, PDF, CC, CBH, ISI, output)
+  {
+    result <- SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, PC, PDF,
+                          CC, CBH, ISI)
+    return(result[[output]])
+  }
+  checkData('SlopeAdjust',
+            fctSlopeAdjust,
             list(data.table(FUELTYPE=FUELTYPE),
                  data.table(FFMC=FFMC),
                  data.table(BUI=BUI),
@@ -17,5 +23,4 @@ test_that("SlopeAdjust", {
                  data.table(CBH=CBH),
                  data.table(ISI=ISI),
                  data.table(output = "RAZ")))
-  })
 })

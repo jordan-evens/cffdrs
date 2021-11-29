@@ -1,9 +1,9 @@
 test_that("FineFuelMoistureCode", {
-  expect_warning(checkData('FineFuelMoistureCode',
-                           cffdrs:::.ffmcCalc,
-                           list(data.table(ffmc_yda=FFMC),
-                                data.table(temp=TEMP),
-                                data.table(rh=RH),
-                                data.table(ws=WS),
-                                data.table(prec=PREC))))
+  checkData('FineFuelMoistureCode',
+            FineFuelMoistureCode,
+            list(data.table(ffmc_yda=FFMC),
+                 data.table(temp=TEMP),
+                 data.table(rh=RH),
+                 data.table(ws=WS),
+                 data.table(prec=PREC)))
 })

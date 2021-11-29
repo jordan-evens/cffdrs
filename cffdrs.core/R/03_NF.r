@@ -39,7 +39,7 @@
 .LengthToBreadthRatioAtTime..FuelNF <- function(this, LB, HR, CFB) { return(0) }
 .RateOfSpread..FuelNF <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
 .RateOfSpreadAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
-.SlopeAdjust..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) { return(0) }
+.SlopeAdjust..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) { return(list(WSV=as.numeric(NA), RAZ=as.numeric(NA))) }
 .SurfaceFuelConsumption..FuelNF <- function(this, FFMC, BUI, PC, GFL) { return(0) }
 .FireBehaviourPrediction..FuelNF <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
 {
