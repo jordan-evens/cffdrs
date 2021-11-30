@@ -466,13 +466,13 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   #Surface spread rate with 0 wind on level ground
   RSZ <- ifelse(FUELTYPE %in% c("M1", "M2"),
                 cffdrs:::.ROScalc(rep("C2", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, PDF, 
-                         CC, CBH),
+                                  CC, CBH),
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for C2
   RSF_C2 <- ifelse(FUELTYPE %in% c("M1", "M2"), RSZ * SF, RSF_C2)
   RSZ <- ifelse(FUELTYPE %in% c("M1", "M2"),
                 cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, 
-                         PDF, CC, CBH),RSZ)
+                                  PDF, CC, CBH),RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for D1
   RSF_D1 <- ifelse(FUELTYPE %in% c("M1", "M2"), RSZ * SF, RSF_D1)
   RSF0 <- 1 - (RSF_C2 / a[["C2"]])^(1 / c0[["C2"]])
@@ -503,14 +503,14 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   #Surface spread rate with 0 wind on level ground
   RSZ <- ifelse(FUELTYPE %in% c("M3"), 
                 cffdrs:::.ROScalc(rep("M3", length(FMC)), ISI = ISZ, BUI = NoBUI, FMC, SFC, 
-                         PC, PDF100, CC, CBH), 
+                                  PC, PDF100, CC, CBH), 
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for M3
   RSF_M3 <- ifelse(FUELTYPE %in% c("M3"), RSZ * SF, RSF_M3)
   #Surface spread rate with 0 wind on level ground, using D1
   RSZ <- ifelse(FUELTYPE %in% c("M3"), 
                 cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, 
-                         PDF100, CC, CBH), 
+                                  PDF100, CC, CBH), 
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for M3
   RSF_D1 <- ifelse(FUELTYPE %in% c("M3"), RSZ * SF, RSF_D1)
@@ -539,14 +539,14 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   #Surface spread rate with 0 wind on level ground, using M4
   RSZ <- ifelse(FUELTYPE %in% c("M4"), 
                 cffdrs:::.ROScalc(rep("M4", length(FMC)), ISI = ISZ, BUI = NoBUI, FMC, SFC, 
-                         PC, PDF100, CC, CBH), 
+                                  PC, PDF100, CC, CBH), 
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for M4
   RSF_M4 <- ifelse(FUELTYPE %in% c("M4"), RSZ * SF, RSF_M4)
   #Surface spread rate with 0 wind on level ground, using M4
   RSZ <- ifelse(FUELTYPE %in% c("M4"), 
                 cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, 
-                         PDF100, CC, CBH), 
+                                  PDF100, CC, CBH), 
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for D1
   RSF_D1 <- ifelse(FUELTYPE %in% c("M4"), RSZ * SF,RSF_D1)
@@ -606,10 +606,14 @@ saveData('SlopeEquivalentInitialSpreadIndex',
               data.table(ISI=ISI),
               data.table(output = "RAZ")))
 fctSlopeWSE <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                                                    CC, CBH, ISI, output = "RAZ")
+                        CC, CBH, ISI, output = "RAZ")
 {
   ISF <- fctSlopeISI(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC,
                      PDF, CC, CBH, ISI, output)
+  if (is.na(ISF) || -99.0 == ISF)
+  {
+    return(NA)
+  }
   #Eq. 46 (FCFDG 1992)
   m <- 147.2 * (101 - FFMC) / (59.5 + FFMC)
   #Eq. 45 (FCFDG 1992) - FFMC function from the ISI equation
@@ -626,6 +630,123 @@ fctSlopeWSE <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
 }
 saveData('SlopeEquivalentWindSpeed',
          fctSlopeWSE,
+         list(data.table(FUELTYPE=FUELTYPE),
+              data.table(FFMC=FFMC),
+              data.table(BUI=BUI),
+              data.table(WS=WS),
+              data.table(WAZ=WAZ),
+              data.table(GS=GS),
+              data.table(SAZ=SAZ),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(PC=PC),
+              data.table(PDF=PDF),
+              data.table(CC=CC),
+              data.table(CBH=CBH),
+              data.table(ISI=ISI),
+              data.table(output = "RAZ")))
+fctSlopeWSX <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                        CC, CBH, ISI, output = "RAZ")
+{
+  WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                     CC, CBH, ISI, output)
+  #Eq. 47 (FCFDG 1992) - resultant vector magnitude in the x-direction
+  WSX <- WS * sin(WAZ) + WSE * sin(SAZ)
+  return(WSX)
+}
+fctSlopeWSY <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                        CC, CBH, ISI, output)
+{
+  WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                     CC, CBH, ISI, output)
+  #Eq. 48 (FCFDG 1992) - resultant vector magnitude in the y-direction
+  WSY <- WS * cos(WAZ) + WSE * cos(SAZ)
+  return(WSY)
+}
+fctSlopeWSV <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                        CC, CBH, ISI, output)
+{
+  WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                     CC, CBH, ISI, output)
+  #Eq. 47 (FCFDG 1992) - resultant vector magnitude in the x-direction
+  WSX <- WS * sin(WAZ) + WSE * sin(SAZ)
+  #Eq. 48 (FCFDG 1992) - resultant vector magnitude in the y-direction
+  WSY <- WS * cos(WAZ) + WSE * cos(SAZ)
+  #Eq. 49 (FCFDG 1992) - the net effective wind speed
+  WSV <- sqrt(WSX * WSX + WSY * WSY)
+  return(WSV)
+}
+fctSlopeRAZ <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                        CC, CBH, ISI, output)
+{
+  WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
+                     CC, CBH, ISI, output)
+  #Eq. 47 (FCFDG 1992) - resultant vector magnitude in the x-direction
+  WSX <- WS * sin(WAZ) + WSE * sin(SAZ)
+  #Eq. 48 (FCFDG 1992) - resultant vector magnitude in the y-direction
+  WSY <- WS * cos(WAZ) + WSE * cos(SAZ)
+  #Eq. 49 (FCFDG 1992) - the net effective wind speed
+  WSV <- sqrt(WSX * WSX + WSY * WSY)
+  #Eq. 50 (FCFDG 1992) - the net effective wind direction (radians)
+  RAZ <- acos(WSY / WSV)
+  #Eq. 51 (FCFDG 1992) - convert possible negative RAZ into more understandable
+  # directions
+  RAZ <- ifelse(WSX < 0, 2 * pi - RAZ, RAZ)
+  return(RAZ)
+}
+saveData('SlopeAdjustWSX',
+         fctSlopeWSX,
+         list(data.table(FUELTYPE=FUELTYPE),
+              data.table(FFMC=FFMC),
+              data.table(BUI=BUI),
+              data.table(WS=WS),
+              data.table(WAZ=WAZ),
+              data.table(GS=GS),
+              data.table(SAZ=SAZ),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(PC=PC),
+              data.table(PDF=PDF),
+              data.table(CC=CC),
+              data.table(CBH=CBH),
+              data.table(ISI=ISI),
+              data.table(output = "RAZ")))
+saveData('SlopeAdjustWSY',
+         fctSlopeWSY,
+         list(data.table(FUELTYPE=FUELTYPE),
+              data.table(FFMC=FFMC),
+              data.table(BUI=BUI),
+              data.table(WS=WS),
+              data.table(WAZ=WAZ),
+              data.table(GS=GS),
+              data.table(SAZ=SAZ),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(PC=PC),
+              data.table(PDF=PDF),
+              data.table(CC=CC),
+              data.table(CBH=CBH),
+              data.table(ISI=ISI),
+              data.table(output = "RAZ")))
+saveData('SlopeAdjust_WSV',
+         fctSlopeWSV,
+         list(data.table(FUELTYPE=FUELTYPE),
+              data.table(FFMC=FFMC),
+              data.table(BUI=BUI),
+              data.table(WS=WS),
+              data.table(WAZ=WAZ),
+              data.table(GS=GS),
+              data.table(SAZ=SAZ),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(PC=PC),
+              data.table(PDF=PDF),
+              data.table(CC=CC),
+              data.table(CBH=CBH),
+              data.table(ISI=ISI),
+              data.table(output = "RAZ")))
+saveData('SlopeAdjust_RAZ',
+         fctSlopeRAZ,
          list(data.table(FUELTYPE=FUELTYPE),
               data.table(FFMC=FFMC),
               data.table(BUI=BUI),
