@@ -8,7 +8,7 @@
                             CFL=0.5),
                  class=c(".C7", ".FuelClosed", "Fuel", ".FuelBase")
 )
-.SurfaceFuelConsumption..C7 <- function(this, FFMC, BUI, PC, GFL)
+.SurfaceFuelConsumptionBase..C7 <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eqs. 13, 14, 15 (FCFDG 1992) - C7 Fuel Types
   return (ifelse(FFMC > 70,

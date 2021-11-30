@@ -17,6 +17,7 @@
 .SlopeAdjust <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) UseMethod(".SlopeAdjust", this)
 .SlopeEquivalentInitialSpreadIndex <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) UseMethod(".SlopeEquivalentInitialSpreadIndex", this)
 .SurfaceFuelConsumption <- function(this, FFMC, BUI, PC, GFL) UseMethod(".SurfaceFuelConsumption", this)
+.SurfaceFuelConsumptionBase <- function(this, FFMC, BUI, PC, GFL) UseMethod(".SurfaceFuelConsumptionBase", this)
 Fuel <- structure(.Data=list(
                    name="Fuel",
                    a=as.numeric(NA),

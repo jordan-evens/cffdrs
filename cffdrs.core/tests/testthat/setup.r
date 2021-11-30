@@ -2,49 +2,57 @@ library(data.table)
 PATH <- '../data/'
 DESIRED_ROWS <- 5000
 
-ACCEL <- list(0, 1)
-ASPECT <- seq(-370, 370, by=0.1)
+DAY <- seq(0, 366)
+PERCENT <- seq(0, 100)
+RADIANS <- seq(-360, 360, by=0.1) * pi/180
+ZERO_OR_ONE <- list(0, 1)
+
+ACCEL <- ZERO_OR_ONE
+ASPECT <- RADIANS
 BOOL <- c(TRUE, FALSE)
-BUI <- seq(-10, 1000, by=0.1)
-BUIEFF <- list(0, 1)
-CBH <- seq(-10, 200, by=0.1)
-CC <- seq(-10, 110)
+BUI <- seq(0, 1000, by=0.1)
+BUIEFF <- ZERO_OR_ONE
+CBH <- seq(0, 200, by=0.1)
+CC <- PERCENT
 CFB <- seq(-1, 2, by=0.01)
 CFL <- seq(-10, 4000, by=0.1)
-D0 <- seq(-10, 370)
-DC <- seq(-10, 1000, by=0.1)
-DMC <- seq(-10, 1000, by=0.1)
-DJ <- seq(-10, 370)
-ELV <- seq(-100, 4000)
+D0 <- DAY
+DC <- seq(0, 1000, by=0.1)
+DMC <- seq(0, 1000, by=0.1)
+DJ <- DAY
+ELV <- seq(0, 10000)
 FC <- seq(-10, 20000)
-FFMC <- seq(-10, 105, by=0.1)
-FMC <- seq(-10, 500, by=0.1)
+FFMC <- seq(0, 101, by=0.1)
+FMC <- seq(0, 500, by=0.1)
 FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
            "D1", "M1", "M2", "M3", "M4", "S1", "S2",
            "S3", "O1A", "O1B")
-GFL <- seq(-10, 200)
-GS <- seq(-100, 300)
-HR <- seq(-10, 6000)
-ISI <- seq(-10, 1000, by=0.1)
-LAT <- seq(-370, 370, by=0.1)
+GFL <- seq(0, 100)
+GS <- seq(0, 200)
+HR <- seq(0, 366 * 24) * 60
+ISI <- seq(0, 300, by=0.1)
+LAT <- seq(-90, 90, by=0.1)
 LB <- seq(-1, 1.1, by=0.01)
-LONG <- seq(-370, 370, by=0.1)
+# FIX: for some reason the original package just makes negatives positive
+LONG <- abs(seq(-180, 360, by=0.1))
 MON <- seq(1, 12)
-PC <- seq(-10, 110)
-PDF <- seq(-10, 100)
+PC <- PERCENT
+PDF <- PERCENT
 PREC <- seq(-10, 300, by=0.01)
 RH <- seq(-10, 110, by=0.01)
 ROS <- seq(0, 600, by=0.01)
-SAZ <- seq(-370, 370, by=0.1)
-SD <- seq(-10, 1e+05)
-SFC <- seq(-10, 20000)
+SAZ <- RADIANS + pi
+SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
+SD <- append(list(-999), seq(0, 100))
+SFC <- seq(0, 20000)
 SH <- seq(-10, 110)
 TEMP <- seq(-30, 60, by=0.1)
-WD <- seq(-370, 370, by=0.1)
-WS <- seq(0, 500, by=0.1)
+WD <- RADIANS
+WS <- seq(0, 300, by=0.1)
 THETA <- seq(-360, 360, by=0.01)
 WSV <- seq(-10, 500, by=0.1)
-WAZ <- seq(-370, 370, by=0.1)
+WAZ <- RADIANS + pi
+WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
 
 pickRows <- function(d1, num_rows=DESIRED_ROWS)
 {
@@ -112,6 +120,7 @@ makeData <- function(name, fct, arguments)
     return(i)
   }
 }
+
 checkResults <- function(name, df1)
 {
   df1 <- data.table(df1)

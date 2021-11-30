@@ -55,5 +55,7 @@ RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CB
 {
   RSI <- .BaseRateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   ROS <- .BuildupEffect(this, BUI) * RSI
+  # HACK: keep old behaviour
+  ROS <- ifelse(ROS <= 0, 0.000001, ROS)
   return(ROS)
 }

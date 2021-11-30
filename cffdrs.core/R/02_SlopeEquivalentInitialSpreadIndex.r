@@ -10,6 +10,8 @@
   RSF <- RSZ * SF
   #Eqs. 41a, 41b (Wotton 2009) - Calculate the slope equivalent ISI
   ISF <- log(max(0.01, 1 - (RSF / this[["a"]])**(1 / this[["c0"]]))) / (-this[["b"]])
+  # s <- 1 - (RSF / this[["a"]])**(1 / this[["c0"]])
+  # ISF <- ifelse(s >= 0.01, log(s), log(0.01)) / (-this[["b"]])
   return(ISF)
 }
 .SlopeEquivalentInitialSpreadIndex..FuelMixedwood <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)

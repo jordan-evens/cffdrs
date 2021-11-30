@@ -43,6 +43,10 @@ SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
 .SlopeAdjust.Fuel <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
   ISF <- .SlopeEquivalentInitialSpreadIndex(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+  if (is.na(ISF) || -99.0 == ISF)
+  {
+    return(list(WSV=NA, RAZ=NA))
+  }
   #Eq. 46 (FCFDG 1992)
   m <- 147.2 * (101 - FFMC) / (59.5 + FFMC)
   #Eq. 45 (FCFDG 1992) - FFMC function from the ISI equation
@@ -66,7 +70,5 @@ SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   #Eq. 51 (FCFDG 1992) - convert possible negative RAZ into more understandable
   # directions
   RAZ <- ifelse(WSX < 0, 2 * pi - RAZ, RAZ)
-  result <- list(WSV, RAZ)
-  names(result) <- c("WSV", "RAZ")
-  return(result)
+  return(list(WSV=WSV, RAZ=RAZ))
 }

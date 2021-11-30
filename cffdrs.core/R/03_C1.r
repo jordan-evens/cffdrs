@@ -8,7 +8,7 @@
                             CFL=0.75),
                  class=c(".C1", ".FuelOpen", "Fuel", ".FuelBase")
 )
-.SurfaceFuelConsumption..C1 <- function(this, FFMC, BUI, PC, GFL)
+.SurfaceFuelConsumptionBase..C1 <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eqs. 9a, 9b (Wotton et. al. 2009) - Solving the lower bound of FFMC value
   # for the C1 fuel type SFC calculation

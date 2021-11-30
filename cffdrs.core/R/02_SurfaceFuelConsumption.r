@@ -28,17 +28,17 @@ SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
   SFC <- ifelse(SFC <= 0, 0.000001, SFC)
   return(SFC)
 })
-.SurfaceFuelConsumption.Fuel <- function(this, FFMC, BUI, PC, GFL)
+.SurfaceFuelConsumptionBase.Fuel <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eq. 10, 11, 12, 16 (FCFDG 1992)
   #C2/M3/M4, C3/C4, C5/C6, and D1 Fuel Types
   return (this[["sfcA"]] * (1 - exp(this[["sfcB"]] * BUI))**this[["sfcC"]])
 }
-.SurfaceFuelConsumption..FuelMixedwood <- function(this, FFMC, BUI, PC, GFL)
+.SurfaceFuelConsumptionBase..FuelMixedwood <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eq. 17 (FCFDG 1992) - M1 and M2 Fuel Types
-  SFC_C2 <- (PC / 100 * .SurfaceFuelConsumption(.C2, FFMC, BUI, PC, GFL))
-  SFC_D1 <- ((100 - PC) / 100 * .SurfaceFuelConsumption(.D1, FFMC, BUI, PC, GFL))
+  SFC_C2 <- (PC / 100 * .SurfaceFuelConsumptionBase(.C2, FFMC, BUI, PC, GFL))
+  SFC_D1 <- ((100 - PC) / 100 * .SurfaceFuelConsumptionBase(.D1, FFMC, BUI, PC, GFL))
   SFC_C2_check <- PC / 100 * (5.0 * (1 - exp(-0.0115 * BUI)))
   SFC_D1_check <- ((100 - PC) / 100 * (1.5 * (1 - exp(-0.0183 * BUI))))
   stopifnot(SFC_C2 == SFC_C2_check)
@@ -48,16 +48,22 @@ SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
   stopifnot(SFC == SFC_check)
   return(SFC)
 }
-.SurfaceFuelConsumption..FuelGrass <- function(this, FFMC, BUI, PC, GFL)
+.SurfaceFuelConsumptionBase..FuelGrass <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eq. 18 (FCFDG 1992) - Grass Fuel Types
   return (GFL)
 }
-.SurfaceFuelConsumption..FuelSlash <- function(this, FFMC, BUI, PC, GFL)
+.SurfaceFuelConsumptionBase..FuelSlash <- function(this, FFMC, BUI, PC, GFL)
 {
   #Eq. 19, 20, 25 (FCFDG 1992) - S1 Fuel Type
   #Eq. 21, 22, 25 (FCFDG 1992) - S2 Fuel Type
   #Eq. 23, 24, 25 (FCFDG 1992) - S3 Fuel Type
   return (this[["sfcA"]] * (1 - exp(this[["sfcB"]] * BUI))
           + this[["sfcC"]] * (1 - exp(this[["sfcD"]] * BUI)))
+}
+.SurfaceFuelConsumption.Fuel <- function(this, FFMC, BUI, PC, GFL)
+{
+  SFC <- .SurfaceFuelConsumptionBase(this, FFMC, BUI, PC, GFL)
+  SFC <- ifelse(SFC <= 0, 0.000001, SFC)
+  return(SFC)
 }

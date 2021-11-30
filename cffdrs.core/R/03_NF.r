@@ -40,7 +40,16 @@
 .RateOfSpread..FuelNF <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
 .RateOfSpreadAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
 .SlopeAdjust..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) { return(list(WSV=as.numeric(NA), RAZ=as.numeric(NA))) }
-.SurfaceFuelConsumption..FuelNF <- function(this, FFMC, BUI, PC, GFL) { return(0) }
+.SlopeEquivalentInitialSpreadIndex..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+{
+  # NOTE: keep old behaviour
+  return(-99.0)
+}
+# .SlopeEquivalentWindSpeed..FuelNF <- function()
+# {
+#   ifelse(ROS <= 0,0.000001,ROS)
+# }
+.SurfaceFuelConsumptionBase..FuelNF <- function(this, FFMC, BUI, PC, GFL) { return(0) }
 .FireBehaviourPrediction..FuelNF <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
 {
   ID <- CFB <- CFC <- FD <- HFI <- RAZ <- ROS <- SFC <- 
