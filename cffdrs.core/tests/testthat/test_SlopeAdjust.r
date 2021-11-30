@@ -4,7 +4,12 @@ test_that("SlopeAdjust", {
   {
     result <- SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, PC, PDF,
                           CC, CBH, ISI)
-    return(result[[output]])
+    if ('WSV' == output)
+    {
+      return(result$WSV)
+    }
+    return(result$RAZ)
+    # return(result[[output]])
   }
   test_that("SlopeAdjust$RAZ", {
     checkData('SlopeAdjustRAZ',

@@ -35,14 +35,18 @@
 #' @returns  list(RAZ, WSV) - Rate of spread azimuth (degrees) and Wind Slope speed (km/hr)
 #' 
 #' @export SlopeAdjust
-SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                       CC, CBH, ISI)
+SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                        FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
-  return(.SlopeAdjust(FUELS[[FUELTYPE]], FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI))
+  return(.SlopeAdjust(FUELS[[FUELTYPE]], FFMC, BUI, WS, WAZ, GS, SAZ,
+                      FMC, SFC, PC, PDF, CC, CBH, ISI))
 }
-.SlopeAdjust.Fuel <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+.SlopeAdjust.Fuel <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ,
+                              FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
-  ISF <- .SlopeEquivalentInitialSpreadIndex(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+  ISF <- .SlopeEquivalentInitialSpreadIndex(this, FFMC, BUI, WS, WAZ, GS, SAZ,
+                                            FMC, SFC, PC, PDF, CC, CBH, ISI)
+  stopifnot(1 == length(ISF))
   if (is.na(ISF) || -99.0 == ISF)
   {
     return(list(WSV=NA, RAZ=NA))
@@ -70,5 +74,13 @@ SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   #Eq. 51 (FCFDG 1992) - convert possible negative RAZ into more understandable
   # directions
   RAZ <- ifelse(WSX < 0, 2 * pi - RAZ, RAZ)
-  return(list(WSV=WSV, RAZ=RAZ))
+  result <- list(WSV=WSV, RAZ=RAZ)
+  # library(testthat)
+  # expect_equal(WSV, WSV)
+  # expect_equal(RAZ, RAZ)
+  # expect_equal(result$WSV, WSV)
+  # expect_equal(result$RAZ, RAZ)
+  # expect_equal(result[["RAZ"]], RAZ)
+  # expect_equal(result[["WSV"]], WSV)
+  return(result)
 }
