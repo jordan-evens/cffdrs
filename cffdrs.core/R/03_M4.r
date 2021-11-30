@@ -15,7 +15,7 @@
 {
   #Initial Rate of Spread for M4 Mixedwood
   #Eq. 30 (Wotton et. al 2009)
-  RSI_m4 <- this[["a"]] * ((1 - exp(-this[["b"]] * ISI))**this[["c0"]])
+  RSI_m4 <- this$a * ((1 - exp(-this$b * ISI))**this$c0)
   #Eq. 33 (Wotton et. al 2009)
   RSI <- PDF / 100* RSI_m4 +
     0.2 * (1 - PDF / 100)* .BaseRateOfSpread(.D1, ISI, BUI=-1, FMC, SFC, PC, PDF, CC,CBH)

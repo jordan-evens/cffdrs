@@ -18,7 +18,7 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
   CBH <- .CrownBaseHeight(this, CBH, SD, SH)
-  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), this[["CFL"]], CFL)
+  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), this$CFL, CFL)
   FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
                 .FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
                 FMC)
@@ -117,10 +117,10 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
     # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
     # Back and at angle theta used in the *TI equations)
     # HACK: old version used non-constant equation for every FUELTYPE
-    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha..FuelClosed(this, CFB))
-    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha..FuelClosed(this, FCFB))
-    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha..FuelClosed(this, BCFB))
-    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha..FuelClosed(this, TCFB))
+    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha..FuelBase(this, CFB))
+    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha..FuelBase(this, FCFB))
+    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha..FuelBase(this, BCFB))
+    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha..FuelBase(this, TCFB))
     
     # FIX: shouldn't it be this?
     # TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(this, CFB))

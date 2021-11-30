@@ -19,7 +19,7 @@ DistanceAtTime <- Vectorize(function(FUELTYPE, ROSeq, HR, CFB)
 {
   return(.DistanceAtTime(FUELS[[FUELTYPE]], ROSeq, HR, CFB))
 })
-.DistanceAtTime.Fuel <- function(this, ROSeq, HR, CFB)
+.DistanceAtTime..FuelBase <- function(this, ROSeq, HR, CFB)
 {
   #Eq. 72 (FCFDG 1992)
   #Calculate the alpha constant for the DISTt calculation

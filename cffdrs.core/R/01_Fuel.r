@@ -36,9 +36,7 @@ Fuel <- structure(.Data=list(
 .CrownBaseHeight.Fuel <- function(this, CBH, SD, SH)
 {
   CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH),
-                ifelse((this[["name"]] == "C6") & SD > 0 & SH > 0,
-                       -11.2 + 1.06 * SH + 0.0017 * SD,
-                       this[["CBH"]]),
+                this$CBH,
                 CBH)
   CBH <- ifelse(CBH < 0, 1e-07, CBH)
   return(CBH)
@@ -50,7 +48,9 @@ Fuel <- structure(.Data=list(
 .FuelClosed <- structure(.Data=list(name=".FuelClosed"), class=c(".FuelClosed", "Fuel", ".FuelBase"))
 .FuelOpen <- structure(.Data=list(name=".FuelOpen"), class=c(".FuelOpen", "Fuel", ".FuelBase"))
 
-.Alpha..FuelClosed <- function(this, CBH)
+#HACK: keep old behaviour for FuelNF
+.Alpha..FuelBase <- function(this, CBH)
+#.Alpha..FuelClosed <- function(this, CBH)
 {
   #Eq. 72 (FCFDG 1992)
   #Calculate the alpha constant for the DISTt calculation

@@ -26,7 +26,7 @@ LengthToBreadthRatioAtTime <- Vectorize(function(FUELTYPE, LB, HR, CFB)
 {
   return(.LengthToBreadthRatioAtTime(FUELS[[FUELTYPE]], LB, HR, CFB))
 })
-.LengthToBreadthRatioAtTime.Fuel <- function(this, LB, HR, CFB)
+.LengthToBreadthRatioAtTime..FuelBase <- function(this, LB, HR, CFB)
 {
   #Eq. 72 (FCFDG 1992) - alpha constant value, dependent on fuel type
   alpha <- .Alpha(this, CFB)

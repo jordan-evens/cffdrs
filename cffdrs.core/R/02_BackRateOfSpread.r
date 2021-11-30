@@ -24,7 +24,7 @@ BackRateOfSpread <- function(FUELTYPE, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CB
 {
   return(.BackRateOfSpread(FUELS[[FUELTYPE]], FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH))
 }
-.BackRateOfSpread.Fuel <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
+.BackRateOfSpread..FuelBase <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Eq. 46 (FCFDG 1992)
   #Calculate the FFMC function from the ISI equation

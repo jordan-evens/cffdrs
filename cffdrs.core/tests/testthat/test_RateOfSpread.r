@@ -1,6 +1,6 @@
 test_that("RateOfSpread", {
   checkData('RateOfSpread',
-            cffdrs:::.ROScalc,
+            RateOfSpread,
             list(data.table(FUELTYPE=FUELTYPE),
                  data.table(ISI=ISI),
                  data.table(BUI=BUI),

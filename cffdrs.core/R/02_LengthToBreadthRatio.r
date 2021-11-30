@@ -24,7 +24,7 @@ LengthToBreadthRatio <- function(FUELTYPE, WSV)
 {
   return(.LengthToBreadthRatio(FUELS[[FUELTYPE]], WSV))
 }
-.LengthToBreadthRatio.Fuel <- function(this, WSV)
+.LengthToBreadthRatio..FuelBase <- function(this, WSV)
 {
   #Eq. 79
   return(1.0 + 8.729 * (1-exp(-0.030 * WSV))**(2.155))

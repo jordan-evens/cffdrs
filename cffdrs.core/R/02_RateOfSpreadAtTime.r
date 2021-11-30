@@ -21,7 +21,7 @@ RateOfSpreadAtTime <- Vectorize(function(FUELTYPE, ROSeq, HR, CFB)
 {
   return(.RateOfSpreadAtTime(FUELS[[FUELTYPE]], ROSeq, HR, CFB))
 })
-.RateOfSpreadAtTime.Fuel <- function(this, ROSeq, HR, CFB)
+.RateOfSpreadAtTime..FuelBase <- function(this, ROSeq, HR, CFB)
 {
   #Eq. 72 - alpha constant value, dependent on fuel type
   alpha <- .Alpha(this, CFB)

@@ -15,8 +15,8 @@
 .FuelNF <- structure(.Data=list(name="NF"),
                      class=c(".FuelNF", ".FuelBase")
 )
-.Alpha..FuelNF <- function(this, CBH) { return(0) }
-.BackRateOfSpread..FuelNF <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
+#.Alpha..FuelNF <- function(this, CBH) { return(0) }
+#.BackRateOfSpread..FuelNF <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
 .BaseRateOfSpread..FuelNF <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
 .BuildupEffect..FuelNF <- function(this, BUI) {
   # keep old behaviour
@@ -27,19 +27,20 @@
   return(as.numeric(NA))
 }
 .CrownBaseHeight..FuelNF <- function(this, CBH, SD, SH) { return(0) }
-.CrownFractionBurned..FuelNF <- function(this, ROS, RSO)
-{
-  #Eq. 58 (FCFDG 1992) Crown fraction burned 
-  CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), 0)
-  return(CFB)
-}
-.DistanceAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
+# .CrownFractionBurned..FuelNF <- function(this, ROS, RSO)
+# {
+#   #Eq. 58 (FCFDG 1992) Crown fraction burned 
+#   CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), 0)
+#   return(CFB)
+# }
+#.DistanceAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
 .FireBehaviourPrediction..FuelNF <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA) { return(0) }
-.LengthToBreadthRatio..FuelNF <- function(this, WSV) { return(0) }
-.LengthToBreadthRatioAtTime..FuelNF <- function(this, LB, HR, CFB) { return(0) }
-.RateOfSpread..FuelNF <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
-.RateOfSpreadAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
-.SlopeAdjust..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) { return(list(WSV=as.numeric(NA), RAZ=as.numeric(NA))) }
+#.LengthToBreadthRatio..FuelNF <- function(this, WSV) { return(0) }
+#.LengthToBreadthRatioAtTime..FuelNF <- function(this, LB, HR, CFB) { return(1.0) }
+#.RateOfSpread..FuelNF <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
+# HACK: return old value instead of logical one
+#.RateOfSpreadAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
+#.SlopeAdjust..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) { return(list(WSV=as.numeric(NA), RAZ=as.numeric(NA))) }
 .SlopeEquivalentInitialSpreadIndex..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
   # NOTE: keep old behaviour

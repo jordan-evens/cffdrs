@@ -1,6 +1,6 @@
 .C6 <- structure(.Data=list(name="C6",
                             a=30,
-                            b=0.0800,
+                            b=0.08,
                             c0=3.0,
                             BUIo=62,
                             Q=0.8,
@@ -11,6 +11,14 @@
                             CFL=1.8),
                  class=c(".C6", ".FuelClosed", "Fuel", ".FuelBase")
 )
+.CrownBaseHeight..C6 <- function(this, CBH, SD, SH)
+{
+  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH),
+                -11.2 + 1.06 * SH + 0.0017 * SD,
+                CBH)
+  CBH <- ifelse(CBH < 0, 1e-07, CBH)
+  return(CBH)
+}
 .RateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Calculate C6 separately
@@ -38,7 +46,7 @@
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
   CBH <- .CrownBaseHeight(this, CBH, SD, SH)
-  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), this[["CFL"]], CFL)
+  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), this$CFL, CFL)
   FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
                 .FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
                 FMC)
@@ -69,7 +77,7 @@
   RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
   RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
   RSC <- CrownRateOfSpreadC6(ISI, FMC)
-  CFB <- .CrownFractionBurned(this, RSS, RSO)
+  CFB <- .CrownFractionBurned(this, RSC, RSO)
   ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   #Calculate Total Fuel Consumption (TFC)
   TFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
@@ -116,7 +124,7 @@
     FCFB <- 0
     BCFB <- 0
     TCFB <- 0
-    # if (CFL != 0 && !(this[["name"]] == "C6"))
+    # if (CFL != 0 && !(this$name == "C6"))
     # {
     #   FCFB <- CrownFractionBurned(FROS, RSO)
     #   BCFB <- CrownFractionBurned(BROS, RSO)

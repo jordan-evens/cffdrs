@@ -1,6 +1,6 @@
 test_that("FoliarMoistureContent", {
   checkData('FoliarMoistureContent',
-            cffdrs:::.FMCcalc,
+            FoliarMoistureContent,
             list(data.table(LAT=LAT),
                  data.table(LONG=LONG),
                  data.table(ELV=ELV),

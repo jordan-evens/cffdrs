@@ -1,6 +1,6 @@
 test_that("DistanceAtTime", {
   checkData('DistanceAtTime',
-            cffdrs:::.DISTtcalc,
+            DistanceAtTime,
             list(data.table(FUELTYPE=FUELTYPE),
                  data.table(ROSeq=ROS),
                  data.table(HR=HR),

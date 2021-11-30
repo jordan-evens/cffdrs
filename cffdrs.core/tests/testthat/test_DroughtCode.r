@@ -1,6 +1,6 @@
 test_that("DroughtCode", {
   checkData('DroughtCode',
-            cffdrs:::.dcCalc,
+            DroughtCode,
             list(data.table(dc_yda=DC),
                  data.table(temp=TEMP),
                  data.table(rh=RH),

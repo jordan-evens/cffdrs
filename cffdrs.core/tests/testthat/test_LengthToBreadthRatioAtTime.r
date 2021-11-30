@@ -1,6 +1,6 @@
 test_that("LengthToBreadthRatioAtTime", {
   checkData('LengthToBreadthRatioAtTime',
-            cffdrs:::.LBtcalc,
+            LengthToBreadthRatioAtTime,
             list(data.table(FUELTYPE=FUELTYPE),
                  data.table(LB=LB),
                  data.table(HR=HR),

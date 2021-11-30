@@ -32,7 +32,7 @@ SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
 {
   #Eq. 10, 11, 12, 16 (FCFDG 1992)
   #C2/M3/M4, C3/C4, C5/C6, and D1 Fuel Types
-  return (this[["sfcA"]] * (1 - exp(this[["sfcB"]] * BUI))**this[["sfcC"]])
+  return (this$sfcA * (1 - exp(this$sfcB * BUI))**this$sfcC)
 }
 .SurfaceFuelConsumptionBase..FuelMixedwood <- function(this, FFMC, BUI, PC, GFL)
 {
@@ -58,10 +58,10 @@ SurfaceFuelConsumption <- Vectorize(function(FUELTYPE, FFMC, BUI, PC, GFL)
   #Eq. 19, 20, 25 (FCFDG 1992) - S1 Fuel Type
   #Eq. 21, 22, 25 (FCFDG 1992) - S2 Fuel Type
   #Eq. 23, 24, 25 (FCFDG 1992) - S3 Fuel Type
-  return (this[["sfcA"]] * (1 - exp(this[["sfcB"]] * BUI))
-          + this[["sfcC"]] * (1 - exp(this[["sfcD"]] * BUI)))
+  return (this$sfcA * (1 - exp(this$sfcB * BUI))
+          + this$sfcC * (1 - exp(this$sfcD * BUI)))
 }
-.SurfaceFuelConsumption.Fuel <- function(this, FFMC, BUI, PC, GFL)
+.SurfaceFuelConsumption..FuelBase <- function(this, FFMC, BUI, PC, GFL)
 {
   SFC <- .SurfaceFuelConsumptionBase(this, FFMC, BUI, PC, GFL)
   SFC <- ifelse(SFC <= 0, 0.000001, SFC)

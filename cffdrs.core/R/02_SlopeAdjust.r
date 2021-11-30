@@ -41,7 +41,7 @@ SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
   return(.SlopeAdjust(FUELS[[FUELTYPE]], FFMC, BUI, WS, WAZ, GS, SAZ,
                       FMC, SFC, PC, PDF, CC, CBH, ISI))
 }
-.SlopeAdjust.Fuel <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ,
+.SlopeAdjust..FuelBase <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ,
                               FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
   ISF <- .SlopeEquivalentInitialSpreadIndex(this, FFMC, BUI, WS, WAZ, GS, SAZ,

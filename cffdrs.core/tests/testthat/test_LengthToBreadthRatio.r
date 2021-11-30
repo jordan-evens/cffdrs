@@ -1,5 +1,5 @@
 test_that("LengthToBreadthRatio", {
   checkData('LengthToBreadthRatio',
-            cffdrs:::.LBcalc,
+            LengthToBreadthRatio,
             list(data.table(FUELTYPE=FUELTYPE),
                  data.table(WSV=WSV)))})

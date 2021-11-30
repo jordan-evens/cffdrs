@@ -1,6 +1,6 @@
 test_that("DuffMoistureCode", {
   checkData('DuffMoistureCode',
-            cffdrs:::.dmcCalc,
+            DuffMoistureCode,
             list(data.table(dmc_yda=DMC),
                  data.table(temp=TEMP),
                  data.table(rh=RH),

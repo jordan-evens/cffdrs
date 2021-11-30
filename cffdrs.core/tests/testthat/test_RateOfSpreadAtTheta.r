@@ -1,6 +1,6 @@
 test_that("RateOfSpreadAtTheta", {
   checkData('RateOfSpreadAtTheta',
-            cffdrs:::.ROSthetacalc,
+            RateOfSpreadAtTheta,
             list(data.table(ROS=ROS),
                  data.table(FROS=ROS),
                  data.table(BROS=ROS),
