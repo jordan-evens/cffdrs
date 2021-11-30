@@ -342,6 +342,99 @@ saveData('InitialSpreadIndex',
          list(data.table(ffmc=FFMC),
               data.table(ws=WS),
               data.table(fbpMod=BOOL)))
+saveData('IntermediateSurfaceRateOfSpreadC6',
+         cffdrs:::.C6calc,
+         list(data.table(FUELTYPE=c("C6")),
+              data.table(ISI=ISI),
+              data.table(BUI=BUI),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(CBH=CBH),
+              data.table(ROS=ROS),
+              data.table(CFB=CFB),
+              data.table(RSC=ROS),
+              data.table(option=c("RSI"))))
+saveData('CrownRateOfSpreadC6',
+         cffdrs:::.C6calc,
+         list(data.table(FUELTYPE=c("C6")),
+              data.table(ISI=ISI),
+              data.table(BUI=BUI),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(CBH=CBH),
+              data.table(ROS=ROS),
+              data.table(CFB=CFB),
+              data.table(RSC=ROS),
+              data.table(option=c("RSC"))))
+fctRSSC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
+{
+  stopifnot("C6" == FUELTYPE)
+  RSI <- cffdrs:::.C6calc(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
+  RSS <- RSI * cffdrs:::.BEcalc(FUELTYPE, BUI)
+  return(RSS)
+}
+saveData('SurfaceRateOfSpreadC6',
+         fctRSSC6,
+         list(data.table(FUELTYPE=c("C6")),
+              data.table(ISI=ISI),
+              data.table(BUI=BUI),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(CBH=CBH),
+              data.table(ROS=ROS),
+              data.table(CFB=CFB),
+              data.table(RSC=ROS),
+              data.table(option=c("RSI"))))
+saveData('CrownFractionBurnedC6',
+         cffdrs:::.C6calc,
+         list(data.table(FUELTYPE=c("C6")),
+              data.table(ISI=ISI),
+              data.table(BUI=BUI),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(CBH=CBH),
+              data.table(ROS=ROS),
+              data.table(CFB=CFB),
+              data.table(RSC=ROS),
+              data.table(option=c("CFB"))))
+fctCSIC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
+{
+  stopifnot("C6" == FUELTYPE)
+  stopifnot("RSC" == option)
+  CSI <- cffdrs:::.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH, "CSI")
+  return(CSI)
+}
+saveData('CriticalSurfaceIntensityC6',
+         fctCSIC6,
+         list(data.table(FUELTYPE=c("C6")),
+              data.table(ISI=ISI),
+              data.table(BUI=BUI),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(CBH=CBH),
+              data.table(ROS=ROS),
+              data.table(CFB=CFB),
+              data.table(RSC=ROS),
+              data.table(option=c("RSC"))))
+fctRSOC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
+{
+  stopifnot("C6" == FUELTYPE)
+  stopifnot("RSC" == option)
+  RSO <- cffdrs:::.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH, "RSO")
+  return(RSO)
+}
+saveData('CriticalSurfaceRateOfSpreadC6',
+         fctRSOC6,
+         list(data.table(FUELTYPE=c("C6")),
+              data.table(ISI=ISI),
+              data.table(BUI=BUI),
+              data.table(FMC=FMC),
+              data.table(SFC=SFC),
+              data.table(CBH=CBH),
+              data.table(ROS=ROS),
+              data.table(CFB=CFB),
+              data.table(RSC=ROS),
+              data.table(option=c("RSC"))))
 saveData('LengthToBreadthRatio',
          cffdrs:::.LBcalc,
          list(data.table(FUELTYPE=FUELTYPE),
