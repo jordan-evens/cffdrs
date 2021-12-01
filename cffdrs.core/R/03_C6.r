@@ -21,13 +21,20 @@
 }
 .RateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
-  #Calculate C6 separately
   RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
   RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
   RSC <- CrownRateOfSpreadC6(ISI, FMC)
   CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
-  RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
-  CFB <- .CrownFractionBurned(this, RSS, RSO)
+  #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
+  RSO <- CSI / (300 * SFC)
+  CFB <- ifelse(RSC > RSS, .CrownFractionBurned(this, RSS, RSO), 0)
+  # #Calculate C6 separately
+  # RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+  # RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
+  # RSC <- CrownRateOfSpreadC6(ISI, FMC)
+  # CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
+  # RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
+  # CFB <- .CrownFractionBurned(this, RSS, RSO)
   ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   return(ROS)
 }
@@ -66,19 +73,18 @@
   RAZ <- ifelse(GS > 0 & FFMC > 0, RAZ0, WAZ)
   #Calculate or keep Initial Spread Index (ISI)
   ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
-  #Calculate Critical Surface Intensity
-  CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
-  #Calculate Surface fire rate of spread (m/min)
-  # FIX: C6 was using the same function as other things
-  RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
   # Calculate the Rate of Spread (ROS) and Crown Fraction Burned (CFB)
   # C6 has different calculations
+  ROS <- .RateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   # HACK: use ifelse for now to keep old behaviour
-  RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
-  RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
-  RSC <- CrownRateOfSpreadC6(ISI, FMC)
-  CFB <- .CrownFractionBurned(this, RSC, RSO)
-  ROS <- RateOfSpreadC6(RSC, RSS, CFB)
+  # RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+  # RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
+  # RSC <- CrownRateOfSpreadC6(ISI, FMC)
+  # CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
+  # #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
+  # RSO <- CSI / (300 * SFC)
+  # CFB <- ifelse(RSC > RSS, .CrownFractionBurned(this, RSS, RSO), 0)
+  # ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   #Calculate Total Fuel Consumption (TFC)
   TFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
   #Calculate Head Fire Intensity(HFI)
@@ -97,6 +103,9 @@
       output == "A") {
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     SF <- ifelse(GS >= 70, 10, exp(3.533 * (GS/100)^1.2))
+    CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
+    #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
+    RSO <- CSI / (300 * SFC)
     #Calculate The Buildup Effect
     BE <- .BuildupEffect(this, BUI)
     #Calculate length to breadth ratio

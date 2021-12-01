@@ -1,4 +1,4 @@
-"FUELTYPE","ISI","BUI","FMC","SFC","CBH","ROS","CFB","RSC","option","SurfaceRateOfSpreadC6"
+"FUELTYPE","ISI","BUI","FMC","SFC","CBH","ROS","CFB","RSC","option","C6SurfaceRateOfSpread"
 "C6",0,0,0,0,0,0,-1,0,"RSI",0
 "C6",200.9,874.8,218.7,0,0,0,-1,0,"RSI",35.4597258406713
 "C6",101,874.8,0,6561,0,0,-1,0,"RSI",35.4268046203351

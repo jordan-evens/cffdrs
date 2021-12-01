@@ -1,9 +1,9 @@
-test_that("CrownRateOfSpreadC6", {
+test_that("C6CrownRateOfSpread", {
   fct <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
   {
     return(CrownRateOfSpreadC6(ISI, FMC))
   }
-  checkData('CrownRateOfSpreadC6',
+  checkData('C6CrownRateOfSpread',
             fct,
             list(data.table(FUELTYPE=c("C6")),
                  data.table(ISI=ISI),

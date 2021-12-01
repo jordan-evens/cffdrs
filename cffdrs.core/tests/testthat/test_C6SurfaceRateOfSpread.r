@@ -1,9 +1,12 @@
-test_that("IntermediateSurfaceRateOfSpreadC6", {
+test_that("C6SurfaceRateOfSpreadC6", {
   fct <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
   {
-    return(IntermediateSurfaceRateOfSpreadC6(ISI, FMC))
+    stopifnot("C6" == FUELTYPE)
+    stopifnot("RSI" == option)
+    RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+    return(SurfaceRateOfSpreadC6(RSI, BUI))
   }
-  checkData('IntermediateSurfaceRateOfSpreadC6',
+  checkData('C6SurfaceRateOfSpread',
             fct,
             list(data.table(FUELTYPE=c("C6")),
                  data.table(ISI=ISI),

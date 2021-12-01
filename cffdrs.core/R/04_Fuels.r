@@ -1,5 +1,5 @@
-FUELS <- list(NF=.FuelNF,
-              WA=.FuelWA,
+FUELS <- list(NF=.NF,
+              WA=.WA,
               C1=.C1,
               C2=.C2,
               C3=.C3,

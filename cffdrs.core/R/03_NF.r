@@ -1,19 +1,11 @@
-.FuelWA <- structure(.Data=list(name="WA",
-                                a=as.numeric(NA),
-                                b=as.numeric(NA),
-                                c0=as.numeric(NA),
-                                BUIo=as.numeric(NA),
-                                Q=as.numeric(NA),
-                                sfcA=as.numeric(NA),
-                                sfcB=as.numeric(NA),
-                                sfcC=as.numeric(NA),
-                                sfcD=as.numeric(NA),
-                                CBH=as.numeric(NA),
-                                CFL=as.numeric(NA)),
+.FuelNF <- structure(.Data=list(),
                      class=c(".FuelNF", ".FuelBase")
 )
-.FuelNF <- structure(.Data=list(name="NF"),
-                     class=c(".FuelNF", ".FuelBase")
+.WA <- structure(.Data=list(name="WA"),
+                     class=c(".WA", ".FuelNF", ".FuelBase")
+)
+.NF <- structure(.Data=list(name="NF"),
+                     class=c(".NF", ".FuelNF", ".FuelBase")
 )
 #.Alpha..FuelNF <- function(this, CBH) { return(0) }
 #.BackRateOfSpread..FuelNF <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH) { return(0) }

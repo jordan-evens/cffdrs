@@ -1,12 +1,9 @@
-test_that("CriticalSurfaceIntensityC6", {
+test_that("C6IntermediateSurfaceRateOfSpread", {
   fct <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
   {
-    stopifnot("C6" == FUELTYPE)
-    stopifnot("RSC" == option)
-    CSI <- CriticalSurfaceIntensity(FUELTYPE, FMC, CBH)
-    return(CSI)
+    return(IntermediateSurfaceRateOfSpreadC6(ISI, FMC))
   }
-  checkData('CriticalSurfaceIntensityC6',
+  checkData('C6IntermediateSurfaceRateOfSpread',
             fct,
             list(data.table(FUELTYPE=c("C6")),
                  data.table(ISI=ISI),
@@ -17,5 +14,5 @@ test_that("CriticalSurfaceIntensityC6", {
                  data.table(ROS=ROS),
                  data.table(CFB=CFB),
                  data.table(RSC=ROS),
-                 data.table(option=c("RSC"))))
+                 data.table(option=c("RSI"))))
 })

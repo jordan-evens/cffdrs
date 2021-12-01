@@ -2,7 +2,9 @@ test_that("SlopeEquivalentInitialSpreadIndex", {
   fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC,
                              PC, PDF, CC, CBH, ISI, output)
   {
-    result <- .SlopeEquivalentInitialSpreadIndex(FUELS[[FUELTYPE]], FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+    result <- .SlopeEquivalentInitialSpreadIndex(FUELS[[FUELTYPE]], FFMC, BUI,
+                                                 WS, WAZ, GS, SAZ, FMC, SFC,
+                                                 PC, PDF, CC, CBH, ISI)
     return(result)
   }
   # HACK: use extra variables so we generate same rows as SlopeAdjust test
