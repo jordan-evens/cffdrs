@@ -342,7 +342,7 @@ saveData('InitialSpreadIndex',
          list(data.table(ffmc=FFMC),
               data.table(ws=WS),
               data.table(fbpMod=BOOL)))
-saveData('IntermediateSurfaceRateOfSpreadC6',
+saveData('C6IntermediateSurfaceRateOfSpread',
          cffdrs:::.C6calc,
          list(data.table(FUELTYPE=c("C6")),
               data.table(ISI=ISI),
@@ -354,7 +354,7 @@ saveData('IntermediateSurfaceRateOfSpreadC6',
               data.table(CFB=CFB),
               data.table(RSC=ROS),
               data.table(option=c("RSI"))))
-saveData('CrownRateOfSpreadC6',
+saveData('C6CrownRateOfSpread',
          cffdrs:::.C6calc,
          list(data.table(FUELTYPE=c("C6")),
               data.table(ISI=ISI),
@@ -373,7 +373,7 @@ fctRSSC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
   RSS <- RSI * cffdrs:::.BEcalc(FUELTYPE, BUI)
   return(RSS)
 }
-saveData('SurfaceRateOfSpreadC6',
+saveData('C6SurfaceRateOfSpread',
          fctRSSC6,
          list(data.table(FUELTYPE=c("C6")),
               data.table(ISI=ISI),
@@ -385,7 +385,7 @@ saveData('SurfaceRateOfSpreadC6',
               data.table(CFB=CFB),
               data.table(RSC=ROS),
               data.table(option=c("RSI"))))
-saveData('CrownFractionBurnedC6',
+saveData('C6CrownFractionBurned',
          cffdrs:::.C6calc,
          list(data.table(FUELTYPE=c("C6")),
               data.table(ISI=ISI),
@@ -404,7 +404,7 @@ fctCSIC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
   CSI <- cffdrs:::.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH, "CSI")
   return(CSI)
 }
-saveData('CriticalSurfaceIntensityC6',
+saveData('C6CriticalSurfaceIntensity',
          fctCSIC6,
          list(data.table(FUELTYPE=c("C6")),
               data.table(ISI=ISI),
@@ -423,7 +423,7 @@ fctRSOC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
   RSO <- cffdrs:::.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH, "RSO")
   return(RSO)
 }
-saveData('CriticalSurfaceRateOfSpreadC6',
+saveData('C6CriticalSurfaceRateOfSpread',
          fctRSOC6,
          list(data.table(FUELTYPE=c("C6")),
               data.table(ISI=ISI),
