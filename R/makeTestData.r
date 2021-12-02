@@ -6,7 +6,7 @@ DESIRED_ROWS <- 5000
 DAY <- seq(0, 366)
 PERCENT <- seq(0, 100)
 RADIANS <- seq(-360, 360, by=0.1) * pi/180
-ZERO_OR_ONE <- list(0, 1)
+ZERO_OR_ONE <- c(0, 1)
 
 ACCEL <- ZERO_OR_ONE
 ASPECT <- RADIANS
@@ -25,7 +25,7 @@ ELV <- seq(0, 10000)
 FC <- seq(-10, 20000)
 FFMC <- seq(0, 101, by=0.1)
 FMC <- seq(0, 500, by=0.1)
-FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
+FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C7",
            "D1", "M1", "M2", "M3", "M4", "S1", "S2",
            "S3", "O1A", "O1B")
 GFL <- seq(0, 100)
@@ -44,7 +44,7 @@ RH <- seq(-10, 110, by=0.01)
 ROS <- seq(0, 600, by=0.01)
 SAZ <- RADIANS + pi
 SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
-SD <- append(list(-999), seq(0, 100))
+SD <- unlist(append(list(-999), seq(0, 100)))
 SFC <- seq(0, 20000)
 SH <- seq(-10, 110)
 TEMP <- seq(-30, 60, by=0.1)
@@ -54,6 +54,62 @@ THETA <- seq(-360, 360, by=0.01)
 WSV <- seq(-10, 500, by=0.1)
 WAZ <- RADIANS + pi
 WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
+
+FBP_ARGS <- list(data.table(ID=1),
+                 data.table(FUELTYPE=FUELTYPE),
+                 data.table(FFMC=FFMC),
+                 data.table(BUI=BUI),
+                 data.table(WS=WS),
+                 data.table(WD=WD),
+                 data.table(FMC=FMC),
+                 data.table(GS=GS),
+                 data.table(LAT=LAT),
+                 data.table(LONG=LONG),
+                 data.table(ELV=ELV),
+                 data.table(DJ=DJ),
+                 data.table(D0=D0),
+                 data.table(SD=SD),
+                 data.table(SH=SH),
+                 data.table(HR=HR),
+                 data.table(PC=PC),
+                 data.table(PDF=PDF),
+                 data.table(GFL=GFL),
+                 data.table(CC=CC),
+                 data.table(THETA=THETA),
+                 data.table(ACCEL=ACCEL),
+                 data.table(ASPECT=ASPECT),
+                 data.table(BUIEFF=BUIEFF),
+                 data.table(CBH=CBH),
+                 data.table(CFL=CFL),
+                 data.table(ISI=ISI))
+
+C6_ARGS <- list(data.table(ID=1),
+                 data.table(FUELTYPE=c("C6")),
+                 data.table(FFMC=FFMC),
+                 data.table(BUI=BUI),
+                 data.table(WS=WS),
+                 data.table(WD=WD),
+                 data.table(FMC=FMC),
+                 data.table(GS=GS),
+                 data.table(LAT=LAT),
+                 data.table(LONG=LONG),
+                 data.table(ELV=ELV),
+                 data.table(DJ=DJ),
+                 data.table(D0=D0),
+                 data.table(SD=SD),
+                 data.table(SH=SH),
+                 data.table(HR=HR),
+                 data.table(PC=PC),
+                 data.table(PDF=PDF),
+                 data.table(GFL=GFL),
+                 data.table(CC=CC),
+                 data.table(THETA=THETA),
+                 data.table(ACCEL=ACCEL),
+                 data.table(ASPECT=ASPECT),
+                 data.table(BUIEFF=BUIEFF),
+                 data.table(CBH=CBH),
+                 data.table(CFL=CFL),
+                 data.table(ISI=ISI))
 
 pickRows <- function(d1, num_rows=DESIRED_ROWS)
 {
@@ -98,6 +154,7 @@ makeInput <- function(arguments)
 makeData <- function(name, fct, arguments)
 {
   i <- makeInput(arguments)
+  n0 <- nrow(i)
   #i[, c(name)] <- do.call(fct, i)
   r <- list(do.call(fct, i[1, ]))
   isRow <- length(r[[1]]) > 1
@@ -109,6 +166,7 @@ makeData <- function(name, fct, arguments)
       r2 <- do.call(fct, i[n, ])
       r <- rbind(r, r2)
     }
+    stopifnot(nrow(i) == n0)
     return(r)
   }
   else
@@ -118,12 +176,14 @@ makeData <- function(name, fct, arguments)
       r <- append(r, do.call(fct, i[n, ]))
     }
     i[, c(name)] <- unlist(r)
+    stopifnot(nrow(i) == n0)
     return(i)
   }
 }
 
 saveResults <- function(name, data)
 {
+  #data <- apply(data, 2, as.character)
   write.csv(data, paste0(PATH, name, '.csv'), row.names=FALSE)
 }
 
@@ -162,7 +222,45 @@ checkData <- function(name, fct, arguments)
   expected <- df2[[name]]
   expect_equal(actual, expected)
 }
-
+fctOnInput <- function(fct)
+{
+  return(function(ID, FUELTYPE, FFMC, BUI, WS, WD, FMC, GS, LAT, LONG, ELV, DJ, D0,
+                  SD, SH, HR, PC, PDF, GFL, CC, THETA, ACCEL, ASPECT, BUIEFF,
+                  CBH, CFL, ISI)
+  {
+    input <- data.frame(ID=ID,
+                        FUELTYPE=FUELTYPE,
+                        FFMC=FFMC,
+                        BUI=BUI,
+                        WS=WS,
+                        WD=WD,
+                        FMC=FMC,
+                        GS=GS,
+                        LAT=LAT,
+                        LONG=LONG,
+                        ELV=ELV,
+                        DJ=DJ,
+                        D0=D0,
+                        SD=SD,
+                        SH=SH,
+                        HR=HR,
+                        PC=PC,
+                        PDF=PDF,
+                        GFL=GFL,
+                        CC=CC,
+                        THETA=THETA,
+                        ACCEL=ACCEL,
+                        ASPECT=ASPECT,
+                        BUIEFF=BUIEFF,
+                        CBH=CBH,
+                        CFL=CFL,
+                        ISI=ISI)
+    stopifnot(1 == nrow(input))
+    result <- fct(input=input, output="S")
+    stopifnot(1 == nrow(result))
+    return(result)
+  })
+}
 saveData('BackRateOfSpread',
          cffdrs:::.BROScalc,
          list(data.table(FUELTYPE=FUELTYPE),
@@ -246,70 +344,16 @@ test_fbp$WS <- as.numeric(test_fbp$WS)
 test_fbp$GFL <- as.numeric(test_fbp$GFL)
 test_fbp$CBH <- as.numeric(test_fbp$CBH)
 test_fbp$CFL <- as.numeric(test_fbp$CFL)
-saveResults('FireBehaviourPrediction_test_fbp',
-            cffdrs:::.FBPcalc(test_fbp, "A"))
-fctFBP <- function(ID, FUELTYPE, FFMC, BUI, WS, WD, FMC, GS, LAT, LONG, ELV, DJ, D0,
-                   SD, SH, HR, PC, PDF, GFL, CC, THETA, ACCEL, ASPECT, BUIEFF,
-                   CBH, CFL, ISI)
-{
-  input <- data.frame(ID=ID,
-                      FUELTYPE=FUELTYPE,
-                      FFMC=FFMC,
-                      BUI=BUI,
-                      WS=WS,
-                      WD=WD,
-                      FMC=FMC,
-                      GS=GS,
-                      LAT=LAT,
-                      LONG=LONG,
-                      ELV=ELV,
-                      DJ=DJ,
-                      D0=D0,
-                      SD=SD,
-                      SH=SH,
-                      HR=HR,
-                      PC=PC,
-                      PDF=PDF,
-                      GFL=GFL,
-                      CC=CC,
-                      THETA=THETA,
-                      ACCEL=ACCEL,
-                      ASPECT=ASPECT,
-                      BUIEFF=BUIEFF,
-                      CBH=CBH,
-                      CFL=CFL,
-                      ISI=ISI)
-  return(cffdrs:::.FBPcalc(input=input, output="S"))
-}
-saveData('FireBehaviourPrediction',
-         fctFBP,
-         list(data.table(ID=1),
-              data.table(FUELTYPE=FUELTYPE),
-              data.table(FFMC=FFMC),
-              data.table(BUI=BUI),
-              data.table(WS=WS),
-              data.table(WD=WD),
-              data.table(FMC=FMC),
-              data.table(GS=GS),
-              data.table(LAT=LAT),
-              data.table(LONG=LONG),
-              data.table(ELV=ELV),
-              data.table(DJ=DJ),
-              data.table(D0=D0),
-              data.table(SD=SD),
-              data.table(SH=SH),
-              data.table(HR=HR),
-              data.table(PC=PC),
-              data.table(PDF=PDF),
-              data.table(GFL=GFL),
-              data.table(CC=CC),
-              data.table(THETA=THETA),
-              data.table(ACCEL=ACCEL),
-              data.table(ASPECT=ASPECT),
-              data.table(BUIEFF=BUIEFF),
-              data.table(CBH=CBH),
-              data.table(CFL=CFL),
-              data.table(ISI=ISI)))
+saveResults('FireBehaviourPrediction_test_fbp_NoC6',
+            cffdrs:::.FBPcalc(test_fbp[!(test_fbp$FuelType %in% c("C6", "c6", "C-6", "c-6")),], "A"))
+saveResults('FireBehaviourPrediction_test_fbp_C6',
+            cffdrs:::.FBPcalc(test_fbp[test_fbp$FuelType %in% c("C6", "c6", "C-6", "c-6"),], "A"))
+saveData('FireBehaviourPredictionNoC6',
+         fctOnInput(cffdrs:::.FBPcalc),
+         FBP_ARGS)
+saveData('FireBehaviourPredictionC6',
+         fctOnInput(cffdrs:::.FBPcalc),
+         C6_ARGS)
 saveData('FireIntensity',
          cffdrs:::.FIcalc,
          list(data.table(FC=FC),
@@ -871,3 +915,494 @@ saveData('TotalFuelConsumption',
               data.table(PC=PC),
               data.table(PDF=PDF),
               data.table(option="TFC")))
+fctWSV0  <- function(input=NULL, output="Primary") {                                                                                           
+  
+  #  Quite often users will have a data frame called "input" already attached
+  #  to the workspace. To mitigate this, we remove that if it exists, and warn
+  #  the user of this case.
+  if (!is.na(charmatch("input", search()))) {
+    warning("Attached dataset 'input' is being detached to use fbp() function.")
+    detach(input)
+  }
+  output <- toupper(output)
+  #if input does not exist, then set defaults
+  if (is.null(input)) {
+    input<-data.frame(FUELTYPE="C2",ACCEL=0,DJ=180,D0=0,ELV=0,BUIEFF=1,HR=1,
+                      FFMC=90,ISI=0,BUI=60,WS=10,WD=0,GS=0,ASPECT=0,PC=50,
+                      PDF=35,CC=80,GFL=0.35,CBH=3,CFL=1,LAT=55,LONG=-120,
+                      FMC=0,THETA=0)
+    input[, "FUELTYPE"] <- as.character(input[, "FUELTYPE"])
+  }
+  #set local scope variables from the parameters for simpler to referencing
+  names(input) <- toupper(names(input))
+  ID <- input$ID
+  FUELTYPE <- toupper(input$FUELTYPE)
+  FFMC <- input$FFMC
+  BUI <- input$BUI
+  WS <- input$WS
+  WD <- input$WD
+  FMC <- input$FMC
+  GS <- input$GS
+  LAT <- input$LAT
+  LONG <- input$LONG
+  ELV <- input$ELV
+  DJ <- input$DJ
+  D0 <- input$D0
+  SD <- input$SD
+  SH <- input$SH
+  HR <- input$HR
+  PC <- input$PC
+  PDF <- input$PDF
+  GFL <- input$GFL
+  CC <- input$CC
+  THETA <- input$THETA
+  ACCEL <- input$ACCEL
+  ASPECT <- input$ASPECT
+  BUIEFF <- input$BUIEFF
+  CBH <- input$CBH
+  CFL <- input$CFL
+  ISI <- input$ISI
+  n0 <- nrow(input)
+  ############################################################################
+  #                         BEGIN
+  # Set warnings for missing and required input variables.
+  # Set defaults for inputs that are not already set.
+  ############################################################################
+  if (!exists("FUELTYPE") | is.null(FUELTYPE)){ 
+    warning("FuelType is a required input, default FuelType = C2 is used in the 
+            calculation")
+    FUELTYPE <- "C2"}
+  if (!exists("FFMC") | is.null(FFMC)){ 
+    warning("FFMC is a required input, default FFMC = 90 is used in the 
+            calculation")
+    FFMC <- 90}
+  if (!exists("BUI") | is.null(BUI)){ 
+    warning("BUI is a required input, default BUI = 60 is used in the 
+            calculation")
+    BUI <- 60}
+  if (!exists("WS") | is.null(WS)){ 
+    warning("WS is a required input, WS = 10 km/hr is used in the calculation")
+    WS <- 10}
+  if (!exists("GS") | is.null(GS)){ 
+    warning("GS is a required input,GS = 0 is used in the calculation")
+    GS <- 0}
+  if (!exists("LAT") | is.null(LAT)){ 
+    warning("LAT is a required input, default LAT=55 is used in the 
+            calculation")
+    LAT <- 55}
+  if (!exists("LONG") | is.null(LONG)){ 
+    warning("LONG is a required input, LONG = -120 is used in the calculation")
+    LONG <- -120}
+  if (!exists("DJ") | is.null(DJ)){ 
+    warning("Dj is a required input, Dj = 180 is used in the calculation")
+    DJ <- 180}
+  if (!exists("ASPECT") | is.null(ASPECT)){ 
+    warning("Aspect is a required input, Aspect = 0 is used in the calculation")
+    ASPECT <- 0}
+  if (!exists("WD") | is.null(WD)) 
+    WD <- 0
+  if (!exists("FMC") | is.null(FMC)) 
+    FMC <- 0
+  if (!exists("ELV") | is.null(ELV)) 
+    ELV <- 0
+  if (!exists("SD") | is.null(SD)) 
+    SD <- 0
+  if (!exists("SH") | is.null(SH)) 
+    SH <- 0
+  if (!exists("D0") | is.null(D0)) 
+    D0 <- 0
+  if (!exists("HR") | is.null(HR)) 
+    HR <- 1
+  if (!exists("PC") | is.null(PC)) 
+    PC <- 50
+  if (!exists("PDF") | is.null(PDF)) 
+    PDF <- 35
+  if (!exists("GFL") | is.null(GFL)) 
+    GFL <- 0.35
+  if (!exists("CC") | is.null(CC)) 
+    CC <- 80
+  if (!exists("THETA") | is.null(THETA)) 
+    THETA <- 0
+  if (!exists("ACCEL") | is.null(ACCEL)) 
+    ACCEL <- 0
+  if (!exists("BUIEFF") | is.null(BUIEFF)) 
+    BUIEFF <- 1
+  if (!exists("CBH") | is.null(CBH)) 
+    CBH <- 0
+  if (!exists("CFL") | is.null(CFL)) 
+    CFL <- 0
+  if (!exists("ISI") | is.null(ISI)) 
+    ISI <- 0
+  #Convert Wind Direction from degress to radians
+  WD <- WD * pi/180
+  #Convert Theta from degress to radians
+  THETA <- THETA * pi/180
+  ASPECT <- ifelse(is.na(ASPECT), 0, ASPECT)
+  ASPECT <- ifelse(ASPECT < 0, ASPECT + 360, ASPECT)
+  #Convert Aspect from degress to radians
+  ASPECT <- ASPECT * pi/180
+  ACCEL <- ifelse(is.na(ACCEL) | ACCEL < 0, 0, ACCEL)
+  if (length(ACCEL[!ACCEL %in% c(0, 1)]) > 0) 
+    warning("Input variable Accel is out of range, will be assigned to 1")
+  ACCEL <- ifelse(!ACCEL %in% c(0, 1), 1, ACCEL)
+  DJ <- ifelse(DJ < 0 | DJ > 366, 0, DJ)
+  DJ <- ifelse(is.na(DJ), 180, DJ)
+  D0 <- ifelse(is.na(D0) | D0 < 0 | D0 > 366, 0, D0)
+  ELV <- ifelse(ELV < 0 | ELV > 10000, 0, ELV)
+  ELV <- ifelse(is.na(ELV), 0, ELV)
+  BUIEFF <- ifelse(BUIEFF <= 0, 0, 1)
+  BUIEFF <- ifelse(is.na(BUIEFF), 1, BUIEFF)
+  HR <- ifelse(HR < 0, -HR, HR)
+  HR <- ifelse(HR > 366 * 24, 24, HR)
+  HR <- ifelse(is.na(HR), 0, HR)
+  FFMC <- ifelse(FFMC < 0 | FFMC > 101, 0, FFMC)
+  FFMC <- ifelse(is.na(FFMC), 90, FFMC)
+  ISI <- ifelse(is.na(ISI) | ISI < 0 | ISI > 300, 0, ISI)
+  BUI <- ifelse(BUI < 0 | BUI > 1000, 0, BUI)
+  BUI <- ifelse(is.na(BUI), 60, BUI)
+  WS <- ifelse(WS < 0 | WS > 300, 0, WS)
+  WS <- ifelse(is.na(WS), 10, WS)
+  WD <- ifelse(is.na(WD) | WD < -2 * pi | WD > 2 * pi, 
+               0, WD)
+  GS <- ifelse(is.na(GS) | GS < 0 | GS > 200, 0, GS)
+  GS <- ifelse(ASPECT < -2 * pi | ASPECT > 2 * pi, 0, GS)
+  PC <- ifelse(is.na(PC) | PC < 0 | PC > 100, 50, PC)
+  PDF <- ifelse(is.na(PDF) | PDF < 0 | PDF > 100, 35, PDF)
+  CC <- ifelse(CC <= 0 | CC > 100, 95, CC)
+  CC <- ifelse(is.na(CC), 80, CC)
+  GFL <- ifelse(is.na(GFL) | GFL <= 0 | GFL > 100, 0.35, 
+                GFL)
+  LAT <- ifelse(LAT < -90 | LAT > 90, 0, LAT)
+  LAT <- ifelse(is.na(LAT), 55, LAT)
+  LONG <- ifelse(LONG < -180 | LONG > 360, 0, LONG)
+  LONG <- ifelse(is.na(LONG), -120, LONG)
+  THETA <- ifelse(is.na(THETA) | THETA < -2 * pi | THETA > 
+                    2 * pi, 0, THETA)
+  SD <- ifelse(SD < 0 | SD > 1e+05, -999, SD)
+  SD <- ifelse(is.na(SD), 0, SD)
+  SH <- ifelse(SH < 0 | SH > 100, -999, SH)
+  SH <- ifelse(is.na(SH), 0, SH)
+  
+  FUELTYPE <- sub("-", "", FUELTYPE)
+  FUELTYPE <- sub(" ", "", FUELTYPE)
+  if(length(FUELTYPE[is.na(FUELTYPE)])>0){
+    warning("FuelType contains NA, using C2 (default) in the calculation")
+    FUELTYPE<-ifelse(is.na(FUELTYPE),"C2",FUELTYPE)}
+  ############################################################################
+  #                         END
+  ############################################################################
+  ############################################################################
+  #                         START
+  # Corrections
+  ############################################################################
+  #Convert hours to minutes
+  HR <- HR * 60
+  #Corrections to reorient Wind Azimuth(WAZ) and Uphill slode azimuth(SAZ)
+  WAZ <- WD + pi
+  WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
+  SAZ <- ASPECT + pi
+  SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
+  #Any negative longitudes (western hemisphere) are translated to positive 
+  #  longitudes
+  LONG <- ifelse(LONG < 0, -LONG, LONG)
+  ############################################################################
+  #                         END
+  ############################################################################
+  ############################################################################
+  #                         START
+  # Initializing variables
+  ############################################################################
+  SFC <- TFC <- HFI <- CFB <- ROS <- 0
+  RAZ <- -999
+  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+      output == "A") {
+    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
+      BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
+    TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
+  }
+  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0, 
+            0, 0)
+  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+                   "O1B")
+  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in% 
+                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 * 
+                                                           SD, CBHs[FUELTYPE]), CBH)
+  CBH <- ifelse(CBH < 0, 1e-07, CBH)
+  CFLs <- c(0.75, 0.8, 1.15, 1.2, 1.2, 1.8, 0.5, 0, 0.8, 0.8, 
+            0.8, 0.8, 0, 0, 0, 0, 0)
+  names(CFLs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+                   "O1B")
+  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), CFLs[FUELTYPE], 
+                CFL)
+  FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC), cffdrs:::.FMCcalc(LAT,
+                                                            LONG, ELV, DJ, D0), FMC)
+  FMC <- ifelse(FUELTYPE %in% c("D1", "S1", "S2", "S3", "O1A",
+                                "O1B"), 0, FMC)
+  ############################################################################
+  #                         END
+  ############################################################################
+
+  #Calculate Surface fuel consumption (SFC)
+  SFC <- cffdrs:::.SFCcalc(FUELTYPE, FFMC, BUI, PC, GFL)
+  #Disable BUI Effect if necessary
+  BUI <- ifelse(BUIEFF != 1, 0, BUI)
+  #Calculate the net effective windspeed (WSV)
+  WSV0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                     FMC, SFC, PC, PDF, CC, CBH, ISI, output = "WSV")
+  return(WSV0)
+}
+saveData('FireBehaviourPredictionNoC6_WSV0',
+         fctOnInput(fctWSV0),
+         FBP_ARGS)
+saveData('FireBehaviourPredictionC6_WSV0',
+         fctOnInput(fctWSV0),
+         C6_ARGS)
+fctRAZ0  <- function(input=NULL, output="Primary")
+{                                                                                           
+  #  Quite often users will have a data frame called "input" already attached
+  #  to the workspace. To mitigate this, we remove that if it exists, and warn
+  #  the user of this case.
+  if (!is.na(charmatch("input", search()))) {
+    warning("Attached dataset 'input' is being detached to use fbp() function.")
+    detach(input)
+  }
+  output <- toupper(output)
+  #if input does not exist, then set defaults
+  if (is.null(input)) {
+    input<-data.frame(FUELTYPE="C2",ACCEL=0,DJ=180,D0=0,ELV=0,BUIEFF=1,HR=1,
+                      FFMC=90,ISI=0,BUI=60,WS=10,WD=0,GS=0,ASPECT=0,PC=50,
+                      PDF=35,CC=80,GFL=0.35,CBH=3,CFL=1,LAT=55,LONG=-120,
+                      FMC=0,THETA=0)
+    input[, "FUELTYPE"] <- as.character(input[, "FUELTYPE"])
+  }
+  #set local scope variables from the parameters for simpler to referencing
+  names(input) <- toupper(names(input))
+  ID <- input$ID
+  FUELTYPE <- toupper(input$FUELTYPE)
+  FFMC <- input$FFMC
+  BUI <- input$BUI
+  WS <- input$WS
+  WD <- input$WD
+  FMC <- input$FMC
+  GS <- input$GS
+  LAT <- input$LAT
+  LONG <- input$LONG
+  ELV <- input$ELV
+  DJ <- input$DJ
+  D0 <- input$D0
+  SD <- input$SD
+  SH <- input$SH
+  HR <- input$HR
+  PC <- input$PC
+  PDF <- input$PDF
+  GFL <- input$GFL
+  CC <- input$CC
+  THETA <- input$THETA
+  ACCEL <- input$ACCEL
+  ASPECT <- input$ASPECT
+  BUIEFF <- input$BUIEFF
+  CBH <- input$CBH
+  CFL <- input$CFL
+  ISI <- input$ISI
+  n0 <- nrow(input)
+  stopifnot(1 == n0)
+  ############################################################################
+  #                         BEGIN
+  # Set warnings for missing and required input variables.
+  # Set defaults for inputs that are not already set.
+  ############################################################################
+  if (!exists("FUELTYPE") | is.null(FUELTYPE)){ 
+    warning("FuelType is a required input, default FuelType = C2 is used in the 
+            calculation")
+    FUELTYPE <- "C2"}
+  if (!exists("FFMC") | is.null(FFMC)){ 
+    warning("FFMC is a required input, default FFMC = 90 is used in the 
+            calculation")
+    FFMC <- 90}
+  if (!exists("BUI") | is.null(BUI)){ 
+    warning("BUI is a required input, default BUI = 60 is used in the 
+            calculation")
+    BUI <- 60}
+  if (!exists("WS") | is.null(WS)){ 
+    warning("WS is a required input, WS = 10 km/hr is used in the calculation")
+    WS <- 10}
+  if (!exists("GS") | is.null(GS)){ 
+    warning("GS is a required input,GS = 0 is used in the calculation")
+    GS <- 0}
+  if (!exists("LAT") | is.null(LAT)){ 
+    warning("LAT is a required input, default LAT=55 is used in the 
+            calculation")
+    LAT <- 55}
+  if (!exists("LONG") | is.null(LONG)){ 
+    warning("LONG is a required input, LONG = -120 is used in the calculation")
+    LONG <- -120}
+  if (!exists("DJ") | is.null(DJ)){ 
+    warning("Dj is a required input, Dj = 180 is used in the calculation")
+    DJ <- 180}
+  if (!exists("ASPECT") | is.null(ASPECT)){ 
+    warning("Aspect is a required input, Aspect = 0 is used in the calculation")
+    ASPECT <- 0}
+  if (!exists("WD") | is.null(WD)) 
+    WD <- 0
+  if (!exists("FMC") | is.null(FMC)) 
+    FMC <- 0
+  if (!exists("ELV") | is.null(ELV)) 
+    ELV <- 0
+  if (!exists("SD") | is.null(SD)) 
+    SD <- 0
+  if (!exists("SH") | is.null(SH)) 
+    SH <- 0
+  if (!exists("D0") | is.null(D0)) 
+    D0 <- 0
+  if (!exists("HR") | is.null(HR)) 
+    HR <- 1
+  if (!exists("PC") | is.null(PC)) 
+    PC <- 50
+  if (!exists("PDF") | is.null(PDF)) 
+    PDF <- 35
+  if (!exists("GFL") | is.null(GFL)) 
+    GFL <- 0.35
+  if (!exists("CC") | is.null(CC)) 
+    CC <- 80
+  if (!exists("THETA") | is.null(THETA)) 
+    THETA <- 0
+  if (!exists("ACCEL") | is.null(ACCEL)) 
+    ACCEL <- 0
+  if (!exists("BUIEFF") | is.null(BUIEFF)) 
+    BUIEFF <- 1
+  if (!exists("CBH") | is.null(CBH)) 
+    CBH <- 0
+  if (!exists("CFL") | is.null(CFL)) 
+    CFL <- 0
+  if (!exists("ISI") | is.null(ISI)) 
+    ISI <- 0
+  #Convert Wind Direction from degress to radians
+  WD <- WD * pi/180
+  #Convert Theta from degress to radians
+  THETA <- THETA * pi/180
+  ASPECT <- ifelse(is.na(ASPECT), 0, ASPECT)
+  ASPECT <- ifelse(ASPECT < 0, ASPECT + 360, ASPECT)
+  #Convert Aspect from degress to radians
+  ASPECT <- ASPECT * pi/180
+  ACCEL <- ifelse(is.na(ACCEL) | ACCEL < 0, 0, ACCEL)
+  if (length(ACCEL[!ACCEL %in% c(0, 1)]) > 0) 
+    warning("Input variable Accel is out of range, will be assigned to 1")
+  ACCEL <- ifelse(!ACCEL %in% c(0, 1), 1, ACCEL)
+  DJ <- ifelse(DJ < 0 | DJ > 366, 0, DJ)
+  DJ <- ifelse(is.na(DJ), 180, DJ)
+  D0 <- ifelse(is.na(D0) | D0 < 0 | D0 > 366, 0, D0)
+  ELV <- ifelse(ELV < 0 | ELV > 10000, 0, ELV)
+  ELV <- ifelse(is.na(ELV), 0, ELV)
+  BUIEFF <- ifelse(BUIEFF <= 0, 0, 1)
+  BUIEFF <- ifelse(is.na(BUIEFF), 1, BUIEFF)
+  HR <- ifelse(HR < 0, -HR, HR)
+  HR <- ifelse(HR > 366 * 24, 24, HR)
+  HR <- ifelse(is.na(HR), 0, HR)
+  FFMC <- ifelse(FFMC < 0 | FFMC > 101, 0, FFMC)
+  FFMC <- ifelse(is.na(FFMC), 90, FFMC)
+  ISI <- ifelse(is.na(ISI) | ISI < 0 | ISI > 300, 0, ISI)
+  BUI <- ifelse(BUI < 0 | BUI > 1000, 0, BUI)
+  BUI <- ifelse(is.na(BUI), 60, BUI)
+  WS <- ifelse(WS < 0 | WS > 300, 0, WS)
+  WS <- ifelse(is.na(WS), 10, WS)
+  WD <- ifelse(is.na(WD) | WD < -2 * pi | WD > 2 * pi, 
+               0, WD)
+  GS <- ifelse(is.na(GS) | GS < 0 | GS > 200, 0, GS)
+  GS <- ifelse(ASPECT < -2 * pi | ASPECT > 2 * pi, 0, GS)
+  PC <- ifelse(is.na(PC) | PC < 0 | PC > 100, 50, PC)
+  PDF <- ifelse(is.na(PDF) | PDF < 0 | PDF > 100, 35, PDF)
+  CC <- ifelse(CC <= 0 | CC > 100, 95, CC)
+  CC <- ifelse(is.na(CC), 80, CC)
+  GFL <- ifelse(is.na(GFL) | GFL <= 0 | GFL > 100, 0.35, 
+                GFL)
+  LAT <- ifelse(LAT < -90 | LAT > 90, 0, LAT)
+  LAT <- ifelse(is.na(LAT), 55, LAT)
+  LONG <- ifelse(LONG < -180 | LONG > 360, 0, LONG)
+  LONG <- ifelse(is.na(LONG), -120, LONG)
+  THETA <- ifelse(is.na(THETA) | THETA < -2 * pi | THETA > 
+                    2 * pi, 0, THETA)
+  SD <- ifelse(SD < 0 | SD > 1e+05, -999.0, as.numeric(SD))
+  SD <- ifelse(is.na(SD), 0.0, SD)
+  SH <- ifelse(SH < 0 | SH > 100, -999, SH)
+  SH <- ifelse(is.na(SH), 0, SH)
+  stopifnot(1 == length(SD))
+  FUELTYPE <- sub("-", "", FUELTYPE)
+  FUELTYPE <- sub(" ", "", FUELTYPE)
+  if(length(FUELTYPE[is.na(FUELTYPE)])>0){
+    warning("FuelType contains NA, using C2 (default) in the calculation")
+    FUELTYPE<-ifelse(is.na(FUELTYPE),"C2",FUELTYPE)}
+  ############################################################################
+  #                         END
+  ############################################################################
+  ############################################################################
+  #                         START
+  # Corrections
+  ############################################################################
+  #Convert hours to minutes
+  HR <- HR * 60
+  #Corrections to reorient Wind Azimuth(WAZ) and Uphill slode azimuth(SAZ)
+  WAZ <- WD + pi
+  WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
+  SAZ <- ASPECT + pi
+  SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
+  #Any negative longitudes (western hemisphere) are translated to positive 
+  #  longitudes
+  LONG <- ifelse(LONG < 0, -LONG, LONG)
+  ############################################################################
+  #                         END
+  ############################################################################
+  ############################################################################
+  #                         START
+  # Initializing variables
+  ############################################################################
+  SFC <- TFC <- HFI <- CFB <- ROS <- 0
+  RAZ <- -999
+  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+      output == "A") {
+    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
+      BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
+    TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
+  }
+  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0, 
+            0, 0)
+  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+                   "O1B")
+  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in% 
+                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 * 
+                                                           SD, CBHs[FUELTYPE]), CBH)
+  CBH <- ifelse(CBH < 0, 1e-07, CBH)
+  CFLs <- c(0.75, 0.8, 1.15, 1.2, 1.2, 1.8, 0.5, 0, 0.8, 0.8, 
+            0.8, 0.8, 0, 0, 0, 0, 0)
+  names(CFLs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+                   "O1B")
+  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), CFLs[FUELTYPE], 
+                CFL)
+  FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC), cffdrs:::.FMCcalc(LAT,
+                                                                     LONG, ELV, DJ, D0), FMC)
+  FMC <- ifelse(FUELTYPE %in% c("D1", "S1", "S2", "S3", "O1A",
+                                "O1B"), 0, FMC)
+  ############################################################################
+  #                         END
+  ############################################################################
+  
+  #Calculate Surface fuel consumption (SFC)
+  SFC <- cffdrs:::.SFCcalc(FUELTYPE, FFMC, BUI, PC, GFL)
+  #Disable BUI Effect if necessary
+  BUI <- ifelse(BUIEFF != 1, 0, BUI)
+  #Calculate the net effective windspeed (WSV)
+  WSV0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                              FMC, SFC, PC, PDF, CC, CBH, ISI, output = "WSV")
+  RAZ0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
+                     FMC, SFC, PC, PDF, CC, CBH, ISI, output = "RAZ")
+  return(RAZ0)
+}
+saveData('FireBehaviourPredictionNoC6_RAZ0',
+         fctOnInput(fctRAZ0),
+         FBP_ARGS)
+saveData('FireBehaviourPredictionC6_RAZ0',
+         fctOnInput(fctRAZ0),
+         C6_ARGS)
