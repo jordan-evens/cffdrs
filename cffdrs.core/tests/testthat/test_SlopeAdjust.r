@@ -5,9 +5,9 @@ fctSlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC,
                         FMC, SFC, PC, PDF, CC, CBH, ISI)
   if ('WSV' == output)
   {
-    return(result$WSV)
+    return(result[["WSV"]])
   }
-  return(result$RAZ)
+  return(result[["RAZ"]])
   # return(result[[output]])
 }
 test_that("SlopeAdjust$RAZ", {

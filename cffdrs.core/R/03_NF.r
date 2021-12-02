@@ -1,10 +1,12 @@
 .FuelNF <- structure(.Data=list(),
                      class=c(".FuelNF", ".FuelBase")
 )
-.WA <- structure(.Data=list(name="WA"),
+.WA <- structure(.Data=list(name="WA",
+                            CFL=0),
                      class=c(".WA", ".FuelNF", ".FuelBase")
 )
-.NF <- structure(.Data=list(name="NF"),
+.NF <- structure(.Data=list(name="NF",
+                            CFL=0),
                      class=c(".NF", ".FuelNF", ".FuelBase")
 )
 #.Alpha..FuelNF <- function(this, CBH) { return(0) }
@@ -35,6 +37,7 @@
 #.SlopeAdjust..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) { return(list(WSV=as.numeric(NA), RAZ=as.numeric(NA))) }
 .SlopeEquivalentInitialSpreadIndex..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
+  stopifnot(this$name %in% c('NF', 'WA'))
   # NOTE: keep old behaviour
   return(-99.0)
 }

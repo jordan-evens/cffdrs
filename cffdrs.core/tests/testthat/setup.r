@@ -24,7 +24,7 @@ ELV <- seq(0, 10000)
 FC <- seq(-10, 20000)
 FFMC <- seq(0, 101, by=0.1)
 FMC <- seq(0, 500, by=0.1)
-FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
+FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C7",
            "D1", "M1", "M2", "M3", "M4", "S1", "S2",
            "S3", "O1A", "O1B")
 GFL <- seq(0, 100)
@@ -43,7 +43,7 @@ RH <- seq(-10, 110, by=0.01)
 ROS <- seq(0, 600, by=0.01)
 SAZ <- RADIANS + pi
 SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
-SD <- append(list(-999), seq(0, 100))
+SD <- unlist(append(list(-999), seq(0, 100)))
 SFC <- seq(0, 20000)
 SH <- seq(-10, 110)
 TEMP <- seq(-30, 60, by=0.1)
@@ -53,6 +53,62 @@ THETA <- seq(-360, 360, by=0.01)
 WSV <- seq(-10, 500, by=0.1)
 WAZ <- RADIANS + pi
 WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
+
+FBP_ARGS <- list(data.table(ID=1),
+                 data.table(FUELTYPE=FUELTYPE),
+                 data.table(FFMC=FFMC),
+                 data.table(BUI=BUI),
+                 data.table(WS=WS),
+                 data.table(WD=WD),
+                 data.table(FMC=FMC),
+                 data.table(GS=GS),
+                 data.table(LAT=LAT),
+                 data.table(LONG=LONG),
+                 data.table(ELV=ELV),
+                 data.table(DJ=DJ),
+                 data.table(D0=D0),
+                 data.table(SD=SD),
+                 data.table(SH=SH),
+                 data.table(HR=HR),
+                 data.table(PC=PC),
+                 data.table(PDF=PDF),
+                 data.table(GFL=GFL),
+                 data.table(CC=CC),
+                 data.table(THETA=THETA),
+                 data.table(ACCEL=ACCEL),
+                 data.table(ASPECT=ASPECT),
+                 data.table(BUIEFF=BUIEFF),
+                 data.table(CBH=CBH),
+                 data.table(CFL=CFL),
+                 data.table(ISI=ISI))
+
+C6_ARGS <- list(data.table(ID=1),
+                data.table(FUELTYPE=c("C6")),
+                data.table(FFMC=FFMC),
+                data.table(BUI=BUI),
+                data.table(WS=WS),
+                data.table(WD=WD),
+                data.table(FMC=FMC),
+                data.table(GS=GS),
+                data.table(LAT=LAT),
+                data.table(LONG=LONG),
+                data.table(ELV=ELV),
+                data.table(DJ=DJ),
+                data.table(D0=D0),
+                data.table(SD=SD),
+                data.table(SH=SH),
+                data.table(HR=HR),
+                data.table(PC=PC),
+                data.table(PDF=PDF),
+                data.table(GFL=GFL),
+                data.table(CC=CC),
+                data.table(THETA=THETA),
+                data.table(ACCEL=ACCEL),
+                data.table(ASPECT=ASPECT),
+                data.table(BUIEFF=BUIEFF),
+                data.table(CBH=CBH),
+                data.table(CFL=CFL),
+                data.table(ISI=ISI))
 
 pickRows <- function(d1, num_rows=DESIRED_ROWS)
 {
@@ -148,4 +204,41 @@ checkData <- function(name, fct, arguments)
   actual <- df1[[name]]
   expected <- df2[[name]]
   expect_equal(actual, expected)
+}
+
+fctOnInput <- function(fct)
+{
+  return(function(ID, FUELTYPE, FFMC, BUI, WS, WD, FMC, GS, LAT, LONG, ELV, DJ, D0,
+                  SD, SH, HR, PC, PDF, GFL, CC, THETA, ACCEL, ASPECT, BUIEFF,
+                  CBH, CFL, ISI)
+  {
+    input <- data.frame(ID=ID,
+                        FUELTYPE=FUELTYPE,
+                        FFMC=FFMC,
+                        BUI=BUI,
+                        WS=WS,
+                        WD=WD,
+                        FMC=FMC,
+                        GS=GS,
+                        LAT=LAT,
+                        LONG=LONG,
+                        ELV=ELV,
+                        DJ=DJ,
+                        D0=D0,
+                        SD=SD,
+                        SH=SH,
+                        HR=HR,
+                        PC=PC,
+                        PDF=PDF,
+                        GFL=GFL,
+                        CC=CC,
+                        THETA=THETA,
+                        ACCEL=ACCEL,
+                        ASPECT=ASPECT,
+                        BUIEFF=BUIEFF,
+                        CBH=CBH,
+                        CFL=CFL,
+                        ISI=ISI)
+    return(fct(input=input, output="S"))
+  })
 }

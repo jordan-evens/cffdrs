@@ -31,9 +31,11 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
   SLOPE_ADJUST <- .SlopeAdjust(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
   #Calculate the net effective windspeed (WSV)
+  # WSV0 <- SLOPE_ADJUST[["WSV"]]
   WSV0 <- SLOPE_ADJUST$WSV
   WSV <- ifelse(GS > 0 & FFMC > 0, WSV0, WS)
   #Calculate the net effective wind direction (RAZ)
+  # RAZ0 <- SLOPE_ADJUST[["RAZ"]]
   RAZ0 <- SLOPE_ADJUST$RAZ
   RAZ <- ifelse(GS > 0 & FFMC > 0, RAZ0, WAZ)
   #Calculate or keep Initial Spread Index (ISI)
