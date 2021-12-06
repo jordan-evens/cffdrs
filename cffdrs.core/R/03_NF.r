@@ -20,7 +20,11 @@
   }
   return(as.numeric(NA))
 }
-.CrownBaseHeight..FuelNF <- function(this, CBH, SD, SH) { return(0) }
+.CrownBaseHeight..FuelNF <- function(this, CBH, SD, SH)
+{
+  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), NA, CBH)
+  return(CBH)
+}
 # .CrownFractionBurned..FuelNF <- function(this, ROS, RSO)
 # {
 #   #Eq. 58 (FCFDG 1992) Crown fraction burned 

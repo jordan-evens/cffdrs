@@ -14,7 +14,9 @@
 .CrownBaseHeight..C6 <- function(this, CBH, SD, SH)
 {
   CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH),
-                -11.2 + 1.06 * SH + 0.0017 * SD,
+                ifelse(SD > 0 & SH > 0,
+                       -11.2 + 1.06 * SH + 0.0017 * SD,
+                       this$CBH),
                 CBH)
   CBH <- ifelse(CBH < 0, 1e-07, CBH)
   return(CBH)
@@ -39,102 +41,46 @@
   
   return(as.numeric(BE))
 }
-.CFBcalc <- function(FUELTYPE, FMC, SFC, ROS, CBH, option="CFB"){
-  
-  CFB <- 0
-  #Eq. 56 (FCFDG 1992) Critical surface intensity
-  CSI <- 0.001 * (CBH**1.5) * (460 + 25.9 * FMC)**1.5
-  #Return at this point, if specified by caller
-  if(option=="CSI"){
-    return(CSI)
-  }
-  #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
-  RSO <- CSI / (300 * SFC)
-  #Return at this point, if specified by caller
-  if(option=="RSO"){
-    return(RSO)
-  }
-  #Eq. 58 (FCFDG 1992) Crown fraction burned 
-  CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), CFB)
-  return(CFB)
-}
-
-.C6calc <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, 
-                    option="CFB"){ 
-  
-  #Average foliar moisture effect
-  FMEavg <- 0.778                                                                                                                   
-  #Eq. 59 (FCFDG 1992) Crown flame temperature (degrees K)
-  tt <- 1500 - 2.75 * FMC
-  #Eq. 60 (FCFDG 1992) Head of ignition (kJ/kg)
-  H <- 460 + 25.9 * FMC
-  #Eq. 61 (FCFDG 1992) Average foliar moisture effect
-  FME <- ((1.5 - 0.00275 * FMC)**4.)/(460 + 25.9 * FMC) * 1000
-  #Eq. 62 (FCFDG 1992) Intermediate surface fire spread rate
-  RSI <- 30 * (1 - exp(-0.08 * ISI))**3.0
-  #Return at this point, if specified by caller
-  if (option == "RSI") {
-    return(RSI)
-  }
-  #Eq. 63 (FCFDG 1992) Surface fire spread rate (m/min)
-  RSS <- RSI * .BEcalc(FUELTYPE, BUI)
-  #Eq. 64 (FCFDG 1992) Crown fire spread rate (m/min)
-  RSC <- 60 * (1 - exp(-0.0497 * ISI)) * FME / FMEavg
-  #Return at this point, if specified by caller
-  if (option == "RSC") {
-    return(RSC)
-  }
-  #Crown Fraction Burned
-  CFB    <- ifelse(RSC > RSS,.CFBcalc(FUELTYPE, FMC, SFC, RSS, CBH),0)
-  #Return at this point, if specified by caller
-  if (option == "CFB") {
-    return(CFB)
-  }
-  #Eq. 65 (FCFDG 1992) Calculate Rate of spread (m/min)
-  ROS    <- ifelse(RSC > RSS,RSS + (CFB)*(RSC - RSS),RSS)
-  return(ROS)
-}
-
 .RateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
+  RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+  RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
+  RSC <- CrownRateOfSpreadC6(ISI, FMC)
+  CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
+  #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
+  RSO <- CSI / (300 * SFC)
+  CFB <- ifelse(RSC > RSS, .CrownFractionBurned(this, RSS, RSO), 0)
+  # #Calculate C6 separately
   # RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
   # RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
   # RSC <- CrownRateOfSpreadC6(ISI, FMC)
   # CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
-  # #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
-  # RSO <- CSI / (300 * SFC)
-  # CFB <- ifelse(RSC > RSS, .CrownFractionBurned(this, RSS, RSO), 0)
-  # # #Calculate C6 separately
-  # # RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
-  # # RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
-  # # RSC <- CrownRateOfSpreadC6(ISI, FMC)
-  # # CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
-  # # RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
-  # # CFB <- .CrownFractionBurned(this, RSS, RSO)
-  # ROS <- RateOfSpreadC6(RSC, RSS, CFB)
-  # ROS <- ifelse(ROS <= 0, 0.000001, ROS)
-  # return(ROS)
-  #Average foliar moisture effect
-  FMEavg <- 0.778                                                                                                                   
-  #Eq. 59 (FCFDG 1992) Crown flame temperature (degrees K)
-  tt <- 1500 - 2.75 * FMC
-  #Eq. 60 (FCFDG 1992) Head of ignition (kJ/kg)
-  H <- 460 + 25.9 * FMC
-  #Eq. 61 (FCFDG 1992) Average foliar moisture effect
-  FME <- ((1.5 - 0.00275 * FMC)**4.)/(460 + 25.9 * FMC) * 1000
-  #Eq. 62 (FCFDG 1992) Intermediate surface fire spread rate
-  RSI <- 30 * (1 - exp(-0.08 * ISI))**3.0
-  #Return at this point, if specified by caller
-  #Eq. 63 (FCFDG 1992) Surface fire spread rate (m/min)
-  RSS <- RSI * .BuildupEffect(this, BUI)
-  #Eq. 64 (FCFDG 1992) Crown fire spread rate (m/min)
-  RSC <- 60 * (1 - exp(-0.0497 * ISI)) * FME / FMEavg
-  #Return at this point, if specified by caller
-  #Crown Fraction Burned
-  CFB    <- ifelse(RSC > RSS, .CFBcalc(this$name, FMC, SFC, RSS, CBH),0)
-  #Return at this point, if specified by caller
-  #Eq. 65 (FCFDG 1992) Calculate Rate of spread (m/min)
-  ROS    <- ifelse(RSC > RSS,RSS + (CFB)*(RSC - RSS),RSS)
+  # RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
+  # CFB <- .CrownFractionBurned(this, RSS, RSO)
+  ROS <- RateOfSpreadC6(RSC, RSS, CFB)
+  ROS <- ifelse(ROS <= 0, 0.000001, ROS)
+  return(ROS)
+  # #Average foliar moisture effect
+  # FMEavg <- 0.778
+  # #Eq. 59 (FCFDG 1992) Crown flame temperature (degrees K)
+  # tt <- 1500 - 2.75 * FMC
+  # #Eq. 60 (FCFDG 1992) Head of ignition (kJ/kg)
+  # H <- 460 + 25.9 * FMC
+  # #Eq. 61 (FCFDG 1992) Average foliar moisture effect
+  # FME <- ((1.5 - 0.00275 * FMC)**4.)/(460 + 25.9 * FMC) * 1000
+  # #Eq. 62 (FCFDG 1992) Intermediate surface fire spread rate
+  # RSI <- 30 * (1 - exp(-0.08 * ISI))**3.0
+  # #Return at this point, if specified by caller
+  # #Eq. 63 (FCFDG 1992) Surface fire spread rate (m/min)
+  # RSS <- RSI * .BuildupEffect(this, BUI)
+  # #Eq. 64 (FCFDG 1992) Crown fire spread rate (m/min)
+  # RSC <- 60 * (1 - exp(-0.0497 * ISI)) * FME / FMEavg
+  # #Return at this point, if specified by caller
+  # #Crown Fraction Burned
+  # CFB    <- ifelse(RSC > RSS, .CFBcalc(this$name, FMC, SFC, RSS, CBH),0)
+  # #Return at this point, if specified by caller
+  # #Eq. 65 (FCFDG 1992) Calculate Rate of spread (m/min)
+  # ROS    <- ifelse(RSC > RSS,RSS + (CFB)*(RSC - RSS),RSS)
   return(ROS)
 }
 .FireBehaviourPrediction..C6 <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
@@ -145,9 +91,9 @@
   ############################################################################
   SFC <- TFC <- HFI <- CFB <- ROS <- 0
   RAZ <- -999
-  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+  if (output == "SECONDARY" | output == "ALL" | output == "S" |
       output == "A") {
-    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
+    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <-
       BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
@@ -177,18 +123,15 @@
   # Calculate the Rate of Spread (ROS) and Crown Fraction Burned (CFB)
   # C6 has different calculations
   # ROS <- .RateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
-  # # HACK: use ifelse for now to keep old behaviour
-  # # RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
-  # # RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
-  # # RSC <- CrownRateOfSpreadC6(ISI, FMC)
-  # # CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
-  # # #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
-  # # RSO <- CSI / (300 * SFC)
-  # # CFB <- ifelse(RSC > RSS, .CrownFractionBurned(this, RSS, RSO), 0)
-  # # ROS <- RateOfSpreadC6(RSC, RSS, CFB)
-  ROS <- .C6calc(this$name, ISI, 
-                 BUI, FMC, SFC, CBH, option = "ROS")
-  CFB <- .C6calc(this$name, ISI, BUI, FMC, SFC, CBH, option = "CFB")
+  # HACK: use ifelse for now to keep old behaviour
+  RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+  RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
+  RSC <- CrownRateOfSpreadC6(ISI, FMC)
+  CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
+  #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
+  RSO <- CSI / (300 * SFC)
+  CFB <- ifelse(RSC > RSS, .CrownFractionBurned(this, RSS, RSO), 0)
+  ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   #Calculate Total Fuel Consumption (TFC)
   TFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
   #Calculate Head Fire Intensity(HFI)
@@ -203,7 +146,7 @@
   #Calculate Crown Fuel Consumption(CFC)
   CFC <- .CrownFuelConsumption(this, CFL, CFB, PC, PDF)
   #Calculate the Secondary Outputs
-  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+  if (output == "SECONDARY" | output == "ALL" | output == "S" |
       output == "A") {
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     SF <- ifelse(GS >= 70, 10, exp(3.533 * (GS/100)^1.2))
@@ -217,20 +160,20 @@
     LBt <- ifelse(ACCEL == 0, LB, .LengthToBreadthRatioAtTime(this, LB, HR, CFB))
     #Calculate Back fire rate of spread (BROS)
     BROS <- .BackRateOfSpread(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
-    #Calculate Flank fire rate of spread (FROS) 
+    #Calculate Flank fire rate of spread (FROS)
     FROS <- FlankRateOfSpread(ROS, BROS, LB)
-    #Calculate the eccentricity  
+    #Calculate the eccentricity
     E <- sqrt(1 - 1/LB/LB)
     #Calculate the rate of spread towards angle theta (TROS)
     TROS <- ROS * (1 - E)/(1 - E * cos(THETA - RAZ))
-    #Calculate rate of spread at time t for Flank, Back of fire and at angle 
+    #Calculate rate of spread at time t for Flank, Back of fire and at angle
     #  theta.
     ROSt <- ifelse(ACCEL == 0, ROS, .RateOfSpreadAtTime(this, ROS, HR, CFB))
     BROSt <- ifelse(ACCEL == 0, BROS, .RateOfSpreadAtTime(this, BROS, HR, CFB))
     FROSt <- ifelse(ACCEL == 0, FROS, FlankRateOfSpread(ROSt, BROSt, LBt))
     #Calculate rate of spread towards angle theta at time t (TROSt)
-    TROSt <- ifelse(ACCEL == 0, TROS, 
-                    ROSt * (1 - sqrt(1 - 1 / LBt / LBt)) / 
+    TROSt <- ifelse(ACCEL == 0, TROS,
+                    ROSt * (1 - sqrt(1 - 1 / LBt / LBt)) /
                       (1 - sqrt(1 - 1 / LBt / LBt) * cos(THETA - RAZ)))
     # FIX: C6 is always 0
     #Calculate Crown Fraction Burned for Flank, Back of fire and at angle theta.
@@ -258,16 +201,16 @@
     FROSt <- ifelse(HR < 0, -FROSt, FROSt)
     BROSt <- ifelse(HR < 0, -BROSt, BROSt)
     TROSt <- ifelse(HR < 0, -TROSt, TROSt)
-    
+
     #Calculate the elapsed time to crown fire initiation for Head, Flank, Back
-    # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
+    # fire and at angle theta. The (a# variable is a constant for Head, Flank,
     # Back and at angle theta used in the *TI equations)
     # NOTE: old version used non-constant equation for every FUELTYPE
     TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(this, CFB))
     FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha(this, FCFB))
     BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha(this, BCFB))
     TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha(this, TCFB))
-    
+
     #Fire spread distance for Head, Back, and Flank of fire
     DH <- ifelse(ACCEL == 1, .DistanceAtTime(this, ROS, HR, CFB), ROS * HR)
     DB <- ifelse(ACCEL == 1, .DistanceAtTime(this, BROS, HR, CFB), BROS * HR)
@@ -278,7 +221,7 @@
   #if Primary is selected, wrap the primary outputs into a data frame and
   #  return them
   if (output == "PRIMARY" | output == "P") {
-    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC, 
+    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC,
                 TFC=SFC)
   }
   #If Secondary is selected, wrap the secondary outputs into a data frame
