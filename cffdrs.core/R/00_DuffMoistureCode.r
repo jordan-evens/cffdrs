@@ -19,7 +19,7 @@
 
 #' @param dmc_yda    The Duff Moisture Code from previous iteration
 #' @param temp       Temperature (centigrade)
-#' @param rh         Relative Humidity (%)
+#' @param rh         Relative Humidity (\%)
 #' @param prec       Precipitation(mm)
 #' @param lat        Latitude (decimal degrees)
 #' @param mon        Month (1-12)

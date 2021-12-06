@@ -17,9 +17,9 @@ RateOfSpread(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 
 \item{SFC}{Surface Fuel Consumption (kg/m^2)}
 
-\item{PC}{Percent Conifer (%)}
+\item{PC}{Percent Conifer (\%)}
 
-\item{PDF}{Percent Dead Balsam Fir (%)}
+\item{PDF}{Percent Dead Balsam Fir (\%)}
 
 \item{CC}{Constant}
 

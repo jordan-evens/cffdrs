@@ -20,8 +20,8 @@
 #' @param BUI         Buildup Index 
 #' @param FMC         Foliar Moisture Content 
 #' @param SFC         Surface Fuel Consumption (kg/m^2) 
-#' @param PC          Percent Conifer (%)
-#' @param PDF         Percent Dead Balsam Fir (%) 
+#' @param PC          Percent Conifer (\%)
+#' @param PDF         Percent Dead Balsam Fir (\%)
 #' @param CC          Constant
 #' @param CBH         Crown to base height(m) 
 #' 

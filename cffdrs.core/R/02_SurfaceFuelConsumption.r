@@ -16,7 +16,7 @@
 #' @param FUELTYPE The Fire Behaviour Prediction FuelType
 #' @param BUI      Buildup Index
 #' @param FFMC     Fine Fuel Moisture Code
-#' @param PC       Percent Conifer (%)
+#' @param PC       Percent Conifer (\%)
 #' @param GFL      Grass Fuel Load (kg/m^2)
 #'        
 #' @returns   SFC Surface Fuel Consumption (kg/m^2)

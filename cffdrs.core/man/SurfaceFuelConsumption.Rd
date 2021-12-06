@@ -13,7 +13,7 @@ SurfaceFuelConsumption(FUELTYPE, FFMC, BUI, PC, GFL)
 
 \item{BUI}{Buildup Index}
 
-\item{PC}{Percent Conifer (%)}
+\item{PC}{Percent Conifer (\%)}
 
 \item{GFL}{Grass Fuel Load (kg/m^2)}
 }

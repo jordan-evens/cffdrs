@@ -13,25 +13,25 @@ CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF)
 
 \item{CFB}{Crown Fraction Burned (0-1)}
 
-\item{PC}{Percent Conifer (%)}
+\item{PC}{Percent Conifer (\%)}
 
-\item{PDF}{Percent Dead Balsam Fir (%)}
+\item{PDF}{Percent Dead Balsam Fir (\%)}
 }
 \value{
 CFC Crown Fuel Consumption (kg/m^2)
 }
 \description{
 Computes the Crown Fuel Consumption by Fuel Type.
-  All variables names are laid out in the same manner as FCFDG (1992) or
-  Wotton et. al (2009) 
-  
-  Forestry Canada Fire Danger Group (FCFDG) (1992). "Development and 
-  Structure of the Canadian Forest Fire Behavior Prediction System." 
-  Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
+All variables names are laid out in the same manner as FCFDG (1992) or
+Wotton et. al (2009)
 }
 \details{
+Forestry Canada Fire Danger Group (FCFDG) (1992). "Development and
+Structure of the Canadian Forest Fire Behavior Prediction System."
+Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
+
 Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to
-  the 1992 Canadian forest fire behavior prediction system. Nat. Resour. 
-  Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, 
-  Canada. Information Report GLC-X-10, 45p.
+the 1992 Canadian forest fire behavior prediction system. Nat. Resour.
+Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario,
+Canada. Information Report GLC-X-10, 45p.
 }

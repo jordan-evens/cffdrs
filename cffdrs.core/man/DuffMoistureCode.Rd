@@ -11,7 +11,7 @@ DuffMoistureCode(dmc_yda, temp, rh, prec, lat, mon, lat.adjust = TRUE)
 
 \item{temp}{Temperature (centigrade)}
 
-\item{rh}{Relative Humidity (%)}
+\item{rh}{Relative Humidity (\%)}
 
 \item{prec}{Precipitation(mm)}
 

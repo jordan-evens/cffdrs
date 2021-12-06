@@ -11,7 +11,7 @@ FineFuelMoistureCode(ffmc_yda, temp, rh, ws, prec)
 
 \item{temp}{Temperature (centigrade)}
 
-\item{rh}{Relative Humidity (%)}
+\item{rh}{Relative Humidity (\%)}
 
 \item{ws}{Wind speed (km/h)}
 

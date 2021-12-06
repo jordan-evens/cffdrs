@@ -21,12 +21,12 @@
 #' @param BUI       The Buildup Index value
 #' @param WS        Windspeed (km/h)
 #' @param WAZ       Wind Azimuth
-#' @param GS        Ground Slope (%)
+#' @param GS        Ground Slope (\%)
 #' @param SAZ       Slope Azimuth
 #' @param FMC       Foliar Moisture Content
 #' @param SFC       Surface Fuel Consumption (kg/m^2)
-#' @param PC        Percent Conifer (%)
-#' @param PDF       Percent Dead Balsam Fir (%)
+#' @param PC        Percent Conifer (\%)
+#' @param PDF       Percent Dead Balsam Fir (\%)
 #' @param CC        Constant
 #' @param CBH       Crown Base Height (m)
 #' @param ISI       Initial Spread Index

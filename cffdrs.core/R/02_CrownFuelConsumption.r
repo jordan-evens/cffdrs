@@ -1,25 +1,25 @@
 #' Crown Fuel Consumption calculation
 #' 
-#'   Computes the Crown Fuel Consumption by Fuel Type.
-#'   All variables names are laid out in the same manner as FCFDG (1992) or
-#'   Wotton et. al (2009) 
-#'   
-#'   Forestry Canada Fire Danger Group (FCFDG) (1992). "Development and 
-#'   Structure of the Canadian Forest Fire Behavior Prediction System." 
-#'   Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
-#'
-#'   Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to
-#'   the 1992 Canadian forest fire behavior prediction system. Nat. Resour. 
-#'   Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, 
-#'   Canada. Information Report GLC-X-10, 45p.
+#' Computes the Crown Fuel Consumption by Fuel Type.
+#' All variables names are laid out in the same manner as FCFDG (1992) or
+#' Wotton et. al (2009)
+#' 
+#' Forestry Canada Fire Danger Group (FCFDG) (1992). "Development and
+#' Structure of the Canadian Forest Fire Behavior Prediction System."
+#' Technical Report ST-X-3, Forestry Canada, Ottawa, Ontario.
+#' 
+#' Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to
+#' the 1992 Canadian forest fire behavior prediction system. Nat. Resour.
+#' Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario,
+#' Canada. Information Report GLC-X-10, 45p.
 #'
 #' @param FUELTYPE The Fire Behaviour Prediction FuelType
 #' @param CFL      Crown Fuel Load (kg/m^2)
 #' @param CFB      Crown Fraction Burned (0-1)
-#' @param  PC      Percent Conifer (%)
-#' @param PDF      Percent Dead Balsam Fir (%)
+#' @param PC       Percent Conifer (\%)
+#' @param PDF      Percent Dead Balsam Fir (\%)
 #' 
-#' @returns CFC Crown Fuel Consumption (kg/m^2)
+#' @return CFC Crown Fuel Consumption (kg/m^2)
 #' 
 #' @export CrownFuelConsumption
 CrownFuelConsumption <- function(FUELTYPE, CFL, CFB, PC, PDF)

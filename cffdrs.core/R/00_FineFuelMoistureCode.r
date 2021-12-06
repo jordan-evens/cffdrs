@@ -19,7 +19,7 @@
 
 #' @param ffmc_yda   The Fine Fuel Moisture Code from previous iteration
 #' @param temp       Temperature (centigrade)
-#' @param rh         Relative Humidity (%)
+#' @param rh         Relative Humidity (\%)
 #' @param prec       Precipitation (mm)
 #' @param ws         Wind speed (km/h)
 #' 

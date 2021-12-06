@@ -30,7 +30,7 @@ SlopeAdjust(
 
 \item{WAZ}{Wind Azimuth}
 
-\item{GS}{Ground Slope (%)}
+\item{GS}{Ground Slope (\%)}
 
 \item{SAZ}{Slope Azimuth}
 
@@ -38,9 +38,9 @@ SlopeAdjust(
 
 \item{SFC}{Surface Fuel Consumption (kg/m^2)}
 
-\item{PC}{Percent Conifer (%)}
+\item{PC}{Percent Conifer (\%)}
 
-\item{PDF}{Percent Dead Balsam Fir (%)}
+\item{PDF}{Percent Dead Balsam Fir (\%)}
 
 \item{CC}{Constant}
 
