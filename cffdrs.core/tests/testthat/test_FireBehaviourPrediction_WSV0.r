@@ -226,8 +226,8 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   WSV0 <- SLOPE_ADJUST$WSV
   return(WSV0)
 }
-test_that("FireBehaviourPredictionNoC6_WSV0", {
-  checkData('FireBehaviourPredictionNoC6_WSV0',
+test_that("FireBehaviourPrediction_WSV0", {
+  checkData('FireBehaviourPrediction_WSV0',
             fctOnInput(fctWSV0),
             FBP_ARGS)
 })

@@ -229,8 +229,8 @@ fctRAZ0  <- function(input=NULL, output="Primary") {
   RAZ0 <- SLOPE_ADJUST$RAZ
   return(RAZ0)
 }
-test_that("FireBehaviourPredictionC6_RAZ0", {
-  checkData('FireBehaviourPredictionC6_RAZ0',
+test_that("FireBehaviourPrediction_RAZ0", {
+  checkData('FireBehaviourPrediction_RAZ0',
             fctOnInput(fctRAZ0),
-            C6_ARGS)
+            FBP_ARGS)
 })

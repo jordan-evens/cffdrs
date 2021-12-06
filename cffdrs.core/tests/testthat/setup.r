@@ -24,7 +24,7 @@ ELV <- seq(0, 10000)
 FC <- seq(-10, 20000)
 FFMC <- seq(0, 101, by=0.1)
 FMC <- seq(0, 500, by=0.1)
-FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C7",
+FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
            "D1", "M1", "M2", "M3", "M4", "S1", "S2",
            "S3", "O1A", "O1B")
 GFL <- seq(0, 100)
@@ -81,34 +81,6 @@ FBP_ARGS <- list(data.table(ID=1),
                  data.table(CBH=CBH),
                  data.table(CFL=CFL),
                  data.table(ISI=ISI))
-
-C6_ARGS <- list(data.table(ID=1),
-                data.table(FUELTYPE=c("C6")),
-                data.table(FFMC=FFMC),
-                data.table(BUI=BUI),
-                data.table(WS=WS),
-                data.table(WD=WD),
-                data.table(FMC=FMC),
-                data.table(GS=GS),
-                data.table(LAT=LAT),
-                data.table(LONG=LONG),
-                data.table(ELV=ELV),
-                data.table(DJ=DJ),
-                data.table(D0=D0),
-                data.table(SD=SD),
-                data.table(SH=SH),
-                data.table(HR=HR),
-                data.table(PC=PC),
-                data.table(PDF=PDF),
-                data.table(GFL=GFL),
-                data.table(CC=CC),
-                data.table(THETA=THETA),
-                data.table(ACCEL=ACCEL),
-                data.table(ASPECT=ASPECT),
-                data.table(BUIEFF=BUIEFF),
-                data.table(CBH=CBH),
-                data.table(CFL=CFL),
-                data.table(ISI=ISI))
 
 pickRows <- function(d1, num_rows=DESIRED_ROWS)
 {
