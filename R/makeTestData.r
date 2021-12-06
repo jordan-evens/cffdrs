@@ -25,7 +25,7 @@ ELV <- seq(0, 10000)
 FC <- seq(-10, 20000)
 FFMC <- seq(0, 101, by=0.1)
 FMC <- seq(0, 500, by=0.1)
-FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C7",
+FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
            "D1", "M1", "M2", "M3", "M4", "S1", "S2",
            "S3", "O1A", "O1B")
 GFL <- seq(0, 100)
@@ -57,34 +57,6 @@ WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
 
 FBP_ARGS <- list(data.table(ID=1),
                  data.table(FUELTYPE=FUELTYPE),
-                 data.table(FFMC=FFMC),
-                 data.table(BUI=BUI),
-                 data.table(WS=WS),
-                 data.table(WD=WD),
-                 data.table(FMC=FMC),
-                 data.table(GS=GS),
-                 data.table(LAT=LAT),
-                 data.table(LONG=LONG),
-                 data.table(ELV=ELV),
-                 data.table(DJ=DJ),
-                 data.table(D0=D0),
-                 data.table(SD=SD),
-                 data.table(SH=SH),
-                 data.table(HR=HR),
-                 data.table(PC=PC),
-                 data.table(PDF=PDF),
-                 data.table(GFL=GFL),
-                 data.table(CC=CC),
-                 data.table(THETA=THETA),
-                 data.table(ACCEL=ACCEL),
-                 data.table(ASPECT=ASPECT),
-                 data.table(BUIEFF=BUIEFF),
-                 data.table(CBH=CBH),
-                 data.table(CFL=CFL),
-                 data.table(ISI=ISI))
-
-C6_ARGS <- list(data.table(ID=1),
-                 data.table(FUELTYPE=c("C6")),
                  data.table(FFMC=FFMC),
                  data.table(BUI=BUI),
                  data.table(WS=WS),
@@ -344,16 +316,11 @@ test_fbp$WS <- as.numeric(test_fbp$WS)
 test_fbp$GFL <- as.numeric(test_fbp$GFL)
 test_fbp$CBH <- as.numeric(test_fbp$CBH)
 test_fbp$CFL <- as.numeric(test_fbp$CFL)
-saveResults('FireBehaviourPrediction_test_fbp_NoC6',
-            cffdrs:::.FBPcalc(test_fbp[!(test_fbp$FuelType %in% c("C6", "c6", "C-6", "c-6")),], "A"))
-saveResults('FireBehaviourPrediction_test_fbp_C6',
-            cffdrs:::.FBPcalc(test_fbp[test_fbp$FuelType %in% c("C6", "c6", "C-6", "c-6"),], "A"))
-saveData('FireBehaviourPredictionNoC6',
+saveResults('FireBehaviourPrediction_test_fbp',
+            cffdrs:::.FBPcalc(test_fbp, "A"))
+saveData('FireBehaviourPrediction',
          fctOnInput(cffdrs:::.FBPcalc),
          FBP_ARGS)
-saveData('FireBehaviourPredictionC6',
-         fctOnInput(cffdrs:::.FBPcalc),
-         C6_ARGS)
 saveData('FireIntensity',
          cffdrs:::.FIcalc,
          list(data.table(FC=FC),
@@ -1153,12 +1120,9 @@ fctWSV0  <- function(input=NULL, output="Primary") {
                      FMC, SFC, PC, PDF, CC, CBH, ISI, output = "WSV")
   return(WSV0)
 }
-saveData('FireBehaviourPredictionNoC6_WSV0',
+saveData('FireBehaviourPrediction_WSV0',
          fctOnInput(fctWSV0),
          FBP_ARGS)
-saveData('FireBehaviourPredictionC6_WSV0',
-         fctOnInput(fctWSV0),
-         C6_ARGS)
 fctRAZ0  <- function(input=NULL, output="Primary")
 {                                                                                           
   #  Quite often users will have a data frame called "input" already attached
@@ -1400,12 +1364,9 @@ fctRAZ0  <- function(input=NULL, output="Primary")
                      FMC, SFC, PC, PDF, CC, CBH, ISI, output = "RAZ")
   return(RAZ0)
 }
-saveData('FireBehaviourPredictionNoC6_RAZ0',
+saveData('FireBehaviourPrediction_RAZ0',
          fctOnInput(fctRAZ0),
          FBP_ARGS)
-saveData('FireBehaviourPredictionC6_RAZ0',
-         fctOnInput(fctRAZ0),
-         C6_ARGS)
 fctCBH <-function(FUELTYPE, CBH, SD, SH)
 {
   CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0, 
@@ -1425,9 +1386,3 @@ saveData('CrownBaseHeight',
                data.table(CBH=CBH),
                data.table(SD=SD),
                data.table(SH=SH)))
-saveData('CrownBaseHeightC6',
-         fctCBH,
-         list(data.table(FUELTYPE=c("C6")),
-              data.table(CBH=CBH),
-              data.table(SD=SD),
-              data.table(SH=SH)))
