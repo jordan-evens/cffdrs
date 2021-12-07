@@ -24,6 +24,19 @@
   ISF <- PC / 100 * ISF_C2 + (1 - PC / 100) * ISF_D1
   return(ISF)
 }
+.SlopeEquivalentInitialSpreadIndex..FuelMixedDead <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+{
+  #Set % Dead Balsam Fir to 100%
+  PDF100 <- 100
+  #Eq. 41a (Wotton 2009) - Calculate the slope equivalent ISI
+  #Eq. 41b (Wotton 2009) - Calculate the slope equivalent ISI
+  # HACK: call superclass function
+  ISF_mixed <- .SlopeEquivalentInitialSpreadIndex.Fuel(this, FFMC, BUI=-1, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
+  ISF_D1 <- .SlopeEquivalentInitialSpreadIndex(.D1, FFMC, BUI=-1, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
+  #Eq. 42b (Wotton 2009) - Calculate weighted average for the M3/M4 type
+  ISF <- PDF / 100 * ISF_mixed + (1 - PDF / 100) * ISF_D1
+  return(ISF)
+}
 .SlopeEquivalentInitialSpreadIndex..FuelGrass <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
   #Eq. 39 (FCFDG 1992) - Calculate Spread Factor
