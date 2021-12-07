@@ -16,3 +16,4 @@
                  0) + 1.5 * (1 - exp(-0.0201 * BUI)))
   
 }
+.C7$.SurfaceFuelConsumptionBase <- .SurfaceFuelConsumptionBase..C7

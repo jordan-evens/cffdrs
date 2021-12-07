@@ -48,3 +48,6 @@ CrownFuelConsumption <- function(FUELTYPE, CFL, CFB, PC, PDF)
   CFC <- PDF / 100 * CFC
   return (CFC)
 }
+.FuelBase$.CrownFuelConsumption <- .CrownFuelConsumption..FuelBase
+.FuelMixedwood$.CrownFuelConsumption <- .CrownFuelConsumption..FuelMixedwood
+.FuelMixedDead$.CrownFuelConsumption <- .CrownFuelConsumption..FuelMixedDead

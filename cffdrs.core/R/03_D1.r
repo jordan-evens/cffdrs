@@ -15,3 +15,4 @@
 {
   return(0)
 }
+.D1$.FoliarMoistureContent <- .FoliarMoistureContent..D1

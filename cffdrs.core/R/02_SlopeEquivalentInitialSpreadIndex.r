@@ -207,7 +207,7 @@
   ISZ <- InitialSpreadIndex(FFMC, 0)
   stopifnot(ISZ >= 0)
   #Surface spread rate with 0 wind on level ground
-  RSZ <- .RateOfSpread(this, ISZ, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
+  RSZ <- this$.RateOfSpread(this, ISZ, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
   if (!is.na(RSZ) && RSZ < 0)
   {
     print(this)
@@ -280,7 +280,7 @@
   #ISI with 0 wind on level grounds
   ISZ <- InitialSpreadIndex(FFMC, 0)
   #Surface spread rate with 0 wind on level ground
-  RSZ <- .RateOfSpread(this, ISZ, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
+  RSZ <- this$.RateOfSpread(this, ISZ, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope
   RSF <- RSZ * SF
   #Eqs. 35a, 35b (Wotton 2009) - Curing Factor pivoting around % 58.8
@@ -297,3 +297,6 @@
   }
   return(ISF)
 }
+Fuel$.SlopeEquivalentInitialSpreadIndex <- .SlopeEquivalentInitialSpreadIndex.Fuel
+.FuelMixedwood$.SlopeEquivalentInitialSpreadIndex <- .SlopeEquivalentInitialSpreadIndex..FuelMixedwood
+.FuelGrass$.SlopeEquivalentInitialSpreadIndex <- .SlopeEquivalentInitialSpreadIndex..FuelGrass

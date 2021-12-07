@@ -53,9 +53,12 @@ RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CB
 }
 .RateOfSpread..FuelBase <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
-  RSI <- .BaseRateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
-  ROS <- .BuildupEffect(this, BUI) * RSI
+  RSI <- this$.BaseRateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+  ROS <- this$.BuildupEffect(this, BUI) * RSI
   # HACK: keep old behaviour
   ROS <- ifelse(ROS <= 0, 0.000001, ROS)
   return(ROS)
 }
+Fuel$.BaseRateOfSpread <- .BaseRateOfSpread.Fuel
+.FuelGrass$.BaseRateOfSpread <- .BaseRateOfSpread..FuelGrass
+.FuelBase$.RateOfSpread <- .RateOfSpread..FuelBase

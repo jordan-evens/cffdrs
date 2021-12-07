@@ -77,3 +77,9 @@ Fuel <- structure(.Data=list(
 {
   return(0)
 }
+Fuel$.CrownBaseHeight <- .CrownBaseHeight.Fuel
+.FuelBase$.FoliarMoistureContent <- .FoliarMoistureContent..FuelBase
+.FuelBase$.Alpha <- .Alpha..FuelBase
+.FuelOpen$.Alpha <- .Alpha..FuelOpen
+.FuelGrass$.FoliarMoistureContent <- .FoliarMoistureContent..FuelGrass
+.FuelSlash$.FoliarMoistureContent <- .FoliarMoistureContent..FuelSlash

@@ -18,7 +18,7 @@
   RSI_m4 <- this$a * ((1 - exp(-this$b * ISI))**this$c0)
   #Eq. 33 (Wotton et. al 2009)
   RSI <- PDF / 100* RSI_m4 +
-    0.2 * (1 - PDF / 100)* .BaseRateOfSpread(.D1, ISI, BUI=-1, FMC, SFC, PC, PDF, CC,CBH)
+    0.2 * (1 - PDF / 100)* .D1$.BaseRateOfSpread(.D1, ISI, BUI=-1, FMC, SFC, PC, PDF, CC,CBH)
   return(RSI)
 }
 .SlopeEquivalentInitialSpreadIndex..M4 <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
@@ -28,8 +28,8 @@
   #Eq. 41a (Wotton 2009) - Calculate the slope equivalent ISI
   #Eq. 41b (Wotton 2009) - Calculate the slope equivalent ISI
   # HACK: call superclass function
-  ISF_M4 <- .SlopeEquivalentInitialSpreadIndex.Fuel(this, FFMC, BUI=-1, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
-  ISF_D1 <- .SlopeEquivalentInitialSpreadIndex(.D1, FFMC, BUI=-1, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
+  ISF_M4 <- Fuel$.SlopeEquivalentInitialSpreadIndex(this, FFMC, BUI=-1, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
+  ISF_D1 <- .D1$.SlopeEquivalentInitialSpreadIndex(.D1, FFMC, BUI=-1, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
   #Eq. 42b (Wotton 2009) - Calculate weighted average for the M3 type
   ISF <- PDF / 100 * ISF_M4 + (1 - PDF / 100) * ISF_D1
   if (!is.na(ISF) && ISF < 0)
@@ -40,3 +40,5 @@
   }
   return(ISF)
 }
+.M4$.BaseRateOfSpread <- .BaseRateOfSpread..M4
+.M4$.SlopeEquivalentInitialSpreadIndex <- .SlopeEquivalentInitialSpreadIndex..M4

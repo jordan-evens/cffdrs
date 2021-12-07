@@ -23,9 +23,10 @@ DistanceAtTime <- Vectorize(function(FUELTYPE, ROSeq, HR, CFB)
 {
   #Eq. 72 (FCFDG 1992)
   #Calculate the alpha constant for the DISTt calculation
-  alpha <- .Alpha(this, CFB)
+  alpha <- this$.Alpha(this, CFB)
   #Eq. 71 (FCFDG 1992) Calculate Head fire spread distance
   DISTt  <- ROSeq *
     (HR + exp(-alpha * HR) / alpha - 1 / alpha)
   return(DISTt)
 }
+.FuelBase$.DistanceAtTime <- .DistanceAtTime..FuelBase

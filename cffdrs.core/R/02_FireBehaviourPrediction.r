@@ -1,8 +1,11 @@
 fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
 {
   return(.FireBehaviourPrediction(FUELS[[FUELTYPE]], output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA))
-}
-)
+})
+fctFBP2 <- Vectorize(function(fuel, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
+{
+  return(.FireBehaviourPrediction(fuel, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA))
+})
 .FireBehaviourPrediction.Fuel <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
 {
   ############################################################################
@@ -17,19 +20,19 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
       BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
-  CBH <- .CrownBaseHeight(this, CBH, SD, SH)
+  CBH <- this$.CrownBaseHeight(this, CBH, SD, SH)
   CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), this$CFL, CFL)
   FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
-                .FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
+                this$.FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
                 FMC)
   ############################################################################
   #                         END
   ############################################################################
   #Calculate Surface fuel consumption (SFC)
-  SFC <- .SurfaceFuelConsumption(this, FFMC, BUI, PC, GFL)
+  SFC <- this$.SurfaceFuelConsumption(this, FFMC, BUI, PC, GFL)
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
-  SLOPE_ADJUST <- .SlopeAdjust(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+  SLOPE_ADJUST <- this$.SlopeAdjust(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
   #Calculate the net effective windspeed (WSV)
   # WSV0 <- SLOPE_ADJUST[["WSV"]]
   WSV0 <- SLOPE_ADJUST$WSV
@@ -41,16 +44,16 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
   #Calculate or keep Initial Spread Index (ISI)
   ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
   #Calculate Critical Surface Intensity
-  CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
+  CSI <- this$.CriticalSurfaceIntensity(this, FMC, CBH)
   #Calculate Surface fire rate of spread (m/min)
   RSO <- CriticalSurfaceRateOfSpread(CSI, SFC)
   # Calculate the Rate of Spread (ROS) and Crown Fraction Burned (CFB)
-  ROS <- .RateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
+  ROS <- this$.RateOfSpread(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
   CFB <- ifelse(CFL > 0,
-                .CrownFractionBurned(this, ROS, RSO),
+                this$.CrownFractionBurned(this, ROS, RSO),
                 0)
   #Calculate Total Fuel Consumption (TFC)
-  TFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
+  TFC <- TotalFuelConsumption(this$.CrownFuelConsumption(this, CFL, CFB, PC, PDF), SFC)
   #Calculate Head Fire Intensity(HFI)
   HFI <- FireIntensity(TFC, ROS)
   #Adjust Crown Fraction Burned
@@ -61,19 +64,19 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
   #Calculate Fire Type (S = Surface, C = Crowning, I = Intermittent Crowning)
   FD <- ifelse(CFB < 0.1, "S", ifelse(CFB >= 0.9, "C", "I"))
   #Calculate Crown Fuel Consumption(CFC)
-  CFC <- .CrownFuelConsumption(this, CFL, CFB, PC, PDF)
+  CFC <- this$.CrownFuelConsumption(this, CFL, CFB, PC, PDF)
   #Calculate the Secondary Outputs
   if (output == "SECONDARY" | output == "ALL" | output == "S" | 
       output == "A") {
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     SF <- ifelse(GS >= 70, 10, exp(3.533 * (GS/100)^1.2))
     #Calculate The Buildup Effect
-    BE <- .BuildupEffect(this, BUI)
+    BE <- this$.BuildupEffect(this, BUI)
     #Calculate length to breadth ratio
-    LB <- .LengthToBreadthRatio(this, WSV)
-    LBt <- ifelse(ACCEL == 0, LB, .LengthToBreadthRatioAtTime(this, LB, HR, CFB))
+    LB <- this$.LengthToBreadthRatio(this, WSV)
+    LBt <- ifelse(ACCEL == 0, LB, this$.LengthToBreadthRatioAtTime(this, LB, HR, CFB))
     #Calculate Back fire rate of spread (BROS)
-    BROS <- .BackRateOfSpread(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
+    BROS <- this$.BackRateOfSpread(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
     #Calculate Flank fire rate of spread (FROS) 
     FROS <- FlankRateOfSpread(ROS, BROS, LB)
     #Calculate the eccentricity  
@@ -82,8 +85,8 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
     TROS <- ROS * (1 - E)/(1 - E * cos(THETA - RAZ))
     #Calculate rate of spread at time t for Flank, Back of fire and at angle 
     #  theta.
-    ROSt <- ifelse(ACCEL == 0, ROS, .RateOfSpreadAtTime(this, ROS, HR, CFB))
-    BROSt <- ifelse(ACCEL == 0, BROS, .RateOfSpreadAtTime(this, BROS, HR, CFB))
+    ROSt <- ifelse(ACCEL == 0, ROS, this$.RateOfSpreadAtTime(this, ROS, HR, CFB))
+    BROSt <- ifelse(ACCEL == 0, BROS, this$.RateOfSpreadAtTime(this, BROS, HR, CFB))
     FROSt <- ifelse(ACCEL == 0, FROS, FlankRateOfSpread(ROSt, BROSt, LBt))
     #Calculate rate of spread towards angle theta at time t (TROSt)
     TROSt <- ifelse(ACCEL == 0, TROS, 
@@ -95,15 +98,15 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
     TCFB <- 0
     if (CFL != 0)
     {
-      FCFB <- .CrownFractionBurned(this, FROS, RSO)
-      BCFB <- .CrownFractionBurned(this, BROS, RSO)
-      TCFB <- .CrownFractionBurned(this, TROS, RSO)
+      FCFB <- this$.CrownFractionBurned(this, FROS, RSO)
+      BCFB <- this$.CrownFractionBurned(this, BROS, RSO)
+      TCFB <- this$.CrownFractionBurned(this, TROS, RSO)
     }
     #Calculate Total fuel consumption for the Flank fire, Back fire and at
     #  angle theta
-    FTFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, FCFB, PC, PDF), SFC)
-    BTFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, BCFB, PC, PDF), SFC)
-    TTFC <- TotalFuelConsumption(.CrownFuelConsumption(this, CFL, TCFB, PC, PDF), SFC)
+    FTFC <- TotalFuelConsumption(this$.CrownFuelConsumption(this, CFL, FCFB, PC, PDF), SFC)
+    BTFC <- TotalFuelConsumption(this$.CrownFuelConsumption(this, CFL, BCFB, PC, PDF), SFC)
+    TTFC <- TotalFuelConsumption(this$.CrownFuelConsumption(this, CFL, TCFB, PC, PDF), SFC)
     #Calculate the Fire Intensity at the Flank, Back and at angle theta fire
     FFI <- FireIntensity(FTFC, FROS)
     BFI <- FireIntensity(BTFC, BROS)
@@ -119,20 +122,20 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
     # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
     # Back and at angle theta used in the *TI equations)
     # HACK: old version used non-constant equation for every FUELTYPE
-    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha..FuelBase(this, CFB))
-    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha..FuelBase(this, FCFB))
-    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha..FuelBase(this, BCFB))
-    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha..FuelBase(this, TCFB))
+    TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.FuelBase$.Alpha(this, CFB))
+    FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.FuelBase$.Alpha(this, FCFB))
+    BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.FuelBase$.Alpha(this, BCFB))
+    TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.FuelBase$.Alpha(this, TCFB))
     
     # FIX: shouldn't it be this?
-    # TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(this, CFB))
-    # FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha(this, FCFB))
-    # BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha(this, BCFB))
-    # TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha(this, TCFB))
+    # TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-this$.Alpha(this, CFB))
+    # FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-this$.Alpha(this, FCFB))
+    # BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-this$.Alpha(this, BCFB))
+    # TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-this$.Alpha(this, TCFB))
     
     #Fire spread distance for Head, Back, and Flank of fire
-    DH <- ifelse(ACCEL == 1, .DistanceAtTime(this, ROS, HR, CFB), ROS * HR)
-    DB <- ifelse(ACCEL == 1, .DistanceAtTime(this, BROS, HR, CFB), BROS * HR)
+    DH <- ifelse(ACCEL == 1, this$.DistanceAtTime(this, ROS, HR, CFB), ROS * HR)
+    DB <- ifelse(ACCEL == 1, this$.DistanceAtTime(this, BROS, HR, CFB), BROS * HR)
     DF <- ifelse(ACCEL == 1, (DH + DB)/(LBt * 2), (DH + DB)/(LB * 2))
   }
   #if Primary is selected, wrap the primary outputs into a data frame and
@@ -176,8 +179,8 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
 #' @return output: Either Primary, Secondary, or all FBP outputs in a data.frame
 #' 
 #' @export FireBehaviourPrediction
-FireBehaviourPrediction  <- function(input=NULL, output="Primary") {                                                                                           
-  
+FireBehaviourPrediction  <- function(input=NULL, output="Primary")
+{
   #  Quite often users will have a data frame called "input" already attached
   #  to the workspace. To mitigate this, we remove that if it exists, and warn
   #  the user of this case.
@@ -185,7 +188,6 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
     warning("Attached dataset 'input' is being detached to use fbp() function.")
     detach(input)
   }
-  output <- toupper(output)
   #if input does not exist, then set defaults
   if (is.null(input)) {
     input<-data.frame(FUELTYPE="C2",ACCEL=0,DJ=180,D0=0,ELV=0,BUIEFF=1,HR=1,
@@ -194,10 +196,34 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
                       FMC=0,THETA=0)
     input[, "FUELTYPE"] <- as.character(input[, "FUELTYPE"])
   }
+  else
+  {
+    # copy input so we don't modify it
+    input <- copy(input)
+  }
   #set local scope variables from the parameters for simpler to referencing
   names(input) <- toupper(names(input))
+  input$FUELTYPE <- toupper(input$FUELTYPE)
+  input$FUELTYPE <- sub("-", "", input$FUELTYPE)
+  input$FUELTYPE <- sub(" ", "", input$FUELTYPE)
+  if(length(input$FUELTYPE[is.na(input$FUELTYPE)]) > 0)
+  {
+    warning("FuelType contains NA, using C2 (default) in the calculation")
+    input$FUELTYPE <- ifelse(is.na(input$FUELTYPE), "C2", input$FUELTYPE)
+  }
+  FUELTYPE <- input$FUELTYPE
+  # instead of using do.call naively, break the data into FUELTYPES
+  # if (1 < length(input$FUELTYPE))
+  # {
+  #   result <- NA
+  #   for (f in FUELTYPE)
+  #   {
+  #     result <- rbind(result, FireBehaviourPrediction(input[input$FUELTYPE == f], output))
+  #   }
+  #   return(result)
+  # }
+  output <- toupper(output)
   ID <- input$ID
-  FUELTYPE <- toupper(input$FUELTYPE)
   FFMC <- input$FFMC
   BUI <- input$BUI
   WS <- input$WS
@@ -344,11 +370,6 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   SH <- ifelse(SH < 0 | SH > 100, -999, SH)
   SH <- ifelse(is.na(SH), 0, SH)
   
-  FUELTYPE <- sub("-", "", FUELTYPE)
-  FUELTYPE <- sub(" ", "", FUELTYPE)
-  if(length(FUELTYPE[is.na(FUELTYPE)])>0){
-    warning("FuelType contains NA, using C2 (default) in the calculation")
-    FUELTYPE<-ifelse(is.na(FUELTYPE),"C2",FUELTYPE)}
   ############################################################################
   #                         END
   ############################################################################
@@ -371,6 +392,11 @@ FireBehaviourPrediction  <- function(input=NULL, output="Primary") {
   ############################################################################
   #                         END
   ############################################################################
-  FBP <- data.frame(do.call(rbind, fctFBP(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)), row.names=NULL)
+  # we know that all the FUELTYPEs for this match because of the recursion above
+  fuels <- lapply(FUELTYPE, function(f) { return(FUELS[[f]]) })
+  #FBP <- data.frame(do.call(rbind, fctFBP(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)), row.names=NULL)
+  FBP <- data.frame(do.call(rbind, fctFBP2(fuels, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)), row.names=NULL)
+  #results <- do.call(.FireBehaviourPrediction, c(fuels, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA))
+  #FBP <- data.frame(do.call(rbind, results), row.names=NULL)
   return(FBP)
 }

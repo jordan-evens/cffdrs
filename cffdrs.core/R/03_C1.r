@@ -16,3 +16,4 @@
                  0.75 + 0.75 * (1 - exp(-0.23 * (FFMC - 84)))**0.5,
                  0.75 - 0.75 * (1 - exp(-0.23 * (84 - FFMC)))**0.5))
 }
+.C1$.SurfaceFuelConsumptionBase <- .SurfaceFuelConsumptionBase..C1

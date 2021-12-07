@@ -9,7 +9,8 @@
 {
   NoBUI <- -1
   #Eq. 27 (FCFDG 1992) - Initial Rate of Spread for M2 Mixedwood type
-  RSI <- PC / 100 * .BaseRateOfSpread(.C2, ISI, NoBUI, FMC, SFC, PC, PDF, CC, CBH) +
-    0.2 * ((100 - PC) / 100) * .BaseRateOfSpread(.D1, ISI, NoBUI, FMC, SFC, PC, PDF, CC, CBH)
+  RSI <- PC / 100 * .C2$.BaseRateOfSpread(.C2, ISI, NoBUI, FMC, SFC, PC, PDF, CC, CBH) +
+    0.2 * ((100 - PC) / 100) * .D1$.BaseRateOfSpread(.D1, ISI, NoBUI, FMC, SFC, PC, PDF, CC, CBH)
   return(RSI)
 }
+.M2$.BaseRateOfSpread <- .BaseRateOfSpread..M2

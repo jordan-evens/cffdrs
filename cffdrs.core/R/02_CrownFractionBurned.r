@@ -26,3 +26,4 @@ CrownFractionBurned <- function(FUELTYPE, ROS, RSO)
   CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), 0)
   return(CFB)
 }
+.FuelBase$.CrownFractionBurned <- .CrownFractionBurned..FuelBase

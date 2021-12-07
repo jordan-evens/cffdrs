@@ -25,3 +25,4 @@ BuildupEffect <- Vectorize(function(FUELTYPE, BUI)
               1)
   return(BE)
 }
+Fuel$.BuildupEffect <- .BuildupEffect.Fuel

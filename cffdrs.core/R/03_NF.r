@@ -82,3 +82,10 @@
   }
   return(list(FBP))
 }
+.FuelNF$.BaseRateOfSpread <- .BaseRateOfSpread..FuelNF
+.FuelNF$.BuildupEffect <- .BuildupEffect..FuelNF
+.FuelNF$.CrownBaseHeight <- .CrownBaseHeight..FuelNF
+.FuelNF$.FireBehaviourPrediction <- .FireBehaviourPrediction..FuelNF
+.FuelNF$.SlopeEquivalentInitialSpreadIndex <- .SlopeEquivalentInitialSpreadIndex..FuelNF
+.FuelNF$.SurfaceFuelConsumptionBase <- .SurfaceFuelConsumptionBase..FuelNF
+.FuelNF$.FireBehaviourPrediction <- .FireBehaviourPrediction..FuelNF

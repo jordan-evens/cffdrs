@@ -208,19 +208,19 @@ fctRAZ0  <- function(input=NULL, output="Primary") {
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
   this <- FUELS[[FUELTYPE]]
-  CBH <- .CrownBaseHeight(this, CBH, SD, SH)
+  CBH <- this$.CrownBaseHeight(this, CBH, SD, SH)
   CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), this$CFL, CFL)
   FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
-                .FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
+                this$.FoliarMoistureContent(this, LAT, LONG, ELV, DJ, D0),
                 FMC)
   ############################################################################
   #                         END
   ############################################################################
   #Calculate Surface fuel consumption (SFC)
-  SFC <- .SurfaceFuelConsumption(this, FFMC, BUI, PC, GFL)
+  SFC <- this$.SurfaceFuelConsumption(this, FFMC, BUI, PC, GFL)
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
-  SLOPE_ADJUST <- .SlopeAdjust(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
+  SLOPE_ADJUST <- this$.SlopeAdjust(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
   #Calculate the net effective windspeed (WSV)
   # WSV0 <- SLOPE_ADJUST[["WSV"]]
   WSV0 <- SLOPE_ADJUST$WSV
