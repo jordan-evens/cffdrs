@@ -22,25 +22,6 @@
   return(CBH)
 }
 
-.BEcalc <- function(FUELTYPE, BUI) {
-  
-  #Fuel Type String represenations
-  d <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "D1", "M1", "M2", "M3",
-         "M4","S1", "S2", "S3", "O1A", "O1B")
-  #The average BUI for the fuel type - as referenced by the "d" list above
-  BUIo <- c(72, 64, 62, 66, 56, 62, 106, 32, 50, 50, 50, 50, 38, 63, 31, 01, 
-            01)
-  #Proportion of maximum possible spread rate that is reached at a standard BUI
-  Q <- c(0.9, 0.7, 0.75, 0.8, 0.8, 0.8, 0.85, 0.9, 0.8, 0.8, 0.8, 0.8, 0.75, 
-         0.75, 0.75, 1.0, 1.0)
-  names(BUIo) <- names(Q)<-d
-  
-  #Eq. 54 (FCFDG 1992) The Buildup Effect
-  BE<- ifelse(BUI > 0 & BUIo[FUELTYPE] > 0,
-              exp(50 * log(Q[FUELTYPE]) * (1 / BUI - 1 / BUIo[FUELTYPE])), 1)
-  
-  return(as.numeric(BE))
-}
 .RateOfSpread..C6 <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
@@ -122,9 +103,6 @@
       output == "A") {
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     SF <- ifelse(GS >= 70, 10, exp(3.533 * (GS/100)^1.2))
-    CSI <- .CriticalSurfaceIntensity(this, FMC, CBH)
-    #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
-    RSO <- CSI / (300 * SFC)
     #Calculate The Buildup Effect
     BE <- .BuildupEffect(this, BUI)
     #Calculate length to breadth ratio

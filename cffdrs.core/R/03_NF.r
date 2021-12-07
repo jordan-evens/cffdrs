@@ -25,30 +25,12 @@
   CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), NA, CBH)
   return(CBH)
 }
-# .CrownFractionBurned..FuelNF <- function(this, ROS, RSO)
-# {
-#   #Eq. 58 (FCFDG 1992) Crown fraction burned 
-#   CFB <- ifelse(ROS > RSO, 1 - exp(-0.23 * (ROS - RSO)), 0)
-#   return(CFB)
-# }
-#.DistanceAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
 .FireBehaviourPrediction..FuelNF <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA) { return(0) }
-#.LengthToBreadthRatio..FuelNF <- function(this, WSV) { return(0) }
-#.LengthToBreadthRatioAtTime..FuelNF <- function(this, LB, HR, CFB) { return(1.0) }
-#.RateOfSpread..FuelNF <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH) { return(0) }
-# HACK: return old value instead of logical one
-#.RateOfSpreadAtTime..FuelNF <- function(this, ROSeq, HR, CFB) { return(0) }
-#.SlopeAdjust..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI) { return(list(WSV=as.numeric(NA), RAZ=as.numeric(NA))) }
 .SlopeEquivalentInitialSpreadIndex..FuelNF <- function(this, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)
 {
-  stopifnot(this$name %in% c('NF', 'WA'))
   # NOTE: keep old behaviour
   return(-99.0)
 }
-# .SlopeEquivalentWindSpeed..FuelNF <- function()
-# {
-#   ifelse(ROS <= 0,0.000001,ROS)
-# }
 .SurfaceFuelConsumptionBase..FuelNF <- function(this, FFMC, BUI, PC, GFL) { return(0) }
 .FireBehaviourPrediction..FuelNF <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
 {

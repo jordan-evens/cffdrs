@@ -32,11 +32,5 @@
   ISF_D1 <- .SlopeEquivalentInitialSpreadIndex(.D1, FFMC, BUI=-1, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF100, CC, CBH, ISI)
   #Eq. 42b (Wotton 2009) - Calculate weighted average for the M3 type
   ISF <- PDF / 100 * ISF_M4 + (1 - PDF / 100) * ISF_D1
-  if (!is.na(ISF) && ISF < 0)
-  {
-    print(this)
-    print(ISF)
-    stopifnot(ISF >= 0)
-  }
   return(ISF)
 }

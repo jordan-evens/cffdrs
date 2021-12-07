@@ -31,8 +31,6 @@
 RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   ROS <- .RateOfSpread(FUELS[[FUELTYPE]], ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
-  # #add a constraint
-  # ROS <- ifelse(ROS <= 0,0.000001,ROS)
   return(ROS)
 })
 .BaseRateOfSpread.Fuel <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)

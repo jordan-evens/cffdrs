@@ -46,11 +46,6 @@ SlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
 {
   ISF <- .SlopeEquivalentInitialSpreadIndex(this, FFMC, BUI, WS, WAZ, GS, SAZ,
                                             FMC, SFC, PC, PDF, CC, CBH, ISI)
-  if (!(this$name %in% c('NF', 'WA')) && !is.na(ISF))
-  {
-    stopifnot(ISF != -99)
-  }
-  stopifnot(1 == length(ISF))
   if (is.na(ISF) || -99.0 == ISF)
   {
     return(list(WSV=NA, RAZ=NA))
