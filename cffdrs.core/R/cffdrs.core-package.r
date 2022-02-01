@@ -43,8 +43,8 @@
 #' 
 #' Maintainer: Jordan Evens \email{jordan.evens@nrcan-rncan.gc.ca}
 #' @seealso \code{\link{fbp}}, \code{\link{fireSeason}}, \code{\link{fwi}},
-#' \code{\link{gfmc}}, \code{\link{hffmc}}, \code{\link{sdmc}},
-#' \code{\link{wDC}}
+#' \code{\link{gfmc}}, \code{\link{hffmc}},
+#' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{wDC}}
 #' @references 1. Van Wagner, C.E. and T.L. Pickett. 1985. Equations and
 #' FORTRAN program for the Canadian Forest Fire Weather Index System. Can. For.
 #' Serv., Ottawa, Ont. For. Tech. Rep. 33. 18 p.

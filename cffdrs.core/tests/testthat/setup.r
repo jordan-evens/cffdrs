@@ -122,9 +122,14 @@ makeInput <- function(arguments)
   return(d1)
 }
 
-makeData <- function(name, fct, arguments)
+makeData <- function(name, fct, arguments, split_args)
 {
   i <- makeInput(arguments)
+  if (!split_args)
+  {
+    return(fct(i))
+  }
+  n0 <- nrow(i)
   #i[, c(name)] <- do.call(fct, i)
   r <- list(do.call(fct, i[1, ]))
   isRow <- length(r[[1]]) > 1
@@ -136,6 +141,7 @@ makeData <- function(name, fct, arguments)
       r2 <- do.call(fct, i[n, ])
       r <- rbind(r, r2)
     }
+    stopifnot(nrow(i) == n0)
     return(r)
   }
   else
@@ -145,6 +151,7 @@ makeData <- function(name, fct, arguments)
       r <- append(r, do.call(fct, i[n, ]))
     }
     i[, c(name)] <- unlist(r)
+    stopifnot(nrow(i) == n0)
     return(i)
   }
 }
@@ -164,20 +171,27 @@ checkResults <- function(name, df1)
   }
 }
 
-checkData <- function(name, fct, arguments)
+checkData <- function(name, fct, arguments, split_args=TRUE)
 {
-  df1 <- makeData(name, fct, arguments)
+  df1 <- makeData(name, fct, arguments, split_args)
   df2 <- data.table(read.csv(paste0(PATH, name, '.csv')))
   #print(df1[[name]])
   #print(as.numeric(df1[[name]]))
   #print(df2[[name]])
   #print(as.numeric(df2[[name]]))
   #expect_equal(as.numeric(df1[[name]]), as.numeric(df2[[name]]))
-  actual <- df1[[name]]
-  expected <- df2[[name]]
+  if (split_args)
+  {
+    actual <- df1[[name]]
+    expected <- df2[[name]]
+  }
+  else
+  {
+    actual <- df1
+    expected <- df2[[1]]
+  }
   expect_equal(actual, expected)
 }
-
 fctOnInput <- function(fct)
 {
   return(function(ID, FUELTYPE, FFMC, BUI, WS, WD, FMC, GS, LAT, LONG, ELV, DJ, D0,

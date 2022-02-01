@@ -77,8 +77,8 @@ Inf. Rep. NOR-X-417.
 }
 \seealso{
 \code{\link{fbp}}, \code{\link{fireSeason}}, \code{\link{fwi}},
-\code{\link{gfmc}}, \code{\link{hffmc}}, \code{\link{sdmc}},
-\code{\link{wDC}}
+\code{\link{gfmc}}, \code{\link{hffmc}},
+\code{\link{ShelteredDuffMoistureCode}}, \code{\link{wDC}}
 }
 \author{
 Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
