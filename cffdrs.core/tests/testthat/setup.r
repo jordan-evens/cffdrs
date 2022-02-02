@@ -30,6 +30,7 @@ FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
 GFL <- seq(0, 100)
 GS <- seq(0, 200)
 HR <- seq(0, 366 * 24) * 60
+HOURS <- seq(0, 23)
 ISI <- seq(0, 300, by=0.1)
 LAT <- seq(-90, 90, by=0.1)
 LB <- seq(-1, 1.1, by=0.01)

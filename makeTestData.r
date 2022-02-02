@@ -31,6 +31,7 @@ FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
 GFL <- seq(0, 100)
 GS <- seq(0, 200)
 HR <- seq(0, 366 * 24) * 60
+HOURS <- seq(0, 23)
 ISI <- seq(0, 300, by=0.1)
 LAT <- seq(-90, 90, by=0.1)
 LB <- seq(-1, 1.1, by=0.01)
@@ -336,6 +337,14 @@ saveData('sdmc',
               data.table(rh=RH),
               data.table(mon=MON),
               data.table(day=DJ),
+              data.table(ws=WS)),
+         split_args=FALSE)
+saveData('hffmc',
+         cffdrs.core:::hffmc,
+         list(data.table(hr=HOURS),
+              data.table(temp=TEMP),
+              data.table(prec=PREC),
+              data.table(rh=RH),
               data.table(ws=WS)),
          split_args=FALSE)
 test_fbp <- read.csv2('data/test_fbp.csv', sep=';')

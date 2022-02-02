@@ -1,5 +1,5 @@
 #' Hourly Fine Fuel Moisture Code
-#' 
+#'
 #' \code{hffmc} is used to calculate hourly Fine Fuel Moisture Code (FFMC) and
 #' is based on a calculation routine first described in detail by Van Wagner
 #' (1977) and which has been updated in minor ways by the Canadian Forest
@@ -14,7 +14,7 @@
 #' the last time.step's value of FFMC in its calculation as well.  This
 #' function could be used for either one weather station or for multiple
 #' weather stations.
-#' 
+#'
 #' The hourly FFMC is very similar in its structure and calculation to the
 #' Canadian Forest Fire Weather Index System's daily FFMC (\code{\link{fwi}})
 #' but has an altered drying and wetting rate which more realistically reflects
@@ -30,7 +30,7 @@
 #' reasonable assumption for an hour; however it can become problematic for
 #' longer periods.  For brevity we have referred to this routine throughout
 #' this description as the hourly FFMC.
-#' 
+#'
 #' Because of the shortened time step, which can lead to more frequent
 #' calculations and conversion between moisture content and the code value
 #' itself, we have increased the precision of one of the constants in the
@@ -40,7 +40,7 @@
 #' this constant is used in the equation and is not a change to the standard
 #' FFMC conversion between moisture and code value (which is referred to as the
 #' FF-scale).
-#' 
+#'
 #' The calculation requires the previous hour's FFMC as an input to the
 #' calculation of the current hour's FFMC; this is because the routine can be
 #' thought of as a bookkeeping system and needs to know the amount of moisture
@@ -51,20 +51,20 @@
 #' typical to use a value of 85 when this value cannot be estimated more
 #' accurately; this code value corresponds to a moisture content of about 16\%
 #' in typical pine litter fuels.
-#' 
+#'
 #' @param weatherstream A dataframe containing input variables of hourly
 #' weather observations. It is important that variable names have to be the
 #' same as in the following list, but they are case insensitive. The order in
 #' which the input variables are entered is not important.
-#' 
-#' \tabular{lll}{ 
+#'
+#' \tabular{lll}{
 #' \var{temp} \tab (required) \tab Temperature (centigrade)\cr
-#' \var{rh} \tab (required) \tab Relative humidity (\%)\cr 
-#' \var{ws} \tab (required) \tab 10-m height wind speed (km/h)\cr 
-#' \var{prec} \tab (required) \tab 1-hour rainfall (mm)\cr 
-#' \var{hr} \tab (optional) \tab Hourly value to calculate sub-hourly ffmc \cr 
-#' \var{bui} \tab (optional) \tab Daily BUI value for the computation of hourly 
-#' FWI. It is required when \code{hourlyFWI=TRUE}.\cr } 
+#' \var{rh} \tab (required) \tab Relative humidity (\%)\cr
+#' \var{ws} \tab (required) \tab 10-m height wind speed (km/h)\cr
+#' \var{prec} \tab (required) \tab 1-hour rainfall (mm)\cr
+#' \var{hr} \tab (optional) \tab Hourly value to calculate sub-hourly ffmc \cr
+#' \var{bui} \tab (optional) \tab Daily BUI value for the computation of hourly
+#' FWI. It is required when \code{hourlyFWI=TRUE}.\cr }
 #' Typically this dataframe also contains date and
 #' hour fields so outputs can be associated with a specific day and time,
 #' however these fields are not used in the calculations.  If multiple weather
@@ -109,21 +109,21 @@
 #' \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/25591.pdf}
 #' @keywords methods
 #' @examples
-#' 
+#'
 #' library(cffdrs)
 #' data("test_hffmc")
 #' # show the data format:
 #' head(test_hffmc)
-#' # (1)hffmc default: 
+#' # (1)hffmc default:
 #' # Re-order the data by year, month, day, and hour:
 #' test_hffmc<-test_hffmc[with(test_hffmc, order(yr,mon,day,hr)),]
-#' # Because the test data has 24 hours input variables 
-#' # it is possible to calculate the hourly FFMC chronically 
+#' # Because the test data has 24 hours input variables
+#' # it is possible to calculate the hourly FFMC chronically
 #' # through multiple days(with the default initial ffmc_old=85):
-#' test_hffmc$ffmc_default<-hffmc(test_hffmc) 
+#' test_hffmc$ffmc_default<-hffmc(test_hffmc)
 #' # (2) Calculate FFMC for multiple stations:
-#' # Calculate hourly FFMC with only one initial 
-#' # value (ffmc_old=85), but multiple weather stations. 
+#' # Calculate hourly FFMC with only one initial
+#' # value (ffmc_old=85), but multiple weather stations.
 #' # Sort the input by date/time and the station id:
 #' test_hffmc<-test_hffmc[with(test_hffmc,order(yr,mon,hr)),]
 #' # Add weather station id:
@@ -131,10 +131,10 @@
 #' #check the data:
 #' head(test_hffmc)
 #' test_hffmc$ffmc01<-hffmc(test_hffmc,batch=TRUE)
-#' # With multiple initial FFMC (ffmc_old) as a vector: 
+#' # With multiple initial FFMC (ffmc_old) as a vector:
 #' test_hffmc$ffmc02<- hffmc(test_hffmc,ffmc_old = sample(70:100,10, replace=TRUE),batch=TRUE)
-#' # One time step assuming all records are from different 
-#' # weather stations: 
+#' # One time step assuming all records are from different
+#' # weather stations:
 #'      foo<-hffmc(test_hffmc,batch=FALSE)
 #' # (3) output all hourly FWI System variables:
 #' test_hffmc$id<-NULL
@@ -143,7 +143,7 @@
 #' # this will not run: warning message requesting for daily BUI
 #' test_hffmc$bui<-100
 #' foo<-hffmc(test_hffmc,hourlyFWI=TRUE)
-#' # (4) Calculate time steps in case the time intervals are 
+#' # (4) Calculate time steps in case the time intervals are
 #' # not uniform:
 #' dat0<-test_hffmc[sample(1:30,20),]
 #' dat0<-dat0[with(dat0,order(yr,mon,day,hr)),]
@@ -151,22 +151,22 @@
 #' # different FFMC values.
 #' # without calculating time step (default):
 #' hffmc(dat0,time.step=1)
-#' # with calc.step=TRUE, time.step=1 is applied to 
+#' # with calc.step=TRUE, time.step=1 is applied to
 #' # only the first record, the rests would be calculated:
 #' hffmc(dat0,time.step=1,calc.step=TRUE)
-#' 
+#'
 #' @export hffmc
-hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1, 
+hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
                   calc.step = FALSE, batch = TRUE, hourlyFWI = FALSE) {
 
   t0 <- time.step
   names(weatherstream) <- tolower(names(weatherstream))
   #set up number of stations
   if (batch){
-    if ("id" %in% names(weatherstream)) { 
+    if ("id" %in% names(weatherstream)) {
       n <- length(unique(weatherstream$id))
       if(length(unique(weatherstream[1:n,"id"])) != n){
-        stop("Multiple stations have to start and end at the same dates/time, 
+        stop("Multiple stations have to start and end at the same dates/time,
              and the data must be sorted by date/time and id")
       }
     } else {
@@ -191,16 +191,16 @@ hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
   #Check that the parameters are correct
   if (calc.step){
     hr <- weatherstream$hr
-    if (!exists("hr") | is.null(hr)) 
+    if (!exists("hr") | is.null(hr))
       warning("hour value is missing!")
   }
-  if (!exists("Tp") | is.null(Tp)) 
+  if (!exists("Tp") | is.null(Tp))
     warning("temperature (temp) is missing!")
-  if (!exists("ro") | is.null(ro)) 
+  if (!exists("ro") | is.null(ro))
     warning("precipitation (prec) is missing!")
-  if (!exists("W") | is.null(W)) 
+  if (!exists("W") | is.null(W))
     warning("wind speed (ws) is missing!")
-  if (!exists("H") | is.null(H)) 
+  if (!exists("H") | is.null(H))
     warning("relative humidity (rh) is missing!")
   if (length(H)%%n != 0)
     warning("Weatherstream do not match with number of weather stations")
@@ -220,31 +220,31 @@ hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
     mo <- 147.27723 * (101 - Fo)/(59.5 + Fo)
     rf <- ro[k]
     #Eqs. 3a & 3b (Van Wagner & Pickett 1985)
-    mr <- ifelse(mo <= 150, 
+    mr <- ifelse(mo <= 150,
             mo + 42.5 * rf * exp(-100 / (251 - mo)) * (1 - exp(-6.93 / rf)),
-            mo + 42.5 * rf * exp(-100 / (251 - mo)) * (1 - exp(-6.93 / rf)) + 
+            mo + 42.5 * rf * exp(-100 / (251 - mo)) * (1 - exp(-6.93 / rf)) +
               0.0015 * ((mo - 150)^2) * (rf^0.5))
     #The real moisture content of pine litter ranges up to about 250 percent,
     # so we cap it at 250
     mr <- ifelse(mr > 250, 250, mr)
     mo <- ifelse(ro[k] > 0.0, mr, mo)
     #Eq. 2a Equilibrium moisture content from drying
-    Ed <- 0.942 * (H[k]^0.679) + 11 * exp((H[k] - 100) / 10) + 0.18 * 
+    Ed <- 0.942 * (H[k]^0.679) + 11 * exp((H[k] - 100) / 10) + 0.18 *
           (21.1 - Tp[k]) * (1 - exp(-0.115 * H[k]))
     #Eq. 3a Log drying rate at the normal temperature of 21.1C
-    ko <- 0.424 * (1 - (H[k] / 100)^1.7) + 0.0694 * (W[k]^0.5) * 
+    ko <- 0.424 * (1 - (H[k] / 100)^1.7) + 0.0694 * (W[k]^0.5) *
           (1 - (H[k] / 100)^8)
     #Eq. 3b
     kd <- ko * 0.0579 * exp(0.0365 * Tp[k])
     #Eq. 8 (Van Wagner & Pickett 1985)
     md <- Ed + (mo - Ed) * (10^(-kd * t0))
     #Eq. 2b Equilibrium moisture content from wetting
-    Ew <- 0.618 * (H[k]^0.753) + 10 * exp((H[k] - 100) / 10) + 0.18 * 
+    Ew <- 0.618 * (H[k]^0.753) + 10 * exp((H[k] - 100) / 10) + 0.18 *
           (21.1 - Tp[k]) * (1 - exp(-0.115 * H[k]))
-    #Eq. 7a Log wetting rate at the normal temperature of 21.1 C    
-    k1 <- 0.424 * (1 - ((100 - H[k]) / 100)^1.7) + 0.0694 * 
+    #Eq. 7a Log wetting rate at the normal temperature of 21.1 C
+    k1 <- 0.424 * (1 - ((100 - H[k]) / 100)^1.7) + 0.0694 *
       (W[k]^0.5) * (1 - ((100 - H[k]) / 100)^8)
-    #Eq. 4b 
+    #Eq. 4b
     kw <- k1 * 0.0579 * exp(0.0365 * Tp[k])
     #Eq. 8 (Van Wagner & Pickett 1985)
     mw <- Ew - (Ew - mo) * (10^(-kw * t0))
@@ -259,7 +259,7 @@ hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
   #Calculate hourly isi and fwi
   if (hourlyFWI){
     bui <- weatherstream$bui
-    if (!exists("bui") | is.null(bui)){ 
+    if (!exists("bui") | is.null(bui)){
       warning("Daily BUI is required to calculate hourly FWI")
     } else {
       #Calculate ISI
@@ -269,7 +269,7 @@ hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
       #Calculate DSR
       dsr <- 0.0272 * (fwi^1.77)
       #Put all data into a data.frame to return
-      output <- cbind(weatherstream, 
+      output <- cbind(weatherstream,
                       data.frame(ffmc = f, isi = isi, fwi = fwi, dsr = dsr))
       return(output)
     }
