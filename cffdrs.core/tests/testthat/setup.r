@@ -24,6 +24,7 @@ ELV <- seq(0, 10000)
 FC <- seq(-10, 20000)
 FFMC <- seq(0, 101, by=0.1)
 FMC <- seq(0, 500, by=0.1)
+FRACTION <- seq(0, 1, by=0.05)
 FUELTYPE=c("NF", "WA", "C1", "C2", "C3", "C4", "C5", "C6", "C7",
            "D1", "M1", "M2", "M3", "M4", "S1", "S2",
            "S3", "O1A", "O1B")
