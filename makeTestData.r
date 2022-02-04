@@ -354,6 +354,14 @@ saveData('hffmc',
               data.table(rh=RH),
               data.table(ws=WS)),
          split_args=FALSE)
+saveData('HourlyFineFuelMoistureCode',
+         cffdrs.core:::HourlyFineFuelMoistureCode,
+         list(data.table(temp=TEMP),
+              data.table(rh=RH),
+              data.table(ws=WS),
+              data.table(prec=PREC),
+              data.table(ffmc_old=FFMC),
+              data.table(time.step=HOURS)))
 test_fbp <- read.csv2('data/test_fbp.csv', sep=';')
 test_fbp$FFMC <- as.numeric(test_fbp$FFMC)
 test_fbp$hr <- as.numeric(test_fbp$hr)
