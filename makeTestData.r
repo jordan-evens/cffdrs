@@ -190,24 +190,37 @@ checkResults <- function(name, df1)
 checkData <- function(name, fct, arguments, split_args=TRUE)
 {
   df1 <- makeData(name, fct, arguments, split_args)
-  df2 <- data.table(read.csv(paste0(PATH, name, '.csv')))
-  #print(df1[[name]])
-  #print(as.numeric(df1[[name]]))
-  #print(df2[[name]])
-  #print(as.numeric(df2[[name]]))
-  #expect_equal(as.numeric(df1[[name]]), as.numeric(df2[[name]]))
-  if (split_args)
+  df2 <- read.csv(paste0(PATH, name, '.csv'))
+  if (is.null(nrow(df1)))
   {
-    actual <- df1[[name]]
-    expected <- df2[[name]]
+    # it's just an array so don't compare column names
+    expect_equal(df1, df2[[1]])
   }
   else
   {
-    actual <- df1
-    expected <- df2[[1]]
+    df1 <- data.table(df1)
+    df2 <- data.table(df2)
+    if (split_args)
+    {
+      actual <- df1[[name]]
+      expected <- df2[[name]]
+      expect_equal(actual, expected)
+    }
+    else
+    {
+      expect_equal(colnames(df1), colnames(df2))
+      for (n in sort(colnames(df1)))
+      {
+        test_that(paste0(name, '$', n), {
+          actual <- unlist(df1[[n]])
+          expected <- unlist(df2[[n]])
+          expect_equal(actual, expected)
+        })
+      }
+    }
   }
-  expect_equal(actual, expected)
 }
+
 fctOnInput <- function(fct)
 {
   return(function(ID, FUELTYPE, FFMC, BUI, WS, WD, FMC, GS, LAT, LONG, ELV, DJ, D0,
@@ -353,6 +366,32 @@ saveData('hffmc',
               data.table(prec=PREC),
               data.table(rh=RH),
               data.table(ws=WS)),
+         split_args=FALSE)
+fctGFMC <- function(input)
+{
+  return(cffdrs.core:::gfmc(input, GFMCold=rep(85, length(input$temp)), out="GFMC", batch=FALSE))
+}
+saveData('gfmcGFMC',
+         fctGFMC,
+         list(data.table(temp=TEMP),
+              data.table(rh=RH[RH >= 0 & RH <= 100]),
+              data.table(ws=WS),
+              data.table(prec=PREC[PREC >= 0]),
+              data.table(isol=seq(0, 10000)),
+              data.table(mon=MON)),
+         split_args=FALSE)
+fctMC <- function(input)
+{
+  return(cffdrs.core:::gfmc(input, GFMCold=rep(85, length(input$temp)), out="MC", batch=FALSE))
+}
+saveData('gfmcMC',
+         fctMC,
+         list(data.table(temp=TEMP),
+              data.table(rh=RH[RH >= 0 & RH <= 100]),
+              data.table(ws=WS),
+              data.table(prec=PREC[PREC >= 0]),
+              data.table(isol=seq(0, 10000)),
+              data.table(mon=MON)),
          split_args=FALSE)
 saveData('HourlyFineFuelMoistureCode',
          cffdrs.core:::HourlyFineFuelMoistureCode,
