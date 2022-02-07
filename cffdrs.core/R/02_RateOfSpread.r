@@ -42,8 +42,8 @@ RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CB
 .BaseRateOfSpread..FuelMixedwood <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Eq. 27 (FCFDG 1992) - Initial Rate of Spread for M2 Mixedwood type
-  RSI <- PC / 100 * .BaseRateOfSpread(.C2, ISI, BUI=-1, FMC, SFC, PC, PDF, CC, CBH) +
-    this$ratioD1 * ((100 - PC) / 100) * .BaseRateOfSpread(.D1, ISI, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
+  RSI <- PC / 100 * .RateOfSpread(.C2, ISI, BUI=-1, FMC, SFC, PC, PDF, CC, CBH) +
+    this$ratioD1 * ((100 - PC) / 100) * .RateOfSpread(.D1, ISI, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
   return(RSI)
 }
 .BaseRateOfSpread..FuelMixedDead <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)
@@ -53,7 +53,7 @@ RateOfSpread <- Vectorize(function(FUELTYPE, ISI, BUI, FMC, SFC, PC, PDF, CC, CB
   RSI_mixed <- this$a * ((1 - exp(-this$b * ISI)) ** this$c0)
   #Eq. 29 (Wotton et. al 2009)
   RSI <- PDF / 100 * RSI_mixed +
-    this$ratioD1 * (1 - PDF / 100) * .BaseRateOfSpread(.D1, ISI, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
+    this$ratioD1 * (1 - PDF / 100) * .RateOfSpread(.D1, ISI, BUI=-1, FMC, SFC, PC, PDF, CC, CBH)
   return(RSI)
 }
 .BaseRateOfSpread..FuelGrass <- function(this, ISI, BUI, FMC, SFC, PC, PDF, CC, CBH)

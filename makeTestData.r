@@ -187,7 +187,7 @@ checkResults <- function(name, df1)
   }
 }
 
-checkData <- function(name, fct, arguments, split_args)
+checkData <- function(name, fct, arguments, split_args=TRUE)
 {
   df1 <- makeData(name, fct, arguments, split_args)
   df2 <- data.table(read.csv(paste0(PATH, name, '.csv')))
@@ -248,7 +248,7 @@ fctOnInput <- function(fct)
   })
 }
 saveData('BackRateOfSpread',
-         cffdrs:::.BROScalc,
+         cffdrs.core:::BackRateOfSpread,
          list(data.table(FUELTYPE=FUELTYPE),
               data.table(FFMC=FFMC),
               data.table(BUI=BUI),
@@ -372,7 +372,7 @@ test_fbp$CFL <- as.numeric(test_fbp$CFL)
 saveResults('FireBehaviourPrediction_test_fbp',
             cffdrs:::.FBPcalc(test_fbp, "A"))
 saveData('FireBehaviourPrediction',
-         fctOnInput(cffdrs:::.FBPcalc),
+         fctOnInput(cffdrs.core::FireBehaviourPrediction),
          FBP_ARGS)
 saveData('FireIntensity',
          cffdrs:::.FIcalc,
@@ -532,8 +532,20 @@ saveData('RateOfSpreadAtTime',
               data.table(ROSeq=ROS),
               data.table(HR=HR),
               data.table(CFB=CFB)))
+fctSlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC,
+                           PC, PDF, CC, CBH, ISI, output)
+{
+  result <- cffdrs.core:::SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                                      FMC, SFC, PC, PDF, CC, CBH, ISI)
+  if ('WSV' == output)
+  {
+    return(result[["WSV"]])
+  }
+  return(result[["RAZ"]])
+  # return(result[[output]])
+}
 saveData('SlopeAdjustRAZ',
-         cffdrs:::.Slopecalc,
+         fctSlopeAdjust,
          list(data.table(FUELTYPE=FUELTYPE),
               data.table(FFMC=FFMC),
               data.table(BUI=BUI),
@@ -550,7 +562,7 @@ saveData('SlopeAdjustRAZ',
               data.table(ISI=ISI),
               data.table(output = "RAZ")))
 saveData('SlopeAdjustWSV',
-         cffdrs:::.Slopecalc,
+         fctSlopeAdjust,
          list(data.table(FUELTYPE=FUELTYPE),
               data.table(FFMC=FFMC),
               data.table(BUI=BUI),
@@ -1169,8 +1181,8 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
   #Calculate the net effective windspeed (WSV)
-  WSV0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
-                     FMC, SFC, PC, PDF, CC, CBH, ISI, output = "WSV")
+  WSV0 <- cffdrs.core:::SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                     FMC, SFC, PC, PDF, CC, CBH, ISI)$WSV
   return(WSV0)
 }
 saveData('FireBehaviourPrediction_WSV0',
@@ -1411,10 +1423,8 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
   #Calculate the net effective windspeed (WSV)
-  WSV0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
-                              FMC, SFC, PC, PDF, CC, CBH, ISI, output = "WSV")
-  RAZ0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
-                     FMC, SFC, PC, PDF, CC, CBH, ISI, output = "RAZ")
+  RAZ0 <- cffdrs.core:::SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
+                     FMC, SFC, PC, PDF, CC, CBH, ISI)$RAZ
   return(RAZ0)
 }
 saveData('FireBehaviourPrediction_RAZ0',

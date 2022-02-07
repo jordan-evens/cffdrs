@@ -45,8 +45,8 @@ library(cffdrs.core)
   if (option == "RSI") {
     return(RSI)
   }
-  RSS <- cffdrs.core::SurfaceRateOfSpreadC6(FUELTYPE, RSI, BUI)
-  RSC <- cffdrs.core::CrownRateOfSpreadC6(ISI)
+  RSS <- cffdrs.core::SurfaceRateOfSpreadC6(RSI, BUI)
+  RSC <- cffdrs.core::CrownRateOfSpreadC6(ISI, FMC)
   #Return at this point, if specified by caller
   if (option == "RSC") {
     return(RSC)
@@ -55,9 +55,9 @@ library(cffdrs.core)
   CFB <- 0
   if (RSC > RSS)
   {
-    CSI <- cffdrs.core::CriticalSurfaceIntensity(FMC, CBH)
+    CSI <- cffdrs.core::CriticalSurfaceIntensity(FUELTYPE, FMC, CBH)
     RSO <- cffdrs.core::CriticalSurfaceRateOfSpread(CSI, SFC)
-    CFB <- cffdrs.core::CrownFractionBurned(RSS, RSO)
+    CFB <- cffdrs.core::CrownFractionBurned(FUELTYPE, RSS, RSO)
   }
   #Return at this point, if specified by caller
   if (option == "CFB") {
@@ -70,7 +70,7 @@ library(cffdrs.core)
 #' @noRd
 .CFBcalc <- function(FUELTYPE, FMC, SFC, ROS, CBH, option="CFB")
 {
-  CSI <- cffdrs.core::CriticalSurfaceIntensity(FUELTYPE, FMC, SFC, ROS, CBH)
+  CSI <- cffdrs.core::CriticalSurfaceIntensity(FUELTYPE, FMC, CBH)
   #Return at this point, if specified by caller
   if(option=="CSI"){
     return(CSI)
@@ -80,7 +80,7 @@ library(cffdrs.core)
   if(option=="RSO"){
     return(RSO)
   }
-  CFB <- cffdrs.core::CrownFractionBurned(ROS, RSO)
+  CFB <- cffdrs.core::CrownFractionBurned(FUELTYPE, ROS, RSO)
   return(CFB)
 }
 
