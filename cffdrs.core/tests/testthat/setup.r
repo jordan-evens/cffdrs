@@ -160,9 +160,19 @@ makeData <- function(name, fct, arguments, split_args)
 
 checkResults <- function(name, df1)
 {
+  # don't worry about what names are if this isn't actually a table
+  ignore_names <- is.vector(df1)
   df1 <- data.table(df1)
   df2 <- data.table(read.csv(paste0(PATH, name, '.csv')))
-  expect_equal(colnames(df1), colnames(df2))
+  expect_equal(length(colnames(df1)), length(colnames(df2)))
+  if (ignore_names)
+  {
+    colnames(df2) <- colnames(df1)
+  }
+  else
+  {
+    expect_equal(colnames(df1), colnames(df2))
+  }
   for (n in sort(colnames(df1)))
   {
     test_that(paste0(name, '$', n), {

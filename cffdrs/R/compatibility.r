@@ -612,6 +612,8 @@ hffmc <- cffdrs.core:::hffmc
 #'
 #' @export wDC
 wDC <- cffdrs.core:::OverwinterDroughtCode
+data("test_wDC", package="cffdrs.core")
+data("test_wDC_fs", package="cffdrs.core")
 
 #' Grass Fuel Moisture Code
 #' 
