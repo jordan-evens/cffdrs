@@ -1523,3 +1523,9 @@ saveData('CrownBaseHeight',
                data.table(CBH=CBH),
                data.table(SD=SD),
                data.table(SH=SH)))
+test_lros <- read.csv('data/test_lros.txt', sep='\t')
+saveResults('SimardRateOfSpreadLine',
+            SimardRateOfSpreadLine(test_lros))
+test_pros <- read.csv('data/test_pros.txt', sep='\t')
+saveResults('SimardRateOfSpreadPoint',
+            SimardRateOfSpreadPoint(test_pros))
