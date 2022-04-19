@@ -1,6 +1,6 @@
 #' Fire Season Start and End
 #' 
-#' \code{\link{fireSeason}} calculates the start and end fire season dates for
+#' \code{\link{FireSeason}} calculates the start and end fire season dates for
 #' a given weather station. The current method used in the function is based on
 #' three consecutive daily maximum temperature thresholds (Wotton and Flannigan
 #' 1993, Lawson and Armitage 2008). This function process input from a single
@@ -24,7 +24,7 @@
 #' 
 #' This fire season length definition can also feed in to the overwinter DC
 #' calculations (\link{wDC}). View the cffdrs package help files for an example
-#' of using the \code{fireSeason}, \link{wDC}, and \link{fwi} functions in
+#' of using the \code{FireSeason}, \link{wDC}, and \link{fwi} functions in
 #' conjunction.
 #' 
 #' @param input A data.frame containing input variables of including the
@@ -48,7 +48,7 @@
 #' @param consistent.snow Is consistent snow data in the input? (default=FALSE)
 #' @param multi.year Should the fire season span multiple years?
 #' (default=FALSE)
-#' @return \link{fireSeason} returns a data frame of season and start and end
+#' @return \link{FireSeason} returns a data frame of season and start and end
 #' dates. Columns in data frame are described below.
 #' 
 #' Primary FBP output includes the following 8 variables: 
@@ -82,7 +82,7 @@
 #' 
 #' #Using the default fire season start and end temperature 
 #' #thresholds:
-#' a_fs <- fireSeason(input[input$id==1,])
+#' a_fs <- FireSeason(input[input$id==1,])
 #' 
 #' #Check the result:
 #' a_fs
@@ -101,7 +101,7 @@
 #' #and ends multiple times in the first year. It is up to the user #for how to interpret this.
 #' 
 #' #modified fire season start and end temperature thresholds
-#' a_fs <- fireSeason (input[input$id==1,],fs.start=10, fs.end=3)
+#' a_fs <- FireSeason (input[input$id==1,],fs.start=10, fs.end=3)
 #' a_fs
 #' #    yr mon day fsdatetype
 #' #1 1999   5   2      start
@@ -109,8 +109,8 @@
 #' #3 2000   6  16      start
 #' #4 2000  10   7        end
 #' #select another id value, specify method explicitly
-#' b_fs <- fireSeason(input[input$id==2,],method="WF93")
-#' #print the calculated fireseason
+#' b_fs <- FireSeason(input[input$id==2,],method="WF93")
+#' #print the calculated fire season
 #' b_fs
 #' #   yr mon day fsdatetype
 #' #1 1980   4  21      start
@@ -120,8 +120,8 @@
 #' #5 1981   5  21      start
 #' #6 1981  10  13        end
 #' 
-#' @export fireSeason
-fireSeason <- function(input, fs.start = 12, fs.end = 5, method = "WF93", 
+#' @export FireSeason
+FireSeason <- function(input, fs.start = 12, fs.end = 5, method = "WF93", 
                        consistent.snow = FALSE, multi.year = FALSE){
   #############################################################################
   # Description:
@@ -141,7 +141,7 @@ fireSeason <- function(input, fs.start = 12, fs.end = 5, method = "WF93",
   #     widespread snow coverage data, however this will be a future addition.
   #
   # Args:
-  #   input:    Single station weather data input stream - view fireSeason.Rd 
+  #   input:    Single station weather data input stream - view FireSeason.Rd 
   #             documentation for full description.
   #   fs.start: Temperature threshold to start the fire season (deg celcius)
   #   fs.end:   Temperature threshold to end the fire season (deg celcius)
@@ -298,7 +298,7 @@ fireSeason <- function(input, fs.start = 12, fs.end = 5, method = "WF93",
       }
       # Not an area of consistent snow, so run the wf93 algorithm
       else{
-        fireSeason(input, fs.start, fs.end, method = "WF93")
+        FireSeason(input, fs.start, fs.end, method = "WF93")
       }
     }
   }
