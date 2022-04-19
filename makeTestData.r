@@ -343,7 +343,6 @@ saveResults('OverwinterDroughtCode_test_wDC_2',
 saveResults('OverwinterDroughtCode_test_wDC_3',
             OverwinterDroughtCode(DCf=c(400,300,250), rw=c(99,110,200),
                 a=c(0.75,1.0,0.75), b=c(0.75,0.9,0.75)))
-test_wDC <- read.csv2('data/test_wDC.csv', sep=';')
 input <- test_wDC
 input <- with(input,input[order(id,yr,mon,day),])
 input$date <- as.Date(as.POSIXlt(paste(input$yr,"-",input$mon,"-",input$day,sep="")))
@@ -448,6 +447,11 @@ saveData('FireIntensity',
          cffdrs:::.FIcalc,
          list(data.table(FC=FC),
               data.table(ROS=ROS)))
+test_wDC <- read.csv('data/test_wDC.csv', sep=';')
+input <- with(test_wDC, test_wDC[order(id,yr,mon,day),])
+saveResults('FireSeason_test_wDC_1', FireSeason(input[input$id==1,]))
+saveResults('FireSeason_test_wDC_2', FireSeason(input[input$id==1,],fs.start=10, fs.end=3))
+saveResults('FireSeason_test_wDC_3', FireSeason(input[input$id==2,],method="WF93"))
 saveData('FireWeatherIndex',
          cffdrs:::.fwiCalc,
          list(data.table(isi=ISI),
