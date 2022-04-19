@@ -1100,3 +1100,747 @@ data("test_pros", package="cffdrs.core")
 #' @export lros
 lros <- cffdrs.core:::SimardRateOfSpreadLine
 data("test_lros", package="cffdrs.core")
+
+
+#' Fire Behavior Prediction System function
+#' 
+#' \code{fbp} calculates the outputs from the Canadian Forest Fire Behavior
+#' Prediction (FBP) System (Forestry Canada Fire Danger Group 1992) based on
+#' given fire weather and fuel moisture conditions (from the Canadian Forest
+#' Fire Weather Index (FWI) System (Van Wagner 1987)), fuel type, date, and
+#' slope. Fire weather, for the purpose of FBP System calculation, comprises
+#' observations of 10 m wind speed and direction at the time of the fire, and
+#' two associated outputs from the Fire Weather Index System, the Fine Fuel
+#' Moisture Content (FFMC) and Buildup Index (BUI). FWI System components can
+#' be calculated with the sister function \code{\link{fwi}}.
+#' 
+#' The Canadian Forest Fire Behavior Prediction (FBP) System (Forestry Canada
+#' Fire Danger Group 1992) is a subsystem of the Canadian Forest Fire Danger
+#' Rating System, which also includes the Canadian Forest Fire Weather Index
+#' (FWI) System. The FBP System provides quantitative estimates of head fire
+#' spread rate, fuel consumption, fire intensity, and a basic fire description
+#' (e.g., surface, crown) for 16 different important forest and rangeland types
+#' across Canada. Using a simple conceptual model of the growth of a point
+#' ignition as an ellipse through uniform fuels and under uniform weather
+#' conditions, the system gives, as a set of secondary outputs, estimates of
+#' flank and back fire behavior and consequently fire area perimeter length and
+#' growth rate.
+#' 
+#' The FBP System evolved since the mid-1970s from a series of regionally
+#' developed burning indexes to an interim edition of the nationally develop
+#' FBP system issued in 1984. Fire behavior models for spread rate and fuel
+#' consumption were derived from a database of over 400 experimental, wild and
+#' prescribed fire observations. The FBP System, while providing quantitative
+#' predictions of expected fire behavior is intended to supplement the
+#' experience and judgment of operational fire managers (Hirsch 1996).
+#' 
+#' The FBP System was updated with some minor corrections and revisions in 2009
+#' (Wotton et al. 2009) with several additional equations that were initially
+#' not included in the system. This fbp function included these updates and
+#' corrections to the original equations and provides a complete suite of fire
+#' behavior prediction variables. Default values of optional input variables
+#' provide a reasonable mid-range setting. Latitude, longitude, elevation, and
+#' the date are used to calculate foliar moisture content, using a set of
+#' models defined in the FBP System; note that this latitude/longitude-based
+#' function is only valid for Canada. If the Foliar Moisture Content (FMC) is
+#' specified directly as an input, the fbp function will use this value
+#' directly rather than calculate it. This is also true of other input
+#' variables.
+#' 
+#' Note that Wind Direction (WD) is the compass direction from which wind is
+#' coming. Wind azimuth (not an input) is the direction the wind is blowing to
+#' and is 180 degrees from wind direction; in the absence of slope, the wind
+#' azimuth is coincident with the direction the head fire will travel (the
+#' spread direction azimuth, RAZ). Slope aspect is the main compass direction
+#' the slope is facing. Slope azimuth (not an input) is the direction a head
+#' fire will spread up slope (in the absence of wind effects) and is 180
+#' degrees from slope aspect (Aspect).  Wind direction and slope aspect are the
+#' commonly used directional identifiers when specifying wind and slope
+#' orientation respectively.  The input theta specifies an angle (given as a
+#' compass bearing) at which a user is interested in fire behavior predictions;
+#' it is typically some angle off of the final spread rate direction since if
+#' for instance theta=RAZ (the final spread azimuth of the fire) then the rate
+#' of spread at angle theta (TROS) will be equivalent to ROS.
+#' 
+#' @param input The input data, a data.frame containing fuel types, fire
+#' weather component, and slope (see below). Each vector of inputs defines a
+#' single FBP System prediction for a single fuel type and set of weather
+#' conditions. The data.frame can be used to evaluate the FBP System for a
+#' single fuel type and instant in time, or multiple records for a single point
+#' (e.g., one weather station, either hourly or daily for instance) or multiple
+#' points (multiple weather stations or a gridded surface). All input variables
+#' have to be named as listed below, but they are case insensitive, and do not
+#' have to be in any particular order. Fuel type is of type character; other
+#' arguments are numeric. Missing values in numeric variables could either be
+#' assigned as NA or leave as blank.\cr\cr
+#' 
+#' 
+#' \tabular{lll}{ 
+#' \bold{Required Inputs:}\tab\tab\cr 
+#' \bold{Input} \tab \bold{Description/Full name} \tab \bold{Defaults}\cr 
+#' 
+#' \var{FuelType} 
+#' \tab FBP System Fuel Type including "C-1",\cr
+#' \tab"C-2", "C-3", "C-4","C-5", "C-6", "C-7",\cr
+#' \tab "D-1", "M-1", "M-2", "M-3", "M-4", "NF",\cr
+#' \tab "D-1", "S-2", "S-3", "O-1a", "O-1b", and\cr
+#' \tab  "WA", where "WA" and "NF" stand for \cr
+#' \tab "water" and "non-fuel", respectively.\cr\cr
+#'  
+#' \var{LAT} \tab Latitude [decimal degrees] \tab 55\cr 
+#' \var{LONG} \tab Longitude [decimal degrees] \tab -120\cr 
+#' \var{FFMC} \tab Fine fuel moisture code [FWI System component] \tab 90\cr 
+#' \var{BUI} \tab Buildup index [FWI System component] \tab 60\cr 
+#' \var{WS} \tab Wind speed [km/h] \tab 10\cr
+#' \var{GS} \tab Ground Slope [percent] \tab 0\cr 
+#' \var{Dj} \tab Julian day \tab 180\cr 
+#' \var{Aspect} \tab Aspect of the slope [decimal degrees] \tab 0\cr\cr 
+#' 
+#' \bold{Optional Inputs (1):}
+#' \tab Variables associated with certain fuel \cr
+#' \tab types. These could be skipped if relevant \cr
+#' \tab fuel types do not appear in the input data.\cr\cr
+#' 
+#' \bold{Input} \tab \bold{Full names of inputs} \tab \bold{Defaults}\cr 
+#' 
+#' \var{PC} \tab Percent Conifer for M1/M2 [percent] \tab 50\cr 
+#' \var{PDF} \tab Percent Dead Fir for M3/M4 [percent] \tab 35\cr
+#' \var{cc} \tab Percent Cured for O1a/O1b [percent] \tab 80\cr 
+#' \var{GFL} \tab Grass Fuel Load [kg/m^2] \tab 0.35\cr\cr 
+#' 
+#' \bold{Optional Inputs (2):} 
+#' \tab Variables that could be ignored without \cr
+#' \tab causing major impacts to the primary outputs\cr\cr
+#' 
+#' \bold{Input} \tab \bold{Full names of inputs} \tab \bold{Defaults}\cr 
+#' \var{CBH}   \tab Crown to Base Height [m] \tab 3\cr 
+#' \var{WD}    \tab Wind direction [decimal degrees] \tab 0\cr 
+#' \var{Accel} \tab Acceleration: 1 = point, 0 = line \tab 0\cr 
+#' \var{ELV*}  \tab Elevation [meters above sea level] \tab NA\cr 
+#' \var{BUIEff}\tab Buildup Index effect: 1=yes, 0=no \tab 1\cr 
+#' \var{D0}    \tab Julian day of minimum Foliar Moisture Content \tab 0\cr 
+#' \var{hr}    \tab Hours since ignition \tab 1\cr 
+#' \var{ISI}   \tab Initial spread index \tab 0\cr 
+#' \var{CFL}   \tab Crown Fuel Load [kg/m^2]\tab 1.0\cr 
+#' \var{FMC}   \tab Foliar Moisture Content if known [percent] \tab 0\cr 
+#' \var{SH}    \tab C-6 Fuel Type Stand Height [m] \tab 0\cr 
+#' \var{SD}    \tab C-6 Fuel Type Stand Density [stems/ha] \tab 0\cr 
+#' \var{theta} \tab Elliptical direction of calculation [degrees] \tab 0\cr\cr }
+#' 
+#' @param output FBP output offers 3 options (see details in \bold{Values}
+#' section):
+#' 
+#' \tabular{lc}{ \bold{Outputs} \tab \bold{Number of outputs}\cr 
+#' \var{Primary(\bold{default})} \tab 8\cr 
+#' \var{Secondary} \tab 34\cr 
+#' \var{All} \tab 42\cr\cr}
+#' 
+#' @param m Optimal number of pixels at each iteration of computation when
+#' \code{nrow(input) >= 1000}. Default \code{m = NULL}, where the function will
+#' assign \code{m = 1000} when \code{nrow(input)} is between 1000 and 500,000,
+#' and \code{m = 3000} otherwise. By including this option, the function is
+#' able to process large dataset more efficiently. The optimal value may vary
+#' with different computers.
+#' 
+#' @param cores Number of CPU cores (integer) used in the computation, default
+#' is 1.  By signing \code{cores > 1}, the function will apply parallel
+#' computation technique provided by the \code{foreach} package, which
+#' significantly reduces the computation time for large input data (over a
+#' million records). For small dataset, \code{cores=1} is actually faster.
+#' 
+#' @return \code{fbp} returns a dataframe with primary, secondary, or all
+#' output variables, a combination of the primary and secondary outputs.
+#' 
+#' \bold{Primary} FBP output includes the following 8 variables: 
+#' 
+#' \item{CFB}{Crown Fraction Burned by the head fire} 
+#' \item{CFC}{Crown Fuel Consumption [kg/m^2]} 
+#' \item{FD}{Fire description (1=Surface, 2=Intermittent, 3=Crown)} 
+#' \item{HFI}{Head Fire Intensity [kW/m]}
+#' \item{RAZ}{Spread direction azimuth [degrees]} 
+#' \item{ROS}{Equilibrium Head Fire Rate of Spread [m/min]} 
+#' \item{SFC}{Surface Fuel Consumption [kg/m^2]} 
+#' \item{TFC}{Total Fuel Consumption [kg/m^2]}
+#' 
+#' \bold{Secondary} FBP System outputs include the following 34 raster layers. In order
+#' to calculate the reliable secondary outputs, depending on the outputs, 
+#' optional inputs may have to be provided.  
+#' 
+#' \item{BE}{BUI effect on spread rate} 
+#' \item{SF}{Slope Factor (multiplier for ROS increase upslope)} 
+#' \item{ISI}{Initial Spread Index} 
+#' \item{FFMC}{Fine fuel moisture code [FWI System component]} 
+#' \item{FMC}{Foliar Moisture Content [\%]} 
+#' \item{Do}{Julian Date of minimum FMC} 
+#' \item{RSO}{Critical spread rate for crowning [m/min]}
+#' \item{CSI}{Critical Surface Intensity for crowning [kW/m]}
+#' \item{FROS}{Equilibrium Flank Fire Rate of Spread [m/min]}
+#' \item{BROS}{Equilibrium Back Fire Rate of Spread [m/min]}
+#' \item{HROSt}{Head Fire Rate of Spread at time hr [m/min]}
+#' \item{FROSt}{Flank Fire Rate of Spread at time hr [m/min]}
+#' \item{BROSt}{Back Fire Rate of Spread at time hr [m/min]}
+#' \item{FCFB}{Flank Fire Crown Fraction Burned} 
+#' \item{BCFB}{Back Fire Crown Fraction Burned} 
+#' \item{FFI}{Equilibrium Spread Flank Fire Intensity [kW/m]} 
+#' \item{BFI}{Equilibrium Spread Back Fire Intensity [kW/m]} 
+#' \item{FTFC}{Flank Fire Total Fuel Consumption [kg/m^2] } 
+#' \item{BTFC}{Back Fire Total Fuel Consumption [kg/m^2] } 
+#' \item{DH}{Head Fire Spread Distance after time hr [m] }
+#' \item{DB}{Back Fire Spread Distance after time hr [m] }
+#' \item{DF}{Flank Fire Spread Distance after time hr [m] }
+#' \item{TI}{Time to Crown Fire Initiation [hrs since ignition] }
+#' \item{FTI}{Time to Flank Fire Crown initiation [hrs since ignition]} 
+#' \item{BTI}{Time to Back Fire Crown initiation [hrs since ignition]} 
+#' \item{LB}{Length to Breadth ratio} 
+#' \item{LBt}{Length to Breadth ratio after elapsed time hr } 
+#' \item{WSV}{Net vectored wind speed [km/hr]} 
+#' \item{TROS*}{Equilibrium Rate of Spread at bearing theta [m/min] } 
+#' \item{TROSt*}{Rate of Spread at bearing theta at time t [m/min] } 
+#' \item{TCFB*}{Crown Fraction Burned at bearing theta } 
+#' \item{TFI*}{Fire Intensity at bearing theta [kW/m] } 
+#' \item{TTFC*}{Total Fuel Consumption at bearing theta [kg/m^2] } 
+#' \item{TTI*}{Time to Crown Fire initiation at bearing theta [hrs since ignition] }
+#' 
+#' *These outputs represent fire behaviour at a point on the perimeter of an
+#' elliptical fire defined by a user input angle theta. theta represents the
+#' bearing of a line running between the fire ignition point and a point on the
+#' perimeter of the fire. It is important to note that in this formulation the
+#' theta is a bearing and does not represent the angle from the semi-major axis
+#' (spread direction) of the ellipse. This formulation is similar but not
+#' identical to methods presented in Wotton et al (2009) and Tymstra et al
+#' (2009).
+#' @author Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
+#' Anderson, and Mike Flannigan
+#' @seealso \code{\link{fwi}, \link{fbpRaster}}
+#' @references 1.  Hirsch K.G. 1996. Canadian Forest Fire Behavior Prediction
+#' (FBP) System: user's guide. Nat. Resour. Can., Can. For. Serv., Northwest
+#' Reg., North. For. Cent., Edmonton, Alberta. Spec. Rep. 7. 122p.
+#' 
+#' 2.  Forestry Canada Fire Danger Group. 1992. Development and structure of
+#' the Canadian Forest Fire Behavior Prediction System. Forestry Canada,
+#' Ottawa, Ontario Information Report ST-X-3. 63 p.
+#' \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/10068.pdf}
+#' 
+#' 3.  Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions
+#' to the 1992 Canadian forest fire behavior prediction system. Nat. Resour.
+#' Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario,
+#' Canada. Information Report GLC-X-10, 45p.
+#' \url{http://publications.gc.ca/collections/collection_2010/nrcan/Fo123-2-10-2009-eng.pdf}
+#' 
+#' 4.  Tymstra, C., Bryce, R.W., Wotton, B.M., Armitage, O.B. 2009. Development
+#' and structure of Prometheus: the Canadian wildland fire growth simulation
+#' Model. Nat. Resour. Can., Can. For. Serv., North. For. Cent., Edmonton, AB.
+#' Inf. Rep. NOR-X-417.\url{https://d1ied5g1xfgpx8.cloudfront.net/pdfs/31775.pdf}
+#' @keywords methods
+#' @examples
+#' 
+#' library(cffdrs)
+#' # The dataset is the standard test data for FPB system
+#' # provided by Wotton et al (2009)
+#' data("test_fbp")
+#' head(test_fbp)
+#' #  id FuelType LAT LONG ELV FFMC BUI   WS WD GS  Dj  D0         hr PC PDF GFL cc theta Accel Aspect BUIEff CBH CFL ISI
+#' #1  1      C-1  55  110  NA   90 130 20.0  0 15 182  NA 0.33333333 NA  NA  NA  NA     0     1    270      1  NA  NA   0
+#' #2  2       C2  50   90  NA   97 119 20.4  0 75 121  NA 0.33333333 NA  NA  NA  NA     0     1    315      1  NA  NA   0
+#' #3  3      C-3  55  110  NA   95  30 50.0  0  0 182  NA 0.08333333 NA  NA  NA  NA     0     1    180      1  NA  NA   0
+#' #4  4      C-4  55  105 200   85  82  0.0 NA 75 182  NA 0.50000000 NA  NA  NA  NA     0     1    315      1  NA  NA   0
+#' #5  5       c5  55  105  NA   88  56  3.4  0 23 152 145 0.50000000 NA  NA  NA  NA     0     1    180      1  NA  NA   0
+#' 
+#' #Primary output (default)
+#' fbp(test_fbp)
+#' #or
+#' fbp(test_fbp,output="Primary") 
+#' #or 
+#' fbp(test_fbp,"P")
+#' #Secondary output          
+#' fbp(test_fbp,"Secondary")
+#' #or
+#' fbp(test_fbp,"S")
+#' #All output          
+#' fbp(test_fbp,"All")
+#' #or
+#' fbp(test_fbp,"A")
+#' #For a single record:
+#' fbp(test_fbp[7,])  	
+#' #For a section of the records:
+#' fbp(test_fbp[8:13,])	
+#' #fbp function produces the default values if no data is fed to
+#' #the function:
+#' fbp()
+#' 
+#' @export fbp
+fbp  <- function(input = NULL, output = "Primary", m = NULL, cores = 1){  
+  
+  #hack to avoid Note about no visible binding for global variable ID
+  #http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when
+  #look at the globalvariables() option or others in place of this issue
+  # do not remove this comment until resolved
+  if (!is.na(charmatch("input", search()))) {
+    detach(input)
+  }
+  fullList <- cffdrs.core::FireBehaviourPrediction(input, output = output)
+  
+  return(fullList)
+}
+
+
+#' Fire Weather Index System
+#' 
+#' \code{fwi} is used to calculate the outputs of the Canadian Forest Fire
+#' Weather Index (FWI) System for one day or one fire season based on noon
+#' local standard time (LST) weather observations of temperature, relative
+#' humidity, wind speed, and 24-hour rainfall, as well as the previous day's
+#' fuel moisture conditions. This function could be used for either one weather
+#' station or for multiple weather stations.
+#' 
+#' The Canadian Forest Fire Weather Index (FWI) System is a major subsystem of
+#' the Canadian Forest Fire Danger Rating System, which also includes Canadian
+#' Forest Fire Behavior Prediction (FBP) System. The modern FWI System was
+#' first issued in 1970 and is the result of work by numerous researchers from
+#' across Canada. It evolved from field research which began in the 1930's and
+#' regional fire hazard and fire danger tables developed from that early
+#' research.
+#' 
+#' The modern System (Van Wagner 1987) provides six output indices which
+#' represent fuel moisture and potential fire behavior in a standard pine
+#' forest fuel type. Inputs are a daily noon observation of fire weather, which
+#' consists of screen-level air temperature and relative humidity, 10 meter
+#' open wind speed and 24 accumulated precipitation.
+#' 
+#' The first three outputs of the system (the Fire Fuel Moisture Code (ffmc),
+#' the Duff Moisture Code (dmc), and the Drought Code (dc)) track moisture in
+#' different layers of the fuel making up the forest floor. Their calculation
+#' relies on the daily fire weather observation and also, importantly, the
+#' moisture code value from the previous day as they are in essence bookkeeping
+#' systems tracking the amount of moisture (water) in to and out of the layer.
+#' It is therefore important that when calculating FWI System outputs over an
+#' entire fire season, an uninterrupted daily weather stream is provided; one
+#' day is the assumed time step in the models and thus missing data must be
+#' filled in.
+#' 
+#' The next three outputs of the System are relative (unitless) indicators of
+#' aspects of fire behavior potential: spread rate (the Initial Spread Index,
+#' isi), fuel consumption (the Build-up Index, bui) and fire intensity per unit
+#' length of fire front (the Fire Weather Index, fwi).  This final index, the
+#' fwi, is the component of the System used to establish the daily fire danger
+#' level for a region and communicated to the public.  This final index can be
+#' transformed to the Daily Severity Rating (dsr) to provide a more
+#' reasonably-scaled estimate of fire control difficulty.
+#' 
+#' Both the Duff Moisture Code (dmc) and Drought Code (dc) are influenced by
+#' day length (see Van Wagner 1987). Day length adjustments for different
+#' ranges in latitude can be used (as described in Lawson and Armitage 2008
+#' (\url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/29152.pdf})) and are included
+#' in this R function; latitude must be positive in the northern hemisphere and
+#' negative in the southern hemisphere.
+#' 
+#' The default initial (i.e., "start-up") fuel moisture code values (FFMC=85,
+#' DMC=6, DC=15) provide a reasonable set of conditions for most springtime
+#' conditions in Canada, the Northern U.S., and Alaska. They are not suitable
+#' for particularly dry winters and are presumably not appropriate for
+#' different parts of the world.
+#' 
+#' @param input A dataframe containing input variables of daily weather
+#' observations taken at noon LST. Variable names have to be the same as in the
+#' following list, but they are case insensitive. The order in which the input
+#' variables are entered is not important.
+#' 
+#' \tabular{lll}{ 
+#' \var{id} \tab (optional) 
+#' \tab Unique identifier of a weather\cr
+#' \tab\tab station or spatial point (no restriction on\cr
+#' \tab\tab data type); required when \code{batch=TRUE}\cr 
+#' \var{lat} \tab (recommended) \tab Latitude (decimal degree, default=55)\cr 
+#' \var{long} \tab (optional) \tab Longitude (decimal degree)\cr 
+#' \var{yr} \tab (optional) \tab Year of observation;
+#' required when \code{batch=TRUE}\cr 
+#' \var{mon} \tab (recommended) \tab Month of the year (integer 1-12, default=7)\cr 
+#' \var{day} \tab (optional) \tab Dayof the month (integer); required when \code{batch=TRUE}\cr 
+#' \var{temp} \tab (required) \tab Temperature (centigrade)\cr 
+#' \var{rh} \tab (required) \tab Relative humidity (\%)\cr 
+#' \var{ws} \tab (required) \tab 10-m height wind speed (km/h)\cr 
+#' \var{prec} \tab (required) \tab 24-hour rainfall (mm)\cr }
+#' 
+#' @param init A data.frame or vector contains either the initial values for
+#' FFMC, DMC, and DC or the same variables that were calculated for the
+#' previous day and will be used for the current day's calculation. The
+#' function also accepts a vector if the initial or previous day FWI values is
+#' for only one weather station (a warning message comes up if a single set of
+#' initial values is used for multiple weather stations). Defaults are the
+#' standard initial values for FFMC, DMC, and DC defined as the following:
+#' \tabular{lll}{ 
+#' \bold{Variable} \tab \bold{Description} \tab \bold{Default} \cr
+#' \var{ffmc} \tab Previous day Fine Fuel Moisture Code (FFMC; unitless) \tab 85 \cr
+#' \var{dmc} \tab Previous day Duff Moisture Code (DMC; unitless)\tab 6 \cr
+#' \var{dc} \tab Previous Day Drought Code (DC; unitless) \tab 15\cr
+#' \var{lat} \tab Latitude of the weather station (\emph{Optional}) \tab 55 \cr}
+#' 
+#' @param batch Whether the computation is iterative or single step, default is
+#' TRUE. When \code{batch=TRUE}, the function will calculate daily FWI System
+#' outputs for one weather station over a period of time chronologically with
+#' the initial conditions given (\code{init}) applied only to the first day of
+#' calculation. If multiple weather stations are processed, an additional "id"
+#' column is required in the input to label different stations, and the data
+#' needs to be sorted by date/time and "id".  If \code{batch=FALSE}, the
+#' function calculates only one time step (1 day) base on either the initial
+#' start values or the previous day's FWI System variables, which should also
+#' be assigned to \code{init} argument.
+#' 
+#' @param out The function offers two output options, \code{out="all"} will
+#' produce a data frame that includes both the input and the FWI System
+#' outputs; \code{out="fwi"} will generate a data frame with only the FWI
+#' system components.
+#' 
+#' @param lat.adjust The function offers options for whether day length
+#' adjustments should be applied to the calculations.  The default value is
+#' "TRUE".
+#' 
+#' @param uppercase Output in upper cases or lower cases would be decided by
+#' this argument. Default is TRUE.
+#' 
+#' @return \code{fwi} returns a dataframe which includes both the input and the
+#' FWI System variables as described below: 
+#' \item{Input Variables }{Including temp, rh, ws, and prec with id, long, lat, yr, mon, or day as optional.}
+#' \item{ffmc }{Fine Fuel Moisture Code} 
+#' \item{dmc }{Duff Moisture Code}
+#' \item{dc }{Drought Code} 
+#' \item{isi }{Initial Spread Index} 
+#' \item{bui }{Buildup Index} 
+#' \item{fwi }{Fire Weather Index} 
+#' \item{dsr }{Daily Severity Rating}
+#' 
+#' @author Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
+#' Anderson, and Mike Flannigan
+#' 
+#' @seealso \code{\link{fbp}}, \code{\link{fwiRaster}}, \code{\link{gfmc}},
+#' \code{\link{hffmc}}, \code{\link{hffmcRaster}}, \code{\link{sdmc}},
+#' \code{\link{wDC}}, \code{\link{fireSeason}}
+#' 
+#' @references 1. Van Wagner, C.E. and T.L. Pickett. 1985. Equations and
+#' FORTRAN program for the Canadian Forest Fire Weather Index System. Can. For.
+#' Serv., Ottawa, Ont. For. Tech. Rep. 33. 18 p.
+#' \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/19973.pdf}
+#' 
+#' 2. Van Wagner, C.E. 1987. Development and structure of the Canadian forest
+#' fire weather index system. Forest Technology Report 35. (Canadian Forestry
+#' Service: Ottawa). \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/19927.pdf}
+#' 
+#' 3.  Lawson, B.D. and O.B. Armitage. 2008. Weather guide for the Canadian
+#' Forest Fire Danger Rating System. Nat. Resour. Can., Can. For. Serv., North.
+#' For. Cent., Edmonton, AB.
+#' \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/29152.pdf}
+#' 
+#' @keywords methods
+#' 
+#' @examples
+#' 
+#' library(cffdrs)
+#' # The test data is a standard test
+#' # dataset for FWI system (Van Wagner and Pickett 1985) 
+#' data("test_fwi")
+#' # Show the data, which is already sorted by time:
+#' # head(test_fwi)
+#' # long  lat	yr	mon	day	temp	rh	ws	prec
+#' # -100	40	1985	4	  13	17	  42	25	0
+#' # -100	40	1985	4	  14	20	  21	25	2.4
+#' # -100	40	1985	4	  15	8.5	  40	17	0
+#' # -100	40	1985	4	  16	6.5	  25	6	0
+#' # -100	40	1985	4	  17	13	  34	24	0
+#' 
+#' ## (1) FWI System variables for a single weather station:
+#' # Using the default initial values and batch argument, 
+#' # the function calculate FWI variables chronically:
+#' fwi.out1<-fwi(test_fwi) 				
+#' # Using a different set of initial values:
+#' fwi.out2<-fwi(test_fwi,init=data.frame(ffmc=80, dmc=10,dc=16, lat=50))
+#' # This could also be done as the following:
+#' fwi.out2<-fwi(test_fwi,init=data.frame(80,10,6,50))
+#' # Or:
+#' fwi.out2<-fwi(test_fwi,init=c(80,10,6,50))
+#' # Latitude could be ignored, and the default value (55) will 
+#' # be used:
+#' fwi.out2<-fwi(test_fwi,init=data.frame(80,10,6))
+#' 
+#' ## (2) FWI for one or multiple stations in a single day:
+#' # Change batch argument to FALSE, fwi calculates FWI 
+#' # components based on previous day's fwi outputs:
+#' 
+#' fwi.out3<-fwi(test_fwi,init=fwi.out1,batch=FALSE)                 
+#' # Using a suite of initials, assuming variables from fwi.out1
+#' # are the initial values for different records. 
+#' init_suite<-fwi.out1[,c("FFMC","DMC","DC","LAT")]
+#' # Calculating FWI variables for one day but with multiple
+#' # stations. Because the calculations is for one time step, 
+#' # batch=FALSE:
+#' fwi.out4<-fwi(test_fwi,init=init_suite,batch=FALSE)
+#' 
+#' ## (3) FWI for multiple weather stations over a period of time: 
+#' #Assuming there are 4 weather stations in the test dataset, and they are 
+#' # ordered by day:
+#' test_fwi$day<-rep(1:(nrow(test_fwi)/4),each=4)
+#' test_fwi$id<-rep(1:4,length(unique(test_fwi$day)))
+#' # Running the function with the same default initial inputs, will receive a 
+#' # warning message, but that is fine: 
+#' fwi(test_fwi)
+#' 
+#' ## (4) Daylength adjustment:
+#' # Change latitude values where the monthly daylength adjustments
+#' # are different from the standard ones
+#' test_fwi$lat<-22
+#' # With daylength adjustment
+#' fwi(test_fwi)[1:3,]
+#' # Without daylength adjustment
+#' fwi(test_fwi,lat.adjust=FALSE)[1:3,]
+#' 
+#' @export fwi
+#' 
+fwi <- function(input, init = data.frame(ffmc = 85, dmc = 6, dc = 15, lat = 55),
+                batch = TRUE, out = "all", lat.adjust = TRUE, uppercase = TRUE) {
+  #############################################################################
+  # Description: Canadian Forest Fire Weather Index Calculations. All code
+  #              is based on a C code library that was written by Canadian
+  #              Forest Service Employees, which was originally based on
+  #              the Fortran code listed in the reference below. All equations
+  #              in this code refer to that document, unless otherwise noted.
+  #
+  #              Equations and FORTRAN program for the Canadian Forest Fire 
+  #              Weather Index System. 1985. Van Wagner, C.E.; Pickett, T.L. 
+  #              Canadian Forestry Service, Petawawa National Forestry 
+  #              Institute, Chalk River, Ontario. Forestry Technical Report 33. 
+  #              18 p.
+  #
+  #              Additional reference on FWI system
+  #
+  #              Development and structure of the Canadian Forest Fire Weather 
+  #              Index System. 1987. Van Wagner, C.E. Canadian Forestry Service,
+  #              Headquarters, Ottawa. Forestry Technical Report 35. 35 p.
+  #  
+  #Args:  input:    View Documentation (fwi.Rd) for full description
+  #                 of input data frame
+  #       init:     Initializing moisture values
+  #                 ffmc:     Fine Fuel Moisture Code (default 85)
+  #                 dmc:      Duff Moisture Code (default 6)
+  #                 dc:       Drought Code (default 15)
+  #                 lat:      Latitude (decimal degrees, default 55)
+  #       batch:    Function can be run in a batch mode, where multiple 
+  #                 weather stations or points can be calculated at once. 
+  #                 (TRUE/FALSE, default TRUE)
+  #       out:      Display the calculated FWI values, with or without the 
+  #                 inputs. (all/fwi, default all)
+  #       lat.adjust: Option to adjust day length in the calculations 
+  #                   (TRUE/FALSE, default TRUE)
+  #       uppercase:  Output names in upper or lower case - a commonly 
+  #                   asked for feature, as dataset naming conventions vary 
+  #                   considerably. (TRUE/FALSE, default TRUE)
+  #       
+  #
+  # Returns: A data.frame of the calculated FWI values with or without
+  #          the input data attached to it.
+  #
+  #############################################################################
+  
+  #Quite often users will have a data frame called "input" already attached
+  #  to the workspace. To mitigate this, we remove that if it exists, and warn
+  #  the user of this case.
+  if (!is.na(charmatch("input", search()))) {
+    detach(input)
+  }
+  names(input) <- tolower(names(input))
+  
+  #convert vector to data.frame to ensure consitency
+  if (is.vector(init)){
+    init <- as.data.frame(t(init))
+  }
+  names(init) <- tolower(names(init))
+  #resolve missing names of the initializing variables if necessary
+  if(substr(names(init), 1, 1)[1] == "x" | substr(names(init), 1, 1)[1] == "v"){
+    if (ncol(init) == 3){
+      names(init) <- c("ffmc", "dmc", "dc")
+      init$lat <- 55
+    }else if(ncol(init) == 4){
+      names(init) <- c("ffmc", "dmc", "dc", "lat")
+    }
+  }
+  
+  #############################################################################
+  #                                 
+  # Set local variables and display warnings to user if default is being used
+  #############################################################################
+  ffmc_yda <- init$ffmc
+  dmc_yda  <- init$dmc
+  dc_yda   <- init$dc
+  
+  if ("lat" %in% names(input)) {
+    lat <- input$lat
+  }
+  else {
+    warning("latitude was not provided, assign default value 55")
+    lat <- rep(55, nrow(input))
+  }
+  if ("long" %in% names(input)) {
+    long <- input$long
+  }
+  else {
+    warning("long was not provided, assign a default number -120")
+    long <- rep(-120, nrow(input))
+  }
+  if ("yr" %in% names(input)) {
+    yr <- as.numeric(as.character(input$yr))
+  }
+  else {
+    warning("Year was not provided, assigned default number 5000")
+    yr <- rep(5000, nrow(input))
+  }
+  if ("mon" %in% names(input)) {
+    mon <- as.numeric(as.character(input$mon))
+  }
+  else {
+    warning("Month was not provided, assigned the default value, July")
+    mon <- rep(7, nrow(input))
+  }
+  if ("day" %in% names(input)) {
+    day <- as.numeric(as.character(input$day))
+  }
+  else {
+    warning("Day was not provided, assigned default number -99")
+    day <- rep(-99, nrow(input))
+  }
+  
+  #If batch selected, then sort the data by Date and id and determine the 
+  # length of each run.
+  # Currently when running multiple stations, the stations much have the same
+  # amount of data and same start/end dates
+  #Function stops running if these requirements are not met
+  if (batch){
+    if ("id" %in% names(input)) {
+      input <- input[with(input,order(yr,mon,day,id)),]
+      #number of stations
+      n <- length(unique(input$id))
+      if(length(unique(input[1:n, "id"])) != n){
+        stop("Multiple stations have to start and end at the same dates, and 
+             input data must be sorted by date/time and id")
+      }
+    } else {
+      n <- 1
+    }
+  }else{
+    n <- nrow(input)
+  }
+  
+  temp <- input$temp
+  prec <- input$prec
+  ws <- input$ws
+  rh <- input$rh
+  if (!exists("temp") | is.null(temp)) 
+    stop("temperature (temp) is missing!")
+  if (!exists("prec") | is.null(prec)) 
+    stop("precipitation (prec) is missing!")
+  if (length(prec[prec < 0]) > 0)
+    stop("precipiation (prec) cannot be negative!")
+  if (!exists("ws") | is.null(ws)) 
+    stop("wind speed (ws) is missing!")
+  if (length(ws[ws < 0]) > 0)
+    stop("wind speed (ws) cannot be negative!")
+  if (!exists("rh") | is.null(rh)) 
+    stop("relative humidity (rh) is missing!")
+  if (length(rh[rh < 0]) > 0)
+    stop("relative humidity (rh) cannot be negative!")
+  #############################################################################
+  #                                 END
+  # Set local variables and display warnings to user if default is being used
+  #############################################################################
+  
+  if (length(temp) %% n != 0)
+    warning("Missing records may generate wrong outputs")
+  if (nrow(init) == 1 & n > 1){
+    warning("Same initial data were used for multiple weather stations")
+    ffmc_yda <- rep(ffmc_yda, n)
+    dmc_yda <- rep(dmc_yda, n)
+    dc_yda <- rep(dc_yda, n)
+  }
+  #if the number of rows in the init file does not equal that of the number of
+  # stations, then stop execution as we do not have a complete input set
+  if(nrow(init) > 1 & nrow(init) != n) {
+    stop("Number of initial values do not match with number of weather 
+         stations")
+  }
+  
+  #Length of weather run
+  n0 <- length(temp) / n
+  #Initialize variables
+  ffmc <- dmc <- dc <- isi <- bui <- fwi <- dsr <- NULL
+  #For each day in the run
+  for (i in 1:n0){
+    #k is the data for all stations by day
+    k  <- ((i - 1) * n + 1):(i * n)
+    #constrain relative humidity
+    rh[k] <- ifelse(rh[k] >= 100, 99.9999, rh[k])
+    ###########################################################################
+    # Fine Fuel Moisture Code (FFMC)
+    ###########################################################################
+    ffmc1 = cffdrs.core::FineFuelMoistureCode(ffmc_yda, temp[k], rh[k], ws[k], prec[k])
+    
+    ###########################################################################
+    # Duff Moisture Code (DMC)
+    ###########################################################################
+    dmc1 = cffdrs.core::DuffMoistureCode(dmc_yda, temp[k], rh[k], prec[k], lat[k], mon[k], 
+                                         lat.adjust)
+    
+    ###########################################################################
+    # Drought Code (DC)
+    ###########################################################################
+    dc1 <- cffdrs.core::DroughtCode(dc_yda, temp[k], rh[k], prec[k], lat[k], mon[k],
+                                    lat.adjust)
+    
+    ###########################################################################
+    # Initial Spread Index (ISI)
+    ###########################################################################
+    isi1 <- cffdrs.core::InitialSpreadIndex(ffmc1, ws[k], FALSE)
+    
+    ###########################################################################
+    # Buildup Index (BUI)
+    ###########################################################################
+    bui1 <- cffdrs.core::BuildupIndex(dmc1, dc1)
+    
+    ###########################################################################
+    # Fire Weather Index (FWI)
+    ###########################################################################
+    fwi1 <- cffdrs.core::FireWeatherIndex(isi1, bui1)
+    ###########################################################################
+    #                   Daily Severity Rating (DSR)
+    ###########################################################################
+    #Eq. 31
+    dsr1 <- 0.0272 * (fwi1^1.77)
+    
+    #Concatenate values
+    ffmc<-c(ffmc,ffmc1)
+    dmc<-c(dmc,dmc1)
+    dc<-c(dc,dc1)
+    isi<-c(isi,isi1)
+    bui<-c(bui,bui1)
+    fwi<-c(fwi,fwi1)
+    dsr<-c(dsr,dsr1)
+    ffmc_yda<-ffmc1
+    dmc_yda<-dmc1
+    dc_yda<-dc1
+  } 
+  
+  #If output specified is "fwi", then return only the FWI variables
+  if (out == "fwi") {
+    new_FWI <- data.frame(ffmc = ffmc, dmc = dmc, dc = dc, isi = isi, 
+                          bui = bui, fwi = fwi, dsr = dsr)
+    if (uppercase){
+      names(new_FWI) <- toupper(names(new_FWI))
+    }
+  }
+  #If output specified is "all", then return both FWI and input weather vars
+  else {
+    if (out == "all") {
+      new_FWI <- cbind(input, ffmc, dmc, dc, isi, bui, fwi, dsr)
+      if (uppercase){
+        names(new_FWI) <- toupper(names(new_FWI))
+      }
+    }
+  }
+  return(new_FWI)
+}
