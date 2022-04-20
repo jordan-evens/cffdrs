@@ -146,13 +146,17 @@
 fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
                       out = "all", lat.adjust = TRUE, uppercase = TRUE) {
   
-  #Quite often users will have a data frame called "input" already attached
+  # Quite often users will have a data frame called "input" already attached
   #  to the workspace. To mitigate this, we remove that if it exists, and warn
   #  the user of this case.
   if (!is.na(charmatch("input", search()))) {
+    warning("Attached dataset 'input' is being detached to use fwi() function.")
     detach(input)
   }
   input_raster <- F
+  # This will detect if the user has input rasters and will return rasters even
+  # though the whole function will operate with terra. This will deprecate with
+  # raster.
   if(class(input) %in% c("Raster","RasterStack","RasterBrick")){
     input_raster <- T
     input <- rast(input)

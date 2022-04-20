@@ -159,19 +159,6 @@
 #' }
 #' @param select Selected outputs
 #' 
-#' @param m Optimal number of pixels at each iteration of computation when
-#' \code{ncell(input) >= 1000}. Default m = NULL, where the function will
-#' assign m = 1000 when \code{ncell(input)} is between 1000 and 500,000, and
-#' m=3000 otherwise. By including this option, the function is able to process
-#' large dataset more efficiently. The optimal value may vary with different
-#' computers.
-#' 
-#' @param cores Number of CPU cores (integer) used in the computation, default
-#' is 1.  By signing \code{cores > 1}, the function will apply parallel
-#' computation technique provided by the \code{foreach} package, which
-#' significantly reduces the computation time for large input data (over a
-#' million grid points). For small dataset, \code{cores=1} is actually faster.
-#' 
 #' @return \code{fbpRaster} returns a RasterStack with primary, secondary, or 
 #' all output variables, a combination of the primary and secondary outputs. 
 #' Primary FBP output includes the following 8 raster layers: 
@@ -261,9 +248,9 @@
 #' # The dataset is the standard test data for FBP system
 #' # provided by Wotton et al (2009), and randomly assigned
 #' # to a stack of raster layers
-#' test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
+#' test_fbpRaster <- rast(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
 #' input<-test_fbpRaster
-#' # Stack doesn't hold the raster layer names, we have to assign
+#' # Rast doesn't hold the raster layer names, we have to assign
 #' # them:
 #' names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
 #' "PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
@@ -285,8 +272,8 @@
 #' 
 #' @export fbpRaster
 #' 
-fbpRaster <- function(input, output = "Primary", select=NULL, m=NULL, cores=1){
-
+fbpRaster <- function(input, output = "Primary", select=NULL){
+  
   #  Quite often users will have a data frame called "input" already attached
   #  to the workspace. To mitigate this, we remove that if it exists, and warn
   #  the user of this case. This is also done in Fbp, but we require use
@@ -295,11 +282,19 @@ fbpRaster <- function(input, output = "Primary", select=NULL, m=NULL, cores=1){
     warning("Attached dataset 'input' is being detached to use fbp() function.")
     detach(input)
   }
-  #split up large rasters to allow calculation. This will be used in the
-  #  parallel methods
-  if (is.null(m)){
-    m <- ifelse(ncell(input) > 500000, 3000, 1000)
+  input_raster <- F
+  # This will detect if the user has input rasters and will return rasters even
+  # though the whole function will operate with terra. This will deprecate with
+  # raster.
+  if(class(input) %in% c("Raster","RasterStack","RasterBrick")){
+    input_raster <- T
+    input <- rast(input)
   }
+  if(class(init) %in% c("Raster","RasterStack","RasterBrick")){
+    init <- rast(init)
+  }
+  names(input) <- tolower(names(input))
+
   #Setup correct output names
   allNames <- c("CFB","CFC","FD","HFI","RAZ","ROS","SFC","TFC","BE","SF","ISI",
                 "FFMC", "FMC","D0", "RSO","CSI","FROS","BROS","HROSt","FROSt",
@@ -328,42 +323,10 @@ fbpRaster <- function(input, output = "Primary", select=NULL, m=NULL, cores=1){
   }
   names(input) <- toupper(names(input))
   output <- toupper(output)
-  if("LAT" %in% names(input)){
-    #register a sequential parallel backend
-    registerDoSEQ()
-    #Get the specified raster cell values
-    r <- .getValuesBlock_stackfix(input, nrows=nrow(input))
-    #convert to data.frame
-    r <- as.data.frame(r)
-    names(r) <- names(input)
-  }else{
-    #Convert the raster to points and insert into a data.frame
-    r <- as.data.frame(rasterToPoints(input))
-    #Rename the latitude field
-    names(r)[names(r) == "y"] <- "LAT"
-    #Check for valid latitude
-    if (max(r$LAT) > 90 | min(r$LAT) < -90){
-      warning("Input projection is not in lat/long, consider re-projection or 
-              include LAT as input")
-    }
-  }
-  #Unique IDs
-  r$ID <- 1:nrow(r)
-  #merge fuel codes with integer values
-  fuelCross <- data.frame(FUELTYPE0 = sort(c(paste("C", 1:7, sep="-"),
-                                             "D-1",
-                                             paste("M", 1:4, sep="-"),
-                                             paste("S", 1:3, sep="-"),
-                                             "O-1a", "O-1b", "WA", "NF")),
-                          code=1:19)
-  r <- merge(r, fuelCross, by.x="FUELTYPE", by.y="code", all.x=TRUE, all.y=FALSE)
-
-  r$FUELTYPE <- NULL
-  names(r)[names(r) == "FUELTYPE0"] <- "FUELTYPE"
-  r <- r[with(r, order(ID)), ]
-  names(r)[names(r) == "x"] <- "LONG"
-  #Calculate FBP through the fbp() function
-  FBP <- fbp(r, output = output, m = m, cores = cores)
+  
+  FBP <- lapp(x = input,
+              fun = Vectorize(FireBehaviourPrediction))
+              
   #If secondary output selected then we need to reassign character
   #  represenation of Fire Type S/I/C to a numeric value 1/2/3
   if (!(output == "SECONDARY" | output == "S")){
@@ -380,12 +343,12 @@ fbpRaster <- function(input, output = "Primary", select=NULL, m=NULL, cores=1){
     if (length(select) > 1){
       for (i in 2:length(select)){
         values(out0) <- FBP[,select[i]]
-        out <- stack(out, out0)
+        out <- rast(out, out0)
       }
     }
     names(out)<-select 
-  #If caller specified Primary outputs, then create raster stack that contains
-  #  only primary outputs
+    #If caller specified Primary outputs, then create raster stack that contains
+    #  only primary outputs
   }else if (output == "PRIMARY" | output == "P") {
     message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
     out <- out0 <- input[[1]]
@@ -395,8 +358,8 @@ fbpRaster <- function(input, output = "Primary", select=NULL, m=NULL, cores=1){
       out <- stack(out,out0)
     }
     names(out)<-primaryNames
-  #If caller specified Secondary outputs, then create raster stack that contains
-  #  only secondary outputs
+    #If caller specified Secondary outputs, then create raster stack that contains
+    #  only secondary outputs
   }else if(output == "SECONDARY" | output == "S") {
     out <- out0 <- input[[1]]
     values(out) <- FBP[, secondaryNames[1]]
@@ -405,8 +368,8 @@ fbpRaster <- function(input, output = "Primary", select=NULL, m=NULL, cores=1){
       out <- stack(out, out0)
     }
     names(out)<-secondaryNames
-  #If caller specified All outputs, then create a raster stack that contains
-  #  both primary and secondary outputs
+    #If caller specified All outputs, then create a raster stack that contains
+    #  both primary and secondary outputs
   }else if(output == "ALL" | output == "A") {
     message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
     out <- out0 <- input[[1]]
