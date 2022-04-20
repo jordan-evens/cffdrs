@@ -76,8 +76,8 @@ this case setting the multi.year parameter to TRUE will allow these
 calculations to proceed.
 
 This fire season length definition can also feed in to the overwinter DC
-calculations (\link{wDC}). View the cffdrs package help files for an example
-of using the \code{FireSeason}, \link{wDC}, and \link{fwi} functions in
+calculations (\link{OverwinterDroughtCode}). View the cffdrs package help files for an example
+of using the \code{FireSeason}, \link{OverwinterDroughtCode}, and \link{FireWeatherIndices} functions in
 conjunction.
 }
 \examples{
@@ -141,7 +141,7 @@ Fire Danger Rating System. Nat. Resour. Can., Can. For. Serv., North. For.
 Cent., Edmonton, AB \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/29152.pdf}
 }
 \seealso{
-\code{\link{fwi}, \link{wDC}}
+\code{\link{FireWeatherIndices}, \link{OverwinterDroughtCode}}
 }
 \author{
 Alan Cantin, Xianli Wang, Mike Wotton, and Mike Flannigan

@@ -34,13 +34,15 @@
 #'
 #' \tabular{ll}{ Package: \tab cffdrs\cr Type: \tab Package\cr Version: \tab
 #' 1.8.16\cr Date: \tab 2020-05-26\cr License: \tab GPL-2\cr } This package
-#' includes eleven functions. Seven functions, \code{\link{fwi}},
-#' \code{\link{fwiRaster}}, \code{\link{hffmc}}, \code{\link{hffmcRaster}},
-#' \code{\link{sdmc}}, \code{\link{gfmc}}, and \code{\link{wDC}} are used for
-#' FWI System calculation, whereas two functions, \code{\link{fbp}} and
+#' includes eleven functions. Seven functions, \code{\link{FireWeatherIndices}},
+#' \code{\link{fwiRaster}}, \code{\link{HourlyFineFuelMoistureCode}}, \code{\link{hffmcRaster}},
+#' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{GrassFuelMoistureCode}},
+#' and \code{\link{OverwinterDroughtCode}} are used for
+#' FWI System calculation, whereas two functions, \code{\link{FireBehaviourPrediction}} and
 #' \code{\link{fbpRaster}} are used for FBP System calculation. One function,
-#' \code{\link{fireSeason}} determines fire season start and end dates based on
-#' weather. Two functions \code{\link{pros}} and \code{\link{lros}} are rate of
+#' \code{\link{FireSeason}} determines fire season start and end dates based on
+#' weather. Two functions \code{\link{SimardRateOfSpreadPoint}} and
+#' \code{\link{SimardRateOfSpreadLine}} are rate of
 #' spread and direction calculations across triangles. These functions are not
 #' fully independent: their inputs overlap greatly and the users will have to
 #' provide FWI System outputs to calculate FBP System outputs. The fwi,
@@ -62,10 +64,13 @@
 #' Anderson, Brett Moore, Tom Schiks, Mike Flannigan, and Jordan Evens
 #'
 #' Maintainer: Jordan Evens \email{jordan.evens@nrcan-rncan.gc.ca}
-#' @seealso \code{\link{fbp}}, \code{\link{fireSeason}}, \code{\link{fwi}},
-#' \code{\link{fwiRaster}}, \code{\link{gfmc}}, \code{\link{hffmc}},
-#' \code{\link{hffmcRaster}}, \code{\link{lros}}, \code{\link{pros}},
-#' \code{\link{sdmc}}, \code{\link{wDC}}
+#' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{FireSeason}},
+#' \code{\link{FireWeatherIndices}},
+#' \code{\link{fwiRaster}}, \code{\link{GrassFuelMoistureCode}},
+#' \code{\link{HourlyFineFuelMoistureCode}},
+#' \code{\link{hffmcRaster}}, \code{\link{SimardRateOfSpreadLine}},
+#' \code{\link{SimardRateOfSpreadPoint}},
+#' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{OverwinterDroughtCode}}
 #' @references 1. Van Wagner, C.E. and T.L. Pickett. 1985. Equations and
 #' FORTRAN program for the Canadian Forest Fire Weather Index System. Can. For.
 #' Serv., Ottawa, Ont. For. Tech. Rep. 33. 18 p.
@@ -148,7 +153,7 @@
 #'       #accumulate precipitation for the period between end of last and start of current
 #'       curYr.owdata <- sum(input[(input$date>curYr.owd[1,"date"] &
 #'                           input$date < curYr.owd[2,"date"]),]$prec)
-#'       owDC <- wDC(DCf=tail(curYr.fwi$DC,n=1),rw=curYr.owdata) #calculate overwinter DC value
+#'       owDC <- OverwinterDroughtCode(DCf=tail(curYr.fwi$DC,n=1),rw=curYr.owdata) #calculate overwinter DC value
 #'       curYr.init <- data.frame(ffmc=80,dmc=10,dc=owDC) #Initialize moisture codes
 #'     }
 #'
@@ -167,7 +172,7 @@
 #' }
 #'
 #' ##Usage of the custom function
-#' # Load the test dataset, which is also the test data for wDC:
+#' # Load the test dataset, which is also the test data for OverwinterDroughtCode:
 #' data("test_wDC")
 #' #select 1 weather station
 #' localWX_1 <- test_wDC[test_wDC$id==1,]

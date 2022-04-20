@@ -217,9 +217,9 @@ For. Cent., Edmonton, AB.
 \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/29152.pdf}
 }
 \seealso{
-\code{\link{fbp}}, \code{\link{fwiRaster}}, \code{\link{gfmc}},
+\code{\link{FireBehaviourPrediction}}, \code{\link{fwiRaster}}, \code{\link{gfmc}},
 \code{\link{hffmc}}, \code{\link{hffmcRaster}}, \code{\link{sdmc}},
-\code{\link{wDC}}, \code{\link{fireSeason}}
+\code{\link{OverwinterDroughtCode}}, \code{\link{FireSeason}}
 }
 \author{
 Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry

@@ -126,9 +126,9 @@
 #' @author Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
 #' Anderson, and Mike Flannigan
 #' 
-#' @seealso \code{\link{fbp}}, \code{\link{fwiRaster}}, \code{\link{gfmc}},
+#' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{fwiRaster}}, \code{\link{gfmc}},
 #' \code{\link{hffmc}}, \code{\link{hffmcRaster}}, \code{\link{sdmc}},
-#' \code{\link{wDC}}, \code{\link{fireSeason}}
+#' \code{\link{OverwinterDroughtCode}}, \code{\link{FireSeason}}
 #' 
 #' @references 1. Van Wagner, C.E. and T.L. Pickett. 1985. Equations and
 #' FORTRAN program for the Canadian Forest Fire Weather Index System. Can. For.

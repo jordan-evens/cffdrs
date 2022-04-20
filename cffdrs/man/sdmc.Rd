@@ -96,7 +96,7 @@ tracking sheltered forest floor moisture within the Canadian Forest Fire
 Weather Index System. International Journal of Wildland Fire, 14, 169-182.
 }
 \seealso{
-\code{\link{fwi}}
+\code{\link{FireWeatherIndices}}
 }
 \author{
 Xianli Wang, Mike Wotton, Alan Cantin, and Mike Flannigan

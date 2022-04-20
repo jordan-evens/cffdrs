@@ -50,7 +50,7 @@
 #' @return \code{ShelteredDuffMoistureCode} returns either a single value or a
 #' vector of SDMC values.
 #' @author Xianli Wang, Mike Wotton, Alan Cantin, and Mike Flannigan
-#' @seealso \code{\link{fwi}}
+#' @seealso \code{\link{FireWeatherIndices}}
 #' @references Wotton, B.M., B.J. Stocks, and D.L. Martell. 2005. An index for
 #' tracking sheltered forest floor moisture within the Canadian Forest Fire
 #' Weather Index System. International Journal of Wildland Fire, 14, 169-182.
@@ -150,7 +150,7 @@ ShelteredDuffMoistureCode <- function(temp, prec, rh, dmc, mon, sdmc_old=NULL){
 #' @return \code{sdmc} returns either a single value or a vector of SDMC
 #' values.
 #' @author Xianli Wang, Mike Wotton, Alan Cantin, and Mike Flannigan
-#' @seealso \code{\link{fwi}}
+#' @seealso \code{\link{FireWeatherIndices}}
 #' @references Wotton, B.M., B.J. Stocks, and D.L. Martell. 2005. An index for
 #' tracking sheltered forest floor moisture within the Canadian Forest Fire
 #' Weather Index System. International Journal of Wildland Fire, 14, 169-182.
