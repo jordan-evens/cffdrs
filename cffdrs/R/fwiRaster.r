@@ -53,7 +53,7 @@
 #' for particularly dry winters and are presumably not appropriate for
 #' different parts of the world.
 #' 
-#' @param input A stack or brick containing rasterized daily weather
+#' @param input A c (terra), stack (raster), or brick (raster) containing rasterized daily weather
 #' observations taken at noon LST. Variable names have to be the same as in the
 #' following list, but they are case insensitive. The order in which the inputs
 #' are entered is not important.
@@ -68,7 +68,7 @@
 #' \var{prec} \tab (required)
 #' \tab 24-hour rainfall (mm)\cr }
 #' @param init A vector that contains the initial values for FFMC, DMC, and DC
-#' or a stack that contains raster maps of the three moisture codes calculated
+#' or a c, stack or brick that contains raster maps of the three moisture codes calculated
 #' for the previous day, which will be used for the current day's calculation.
 #' Defaults are the standard initial values for FFMC, DMC, and DC defined as
 #' the following: 
@@ -84,14 +84,14 @@
 #' latitude adjustment (\code{lat.adjust}), it is therefore recommended when
 #' \code{lat.adjust=TRUE} was chosen.
 #' @param out The function offers two output options, \code{out="all"} will
-#' produce a raster stack include both the input and the FWI System outputs;
-#' \code{out="fwi"} will generate a stack with only the FWI system components.
+#' produce a raster c include both the input and the FWI System outputs;
+#' \code{out="fwi"} will generate a c or brick with only the FWI system components.
 #' @param lat.adjust The function offers options for whether latitude
 #' adjustments to day lengths should be applied to the calculations. The
 #' default value is "TRUE".
 #' @param uppercase Output in upper cases or lower cases would be decided by
 #' this argument. Default is TRUE.
-#' @return By default, \code{fwi} returns a raster stack which includes both
+#' @return By default, \code{fwi} returns a raster c which includes both
 #' the input and the FWI System variables, as describe below: \item{Inputs
 #' }{Including \code{temp}, \code{rh}, \code{ws}, and \code{prec} with
 #' \code{lat} as optional.} \item{ffmc }{Fine Fuel Moisture Code} \item{dmc
@@ -124,11 +124,11 @@
 #' @examples
 #' 
 #' library(cffdrs)
-#' require(raster)
-#' # The test data is a stack with four input variables including 
+#' require(terra)
+#' # The test data is a c with four input variables including 
 #' # daily noon temp, rh, ws, and prec (we recommend tif format):
 #' day01src <- system.file("extdata","test_rast_day01.tif",package="cffdrs")
-#' day01 <- stack(day01src)
+#' day01 <- rast(day01src)
 #' day01 <- crop(day01,c(250,255,47,51))
 #' # assign variable names:
 #' names(day01)<-c("temp","rh","ws","prec")
@@ -137,7 +137,7 @@
 #' plot(foo)
 #' ### Additional, longer running examples ###
 #' # (2) use initial values with larger raster
-#' day01 <- stack(day01src)
+#' day01 <- c(day01src)
 #' names(day01)<-c("temp","rh","ws","prec")
 #' \donttest{foo<-fwiRaster(day01)}
 #' plot(foo)
@@ -146,11 +146,23 @@
 fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
                       out = "all", lat.adjust = TRUE, uppercase = TRUE) {
   
-  #Quite often users will have a data frame called "input" already attached
+  # Quite often users will have a data frame called "input" already attached
   #  to the workspace. To mitigate this, we remove that if it exists, and warn
   #  the user of this case.
   if (!is.na(charmatch("input", search()))) {
+    warning("Attached dataset 'input' is being detached to use fwi() function.")
     detach(input)
+  }
+  input_raster <- F
+  # This will detect if the user has input rasters and will return rasters even
+  # though the whole function will operate with terra. This will deprecate with
+  # raster.
+  if(class(input) %in% c("Raster","RasterStack","RasterBrick")){
+    input_raster <- T
+    input <- rast(input)
+  }
+  if(class(init) %in% c("Raster","RasterStack","RasterBrick")){
+    init <- rast(init)
   }
   names(input) <- tolower(names(input))
   temp <- input$temp
@@ -165,19 +177,19 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
     names(lat) <- "lat"
   }
   
-  if (!exists("temp") | is.null(temp)) 
+  if (!exists("temp") | is.null(temp))
     stop("temperature (temp) is missing!")
-  if (!exists("prec") | is.null(prec)) 
+  if (!exists("prec") | is.null(prec))
     stop("precipitation (prec) is missing!")
-  if (!is.null(prec[prec < 0]))
+  if (!!length(prec[prec < 0]))
     stop("precipiation (prec) cannot be negative!")
-  if (!exists("ws") | is.null(ws)) 
+  if (!exists("ws") | is.null(ws))
     stop("wind speed (ws) is missing!")
-  if (!is.null(ws[ws < 0]))
+  if (!!length(ws[ws < 0]))
     stop("wind speed (ws) cannot be negative!")
-  if (!exists("rh") | is.null(rh)) 
+  if (!exists("rh") | is.null(rh))
     stop("relative humidity (rh) is missing!")
-  if (!is.null(rh[rh < 0]))
+  if (!!length(rh[rh < 0]))
     stop("relative humidity (rh) cannot be negative!")
   
   names(init) <- tolower(names(init))
@@ -193,55 +205,56 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
     values(dc_yda) <- init[['dc']]
   } else {
     ffmc_yda <- init$ffmc
-    names(ffmc_yda) <- "ffmc_yda"
     dmc_yda  <- init$dmc
-    names(dmc_yda) <- "dmc_yda"
     dc_yda   <- init$dc
-    names(dc_yda) <- "dc_yda"
   }
+  names(ffmc_yda) <- "ffmc_yda"
+  names(dmc_yda) <- "dmc_yda"
+  names(dc_yda) <- "dc_yda"
+  
   #constrain relative humidity
   rh[rh>=100]<- 99.9999
   ###########################################################################
   #                    Fine Fuel Moisture Code (FFMC)
   ###########################################################################
   
-  ffmc = overlay( stack( ffmc_yda, input[[c("temp","rh","ws","prec")]] ), 
-                  fun = Vectorize(.ffmcCalc))
+  ffmc = lapp(x = c( ffmc_yda, input[[c("temp","rh","ws","prec")]] ), 
+              fun = Vectorize(FineFuelMoistureCode))
   
   ###########################################################################
   #                        Duff Moisture Code (DMC)
   ###########################################################################
   
-  dmc = overlay( stack( dmc_yda, input[[c("temp","rh","prec")]], lat, mon), 
-                 fun = Vectorize(.dmcCalc))
+  dmc = lapp(x = c( dmc_yda, input[[c("temp","rh","prec")]], lat),mon, 
+             fun = Vectorize(DuffMoistureCode))
   
   ###########################################################################
   #                             Drought Code (DC)
   ###########################################################################
   
-  dc = overlay( stack( dc_yda, input[[c("temp","rh","prec")]], lat, mon ), 
-                fun = Vectorize(.dcCalc))
+  dc = lapp(x = c( dc_yda, input[[c("temp","rh","prec")]], lat ),mon, 
+            fun = Vectorize(DroughtCode))
   
   ###########################################################################
   #                    Initial Spread Index (ISI)
   ###########################################################################
   
-  isi <- overlay(stack(ffmc, input[["ws"]] ), 
-                 fun = Vectorize(.ISIcalc))
+  isi <- lapp(x = c(ffmc, input[["ws"]] ), 
+              fun = Vectorize(InitialSpreadIndex))
   
   ###########################################################################
   #                       Buildup Index (BUI)
   ###########################################################################
   
-  bui <- overlay( stack( dmc, dc ),
-                  fun = Vectorize(.buiCalc))
+  bui <- lapp(x = c( dmc, dc ),
+              fun = Vectorize(BuildupEffect))
   
   ###########################################################################
   #                     Fire Weather Index (FWI)
   ###########################################################################
   
-  fwi <- overlay( stack( isi, bui ), 
-                  fun = Vectorize(.fwiCalc))
+  fwi <- lapp(x = c( isi, bui ), 
+              fun = Vectorize(FireWeatherIndex))
   
   ###########################################################################
   #                   Daily Severity Rating (DSR)
@@ -251,8 +264,8 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
   
   #If output specified is "fwi", then return only the FWI variables
   if (out == "fwi") {
-    #Creating a raster stack of FWI variables to return
-    new_FWI <- stack(ffmc, dmc, dc, isi, bui, fwi, dsr)
+    #Creating a raster c of FWI variables to return
+    new_FWI <- c(ffmc, dmc, dc, isi, bui, fwi, dsr)
     names(new_FWI) <- c("ffmc", "dmc", "dc", "isi", "bui", "fwi", "dsr")
     if (uppercase){
       names(new_FWI) <- toupper(names(new_FWI))
@@ -260,14 +273,14 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
     #If output specified is "all", then return both FWI and input weather vars
   } else {
     if (out == "all") {
-      #Create a raster stack of input and FWI variables
-      new_FWI <- stack(input, ffmc, dmc, dc, isi, bui, fwi, dsr)
+      #Create a raster c of input and FWI variables
+      new_FWI <- c(input, ffmc, dmc, dc, isi, bui, fwi, dsr)
       names(new_FWI) <- c(names(input),"ffmc", "dmc", "dc", "isi", "bui", "fwi", "dsr")
       if (uppercase){
         names(new_FWI) <- toupper(names(new_FWI))
       }
     }
   }
-  return(new_FWI)
+  return(if(input_raster){raster::brick(new_FWI)}else{new_FWI})
 }
 
