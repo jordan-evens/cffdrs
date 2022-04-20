@@ -1,4 +1,5 @@
 library(data.table)
+#setwd("tests/testthat")
 PATH <- '../data/'
 DESIRED_ROWS <- 5000
 
@@ -121,7 +122,7 @@ makeInput <- function(arguments)
       d1 <- pickRows(merge(data.frame(d1), data.frame(d2), by=NULL))
     }
   }
-  return(d1)
+  return(data.table(d1))
 }
 
 makeData <- function(name, fct, arguments, split_args)
@@ -129,7 +130,10 @@ makeData <- function(name, fct, arguments, split_args)
   i <- makeInput(arguments)
   if (!split_args)
   {
-    return(fct(i))
+    stopifnot(is.data.table(i))
+    values <- fct(i)
+    i[, c(name)] <- values
+    return(i)
   }
   n0 <- nrow(i)
   #i[, c(name)] <- do.call(fct, i)
@@ -157,6 +161,7 @@ makeData <- function(name, fct, arguments, split_args)
     return(i)
   }
 }
+
 
 checkResults <- function(name, df1)
 {
@@ -200,7 +205,7 @@ checkData <- function(name, fct, arguments, split_args=TRUE)
   else
   {
     actual <- df1
-    expected <- df2[[1]]
+    expected <- df2
   }
   expect_equal(actual, expected)
 }
@@ -239,4 +244,26 @@ fctOnInput <- function(fct)
                         ISI=ISI)
     return(fct(input=input, output="S"))
   })
+}
+test_columns <- function(actual, expected)
+{
+  for (n in names(actual))
+  {
+    test_that(n, {
+      a <- actual[[n]]
+      e <- expected[[n]]
+      if (is.numeric(a))
+      {
+        expect_equal(a, as.numeric(e))
+      }
+      else if(is.character(a))
+      {
+        expect_equal(a, as.character(e))
+      }
+      else
+      {
+        expect_equal(a, e)
+      }
+    })
+  }
 }

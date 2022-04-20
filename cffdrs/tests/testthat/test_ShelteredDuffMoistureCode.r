@@ -1,12 +1,3 @@
-test_that("ShelteredDuffMoistureCode", {
-  checkData('ShelteredDuffMoistureCode',
-            ShelteredDuffMoistureCode,
-            list(data.table(temp=TEMP),
-                 data.table(prec=PREC),
-                 data.table(rh=RH),
-                 data.table(mon=MON),
-                 data.table(dmc=DMC)))
-})
 test_that("sdmc", {
   checkData('sdmc',
             sdmc,

@@ -172,7 +172,7 @@
   #  return them
   if (output == "PRIMARY" | output == "P") {
     FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC,
-                TFC=SFC)
+                TFC=TFC)
   }
   #If Secondary is selected, wrap the secondary outputs into a data frame
   #  and return them.

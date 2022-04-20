@@ -1,6 +1,8 @@
+library(cffdrs)
 library(data.table)
 library(testthat)
-PATH <- '../cffdrs.core/tests/data/'
+#setwd("cffdrs/tests/testthat")
+PATH <- 'cffdrs/tests/data/'
 DESIRED_ROWS <- 5000
 
 DAY <- seq(0, 366)
@@ -122,7 +124,7 @@ makeInput <- function(arguments)
       d1 <- pickRows(merge(data.frame(d1), data.frame(d2), by=NULL))
     }
   }
-  return(d1)
+  return(data.table(d1))
 }
 
 makeData <- function(name, fct, arguments, split_args)
@@ -130,7 +132,10 @@ makeData <- function(name, fct, arguments, split_args)
   i <- makeInput(arguments)
   if (!split_args)
   {
-    return(fct(i))
+    stopifnot(is.data.table(i))
+    values <- fct(i)
+    i[, c(name)] <- values
+    return(i)
   }
   n0 <- nrow(i)
   #i[, c(name)] <- do.call(fct, i)
@@ -261,7 +266,7 @@ fctOnInput <- function(fct)
   })
 }
 saveData('BackRateOfSpread',
-         cffdrs.core:::BackRateOfSpread,
+         cffdrs:::.BROScalc,
          list(data.table(FUELTYPE=FUELTYPE),
               data.table(FFMC=FFMC),
               data.table(BUI=BUI),
@@ -337,18 +342,19 @@ saveData('DuffMoistureCode',
               data.table(mon=MON),
               data.table(lat.adjust=BOOL)))
 saveResults('OverwinterDroughtCode_test_wDC_1',
-            OverwinterDroughtCode(DCf=300,rw=110))
+            cffdrs::wDC(DCf=300,rw=110))
 saveResults('OverwinterDroughtCode_test_wDC_2',
-            OverwinterDroughtCode(DCf=300,rw=110,a=1.0,b=0.9))
+            cffdrs::wDC(DCf=300,rw=110,a=1.0,b=0.9))
 saveResults('OverwinterDroughtCode_test_wDC_3',
-            OverwinterDroughtCode(DCf=c(400,300,250), rw=c(99,110,200),
+            cffdrs::wDC(DCf=c(400,300,250), rw=c(99,110,200),
                 a=c(0.75,1.0,0.75), b=c(0.75,0.9,0.75)))
+data("test_wDC", package="cffdrs")
+data("test_wDC_fs", package="cffdrs")
 input <- test_wDC
 input <- with(input,input[order(id,yr,mon,day),])
 input$date <- as.Date(as.POSIXlt(paste(input$yr,"-",input$mon,"-",input$day,sep="")))
 #select id value 1
 input.2 <- input[input$id==2,]
-test_wDC_fs <- read.csv2('data/test_wDC_fs.csv', sep=';')
 test_wDC_fs$date <- as.Date(as.POSIXlt(paste(test_wDC_fs$yr,"-",test_wDC_fs$mon,"-",
                                              test_wDC_fs$day,sep="")))
 #match to current id value
@@ -362,25 +368,18 @@ curYr.prec <- sum(input.2[(input.2$date>winterStartDate & input.2$date < winterE
 #Assign a fall DC value
 fallDC <- 500
 saveResults('OverwinterDroughtCode_test_wDc_4',
-            OverwinterDroughtCode(DCf=fallDC,rw=curYr.prec))
+            cffdrs::wDC(DCf=fallDC,rw=curYr.prec))
 fallDC <- 250
 saveResults('OverwinterDroughtCode_test_wDc_5',
-            OverwinterDroughtCode(DCf=fallDC,rw=curYr.prec))
+            cffdrs::wDC(DCf=fallDC,rw=curYr.prec))
 saveData('OverwinterDroughtCode',
-         cffdrs.core:::OverwinterDroughtCode,
+         cffdrs::wDC,
          list(data.table(DCf=DMC),
               data.table(rw=seq(0, 1000)),
               data.table(a=FRACTION),
               data.table(b=FRACTION)))
-saveData('ShelteredDuffMoistureCode',
-         cffdrs.core:::ShelteredDuffMoistureCode,
-         list(data.table(temp=TEMP),
-              data.table(prec=PREC),
-              data.table(rh=RH),
-              data.table(mon=MON),
-              data.table(dmc=DMC)))
 saveData('sdmc',
-         cffdrs.core:::sdmc,
+         cffdrs::sdmc,
          list(data.table(dmc=DMC),
               data.table(temp=TEMP),
               data.table(prec=PREC),
@@ -390,7 +389,7 @@ saveData('sdmc',
               data.table(ws=WS)),
          split_args=FALSE)
 saveData('hffmc',
-         cffdrs.core:::hffmc,
+         cffdrs::hffmc,
          list(data.table(hr=HOURS),
               data.table(temp=TEMP),
               data.table(prec=PREC),
@@ -399,7 +398,7 @@ saveData('hffmc',
          split_args=FALSE)
 fctGFMC <- function(input)
 {
-  return(cffdrs.core:::gfmc(input, GFMCold=rep(85, length(input$temp)), out="GFMC", batch=FALSE))
+  return(cffdrs::gfmc(input, GFMCold=rep(85, length(input$temp)), out="GFMC", batch=FALSE))
 }
 saveData('gfmcGFMC',
          fctGFMC,
@@ -412,7 +411,7 @@ saveData('gfmcGFMC',
          split_args=FALSE)
 fctMC <- function(input)
 {
-  return(cffdrs.core:::gfmc(input, GFMCold=rep(85, length(input$temp)), out="MC", batch=FALSE))
+  return(cffdrs::gfmc(input, GFMCold=rep(85, length(input$temp)), out="MC", batch=FALSE))
 }
 saveData('gfmcMC',
          fctMC,
@@ -423,15 +422,20 @@ saveData('gfmcMC',
               data.table(isol=seq(0, 10000)),
               data.table(mon=MON)),
          split_args=FALSE)
+fctHFFMC <- function(input)
+{
+  return(cffdrs::hffmc(input, ffmc_old=input$ffmc_old, time.step=input$time.step, calc.step=FALSE, batch=FALSE, hourlyFWI=FALSE))
+}
 saveData('HourlyFineFuelMoistureCode',
-         cffdrs.core:::HourlyFineFuelMoistureCode,
+         fctHFFMC,
          list(data.table(temp=TEMP),
               data.table(rh=RH),
               data.table(ws=WS),
               data.table(prec=PREC),
               data.table(ffmc_old=FFMC),
-              data.table(time.step=HOURS)))
-test_fbp <- read.csv2('data/test_fbp.csv', sep=';')
+              data.table(time.step=HOURS)),
+         split_args=FALSE)
+data("test_fbp", package="cffdrs")
 test_fbp$FFMC <- as.numeric(test_fbp$FFMC)
 test_fbp$hr <- as.numeric(test_fbp$hr)
 test_fbp$WS <- as.numeric(test_fbp$WS)
@@ -440,18 +444,28 @@ test_fbp$CBH <- as.numeric(test_fbp$CBH)
 test_fbp$CFL <- as.numeric(test_fbp$CFL)
 saveResults('FireBehaviourPrediction_test_fbp',
             cffdrs:::.FBPcalc(test_fbp, "A"))
+saveResults('fbp_01', cffdrs::fbp(test_fbp))
+saveResults('fbp_02', cffdrs::fbp(test_fbp,output="Primary"))
+saveResults('fbp_03', cffdrs::fbp(test_fbp,"P"))
+saveResults('fbp_04', cffdrs::fbp(test_fbp,"Secondary"))
+saveResults('fbp_05', cffdrs::fbp(test_fbp,"S"))
+saveResults('fbp_06', cffdrs::fbp(test_fbp,"All"))
+saveResults('fbp_07', cffdrs::fbp(test_fbp,"A"))
+saveResults('fbp_08', cffdrs::fbp(test_fbp[7,]))
+saveResults('fbp_09', cffdrs::fbp(test_fbp[8:13,]))
+saveResults('fbp_10', cffdrs::fbp())
+
 saveData('FireBehaviourPrediction',
-         fctOnInput(cffdrs.core::FireBehaviourPrediction),
+         fctOnInput(cffdrs:::.FBPcalc),
          FBP_ARGS)
 saveData('FireIntensity',
          cffdrs:::.FIcalc,
          list(data.table(FC=FC),
               data.table(ROS=ROS)))
-test_wDC <- read.csv('data/test_wDC.csv', sep=';')
 input <- with(test_wDC, test_wDC[order(id,yr,mon,day),])
-saveResults('FireSeason_test_wDC_1', FireSeason(input[input$id==1,]))
-saveResults('FireSeason_test_wDC_2', FireSeason(input[input$id==1,],fs.start=10, fs.end=3))
-saveResults('FireSeason_test_wDC_3', FireSeason(input[input$id==2,],method="WF93"))
+saveResults('FireSeason_test_wDC_1', cffdrs::fireSeason(input[input$id==1,]))
+saveResults('FireSeason_test_wDC_2', cffdrs::fireSeason(input[input$id==1,],fs.start=10, fs.end=3))
+saveResults('FireSeason_test_wDC_3', cffdrs::fireSeason(input[input$id==2,],method="WF93"))
 saveData('FireWeatherIndex',
          cffdrs:::.fwiCalc,
          list(data.table(isi=ISI),
@@ -606,20 +620,8 @@ saveData('RateOfSpreadAtTime',
               data.table(ROSeq=ROS),
               data.table(HR=HR),
               data.table(CFB=CFB)))
-fctSlopeAdjust <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC,
-                           PC, PDF, CC, CBH, ISI, output)
-{
-  result <- cffdrs.core:::SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
-                                      FMC, SFC, PC, PDF, CC, CBH, ISI)
-  if ('WSV' == output)
-  {
-    return(result[["WSV"]])
-  }
-  return(result[["RAZ"]])
-  # return(result[[output]])
-}
 saveData('SlopeAdjustRAZ',
-         fctSlopeAdjust,
+         cffdrs:::.Slopecalc,
          list(data.table(FUELTYPE=FUELTYPE),
               data.table(FFMC=FFMC),
               data.table(BUI=BUI),
@@ -636,7 +638,7 @@ saveData('SlopeAdjustRAZ',
               data.table(ISI=ISI),
               data.table(output = "RAZ")))
 saveData('SlopeAdjustWSV',
-         fctSlopeAdjust,
+         cffdrs:::.Slopecalc,
          list(data.table(FUELTYPE=FUELTYPE),
               data.table(FFMC=FFMC),
               data.table(BUI=BUI),
@@ -1255,8 +1257,8 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
   #Calculate the net effective windspeed (WSV)
-  WSV0 <- cffdrs.core:::SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
-                     FMC, SFC, PC, PDF, CC, CBH, ISI)$WSV
+  WSV0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                     FMC, SFC, PC, PDF, CC, CBH, ISI, "WSV")
   return(WSV0)
 }
 saveData('FireBehaviourPrediction_WSV0',
@@ -1497,8 +1499,8 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
   #Calculate the net effective windspeed (WSV)
-  RAZ0 <- cffdrs.core:::SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
-                     FMC, SFC, PC, PDF, CC, CBH, ISI)$RAZ
+  RAZ0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
+                     FMC, SFC, PC, PDF, CC, CBH, ISI, "RAZ")
   return(RAZ0)
 }
 saveData('FireBehaviourPrediction_RAZ0',
@@ -1523,9 +1525,9 @@ saveData('CrownBaseHeight',
                data.table(CBH=CBH),
                data.table(SD=SD),
                data.table(SH=SH)))
-test_lros <- read.csv('data/test_lros.txt', sep='\t')
+data("test_lros", package="cffdrs")
 saveResults('SimardRateOfSpreadLine',
-            SimardRateOfSpreadLine(test_lros))
-test_pros <- read.csv('data/test_pros.txt', sep='\t')
+            cffdrs:::lros(test_lros))
+data("test_pros", package="cffdrs")
 saveResults('SimardRateOfSpreadPoint',
-            SimardRateOfSpreadPoint(test_pros))
+            cffdrs::pros(test_pros))

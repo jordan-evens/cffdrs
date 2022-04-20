@@ -1,3 +1,15 @@
+
+#' Hourly Fine Fuel Moisture Code Calculation
+#' 
+#' @param temp       Temperature (centigrade)
+#' @param rh         Relative Humidity (\%)
+#' @param ws         Wind speed (km/h)
+#' @param prec       Precipitation (mm)
+#' @param ffmc_old   The Fine Fuel Moisture Code from previous iteration
+#' @param time.step  Time step (hours) [default 1 hour]
+#' 
+#' @return A single hourly fine fuel moisture code value
+#' @export HourlyFineFuelMoistureCode
 HourlyFineFuelMoistureCode <- function(temp, rh, ws, prec, ffmc_old, time.step=1)
 {
   Tp <- temp
@@ -274,9 +286,9 @@ hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
       warning("Daily BUI is required to calculate hourly FWI")
     } else {
       #Calculate ISI
-      isi <- cffdrs.core::InitialSpreadIndex(f, W, FALSE)
+      isi <- InitialSpreadIndex(f, W, FALSE)
       #Calculate FWI
-      fwi <- cffdrs.core::FireWeatherIndex(isi, bui)
+      fwi <- FireWeatherIndex(isi, bui)
       #Calculate DSR
       dsr <- 0.0272 * (fwi^1.77)
       #Put all data into a data.frame to return
