@@ -36,7 +36,7 @@
 #' 1.8.16\cr Date: \tab 2020-05-26\cr License: \tab GPL-2\cr } This package
 #' includes eleven functions. Seven functions, \code{\link{fwi}},
 #' \code{\link{fwiRaster}}, \code{\link{hffmc}}, \code{\link{hffmcRaster}},
-#' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{gfmc}},
+#' \code{\link{sdmc}}, \code{\link{gfmc}},
 #' and \code{\link{OverwinterDroughtCode}} are used for
 #' FWI System calculation, whereas two functions, \code{\link{fbp}} and
 #' \code{\link{fbpRaster}} are used for FBP System calculation. One function,
@@ -69,7 +69,7 @@
 #' \code{\link{hffmc}},
 #' \code{\link{hffmcRaster}}, \code{\link{lros}},
 #' \code{\link{pros}},
-#' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{OverwinterDroughtCode}}
+#' \code{\link{sdmc}}, \code{\link{OverwinterDroughtCode}}
 #' @references 1. Van Wagner, C.E. and T.L. Pickett. 1985. Equations and
 #' FORTRAN program for the Canadian Forest Fire Weather Index System. Can. For.
 #' Serv., Ottawa, Ont. For. Tech. Rep. 33. 18 p.
