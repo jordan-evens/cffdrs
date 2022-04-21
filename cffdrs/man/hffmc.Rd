@@ -179,7 +179,7 @@ Information Report PS-X-69.
 \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/25591.pdf}
 }
 \seealso{
-\code{\link{FireBehaviourPrediction}}, \code{\link{fwi}}, \code{\link{hffmcRaster}}
+\code{\link{fbp}}, \code{\link{fwi}}, \code{\link{hffmcRaster}}
 }
 \author{
 Xianli Wang, Mike Wotton, Alan Cantin, Brett Moore, and Mike

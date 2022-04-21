@@ -38,7 +38,7 @@
 #' \code{\link{fwiRaster}}, \code{\link{hffmc}}, \code{\link{hffmcRaster}},
 #' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{gfmc}},
 #' and \code{\link{OverwinterDroughtCode}} are used for
-#' FWI System calculation, whereas two functions, \code{\link{FireBehaviourPrediction}} and
+#' FWI System calculation, whereas two functions, \code{\link{fbp}} and
 #' \code{\link{fbpRaster}} are used for FBP System calculation. One function,
 #' \code{\link{FireSeason}} determines fire season start and end dates based on
 #' weather. Two functions \code{\link{SimardRateOfSpreadPoint}} and
@@ -64,7 +64,7 @@
 #' Anderson, Brett Moore, Tom Schiks, Mike Flannigan, and Jordan Evens
 #'
 #' Maintainer: Jordan Evens \email{jordan.evens@nrcan-rncan.gc.ca}
-#' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{FireSeason}},
+#' @seealso \code{\link{fbp}}, \code{\link{FireSeason}},
 #' \code{\link{fwi}},
 #' \code{\link{fwiRaster}}, \code{\link{gfmc}},
 #' \code{\link{hffmc}},

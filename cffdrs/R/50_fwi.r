@@ -126,7 +126,7 @@
 #' @author Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
 #' Anderson, and Mike Flannigan
 #' 
-#' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{fwiRaster}}, \code{\link{gfmc}},
+#' @seealso \code{\link{fbp}}, \code{\link{fwiRaster}}, \code{\link{gfmc}},
 #' \code{\link{hffmc}}, \code{\link{hffmcRaster}}, \code{\link{sdmc}},
 #' \code{\link{OverwinterDroughtCode}}, \code{\link{FireSeason}}
 #' 

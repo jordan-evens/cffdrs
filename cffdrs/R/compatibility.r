@@ -258,19 +258,3 @@ lros <- function(input)
   .Deprecated("SimardRateOfSpreadLine")
   return(SimardRateOfSpreadLine(input))
 }
-
-#' @noRd
-fbp  <- function(input = NULL, output = "Primary", m = NULL, cores = 1)
-{
-  .Deprecated("FireBehaviourPrediction")
-  #hack to avoid Note about no visible binding for global variable ID
-  #http://stackoverflow.com/questions/9439256/how-can-i-handle-r-cmd-check-no-visible-binding-for-global-variable-notes-when
-  #look at the globalvariables() option or others in place of this issue
-  # do not remove this comment until resolved
-  if (!is.na(charmatch("input", search()))) {
-    detach(input)
-  }
-  fullList <- FireBehaviourPrediction(input, output = output)
-  
-  return(fullList)
-}

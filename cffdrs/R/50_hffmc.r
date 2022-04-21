@@ -102,7 +102,7 @@
 #' weatherstream as well as the hourly or sub-hourly FFMC, ISI, FWI, and DSR.
 #' @author Xianli Wang, Mike Wotton, Alan Cantin, Brett Moore, and Mike
 #' Flannigan
-#' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{fwi}}, \code{\link{hffmcRaster}}
+#' @seealso \code{\link{fbp}}, \code{\link{fwi}}, \code{\link{hffmcRaster}}
 #' @references Van Wagner, C.E. 1977. A method of computing fine fuel moisture
 #' content throughout the diurnal cycle. Environment Canada, Canadian Forestry
 #' Service, Petawawa Forest Experiment Station, Chalk River, Ontario.
