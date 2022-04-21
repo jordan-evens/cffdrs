@@ -4,7 +4,7 @@
 \alias{fbpRaster}
 \title{Raster-based Fire Behavior Prediction System Calculations}
 \usage{
-fbpRaster(input, output = "Primary", select = NULL, m = NULL, cores = 1)
+fbpRaster(input, output = "Primary", select = NULL)
 }
 \arguments{
 \item{input}{The input data, a RasterStack containing fuel types, fire
@@ -79,19 +79,6 @@ section):
 }}
 
 \item{select}{Selected outputs}
-
-\item{m}{Optimal number of pixels at each iteration of computation when
-\code{ncell(input) >= 1000}. Default m = NULL, where the function will
-assign m = 1000 when \code{ncell(input)} is between 1000 and 500,000, and
-m=3000 otherwise. By including this option, the function is able to process
-large dataset more efficiently. The optimal value may vary with different
-computers.}
-
-\item{cores}{Number of CPU cores (integer) used in the computation, default
-is 1.  By signing \code{cores > 1}, the function will apply parallel
-computation technique provided by the \code{foreach} package, which
-significantly reduces the computation time for large input data (over a
-million grid points). For small dataset, \code{cores=1} is actually faster.}
 }
 \value{
 Either Primary, Secondary, or all FBP outputs in a raster stack
@@ -250,9 +237,9 @@ will still work.
 # The dataset is the standard test data for FBP system
 # provided by Wotton et al (2009), and randomly assigned
 # to a stack of raster layers
-test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
+test_fbpRaster <- rast(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
 input<-test_fbpRaster
-# Stack doesn't hold the raster layer names, we have to assign
+# Rast doesn't hold the raster layer names, we have to assign
 # them:
 names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
 "PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")

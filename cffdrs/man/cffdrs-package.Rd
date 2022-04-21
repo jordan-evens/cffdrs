@@ -43,7 +43,7 @@ major vegetation types in Canada.
 1.8.16\cr Date: \tab 2020-05-26\cr License: \tab GPL-2\cr } This package
 includes eleven functions. Seven functions, \code{\link{FireWeatherIndices}},
 \code{\link{fwiRaster}}, \code{\link{HourlyFineFuelMoistureCode}}, \code{\link{hffmcRaster}},
-\code{\link{ShelteredDuffMoistureCode}}, \code{\link{GrassFuelMoistureCode}},
+\code{\link{ShelteredDuffMoistureCode}}, \code{\link{gfmc}},
 and \code{\link{OverwinterDroughtCode}} are used for
 FWI System calculation, whereas two functions, \code{\link{FireBehaviourPrediction}} and
 \code{\link{fbpRaster}} are used for FBP System calculation. One function,
@@ -180,7 +180,7 @@ Inf. Rep. NOR-X-417.
 \seealso{
 \code{\link{FireBehaviourPrediction}}, \code{\link{FireSeason}},
 \code{\link{FireWeatherIndices}},
-\code{\link{fwiRaster}}, \code{\link{GrassFuelMoistureCode}},
+\code{\link{fwiRaster}}, \code{\link{gfmc}},
 \code{\link{HourlyFineFuelMoistureCode}},
 \code{\link{hffmcRaster}}, \code{\link{SimardRateOfSpreadLine}},
 \code{\link{SimardRateOfSpreadPoint}},

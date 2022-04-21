@@ -14,7 +14,7 @@ fwiRaster(
 )
 }
 \arguments{
-\item{input}{A stack or brick containing rasterized daily weather
+\item{input}{A c (terra), stack (raster), or brick (raster) containing rasterized daily weather
 observations taken at noon LST. Variable names have to be the same as in the
 following list, but they are case insensitive. The order in which the inputs
 are entered is not important.
@@ -30,7 +30,7 @@ __default=55__)\cr
 \tab 24-hour rainfall (mm)\cr }}
 
 \item{init}{A vector that contains the initial values for FFMC, DMC, and DC
-or a stack that contains raster maps of the three moisture codes calculated
+or a c, stack or brick that contains raster maps of the three moisture codes calculated
 for the previous day, which will be used for the current day's calculation.
 Defaults are the standard initial values for FFMC, DMC, and DC defined as
 the following: 
@@ -47,8 +47,8 @@ latitude adjustment (\code{lat.adjust}), it is therefore recommended when
 \code{lat.adjust=TRUE} was chosen.}
 
 \item{out}{The function offers two output options, \code{out="all"} will
-produce a raster stack include both the input and the FWI System outputs;
-\code{out="fwi"} will generate a stack with only the FWI system components.}
+produce a raster c include both the input and the FWI System outputs;
+\code{out="fwi"} will generate a c or brick with only the FWI system components.}
 
 \item{lat.adjust}{The function offers options for whether latitude
 adjustments to day lengths should be applied to the calculations. The
@@ -58,7 +58,7 @@ default value is "TRUE".}
 this argument. Default is TRUE.}
 }
 \value{
-By default, \code{fwi} returns a raster stack which includes both
+By default, \code{fwi} returns a raster c which includes both
 the input and the FWI System variables, as describe below: \item{Inputs
 }{Including \code{temp}, \code{rh}, \code{ws}, and \code{prec} with
 \code{lat} as optional.} \item{ffmc }{Fine Fuel Moisture Code} \item{dmc
@@ -124,11 +124,11 @@ different parts of the world.
 \examples{
 
 library(cffdrs)
-require(raster)
-# The test data is a stack with four input variables including 
+require(terra)
+# The test data is a c with four input variables including 
 # daily noon temp, rh, ws, and prec (we recommend tif format):
 day01src <- system.file("extdata","test_rast_day01.tif",package="cffdrs")
-day01 <- stack(day01src)
+day01 <- rast(day01src)
 day01 <- crop(day01,c(250,255,47,51))
 # assign variable names:
 names(day01)<-c("temp","rh","ws","prec")
@@ -137,7 +137,7 @@ foo<-fwiRaster(day01)
 plot(foo)
 ### Additional, longer running examples ###
 # (2) use initial values with larger raster
-day01 <- stack(day01src)
+day01 <- c(day01src)
 names(day01)<-c("temp","rh","ws","prec")
 \donttest{foo<-fwiRaster(day01)}
 plot(foo)
