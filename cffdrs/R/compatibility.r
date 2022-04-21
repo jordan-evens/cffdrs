@@ -274,12 +274,3 @@ fbp  <- function(input = NULL, output = "Primary", m = NULL, cores = 1)
   
   return(fullList)
 }
-
-
-#' @noRd
-fwi <- function(input, init = data.frame(ffmc = 85, dmc = 6, dc = 15, lat = 55),
-                batch = TRUE, out = "all", lat.adjust = TRUE, uppercase = TRUE)
-{
-  .Deprecated("FireWeatherIndices")
-  return(FireWeatherIndices(input, init, batch, out, lat.adjust, uppercase))
-}

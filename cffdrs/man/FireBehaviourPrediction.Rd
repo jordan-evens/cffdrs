@@ -165,7 +165,7 @@ slope. Fire weather, for the purpose of FBP System calculation, comprises
 observations of 10 m wind speed and direction at the time of the fire, and
 two associated outputs from the Fire Weather Index System, the Fine Fuel
 Moisture Content (FFMC) and Buildup Index (BUI). FWI System components can
-be calculated with the sister function \code{\link{FireWeatherIndices}}.
+be calculated with the sister function \code{\link{fwi}}.
 }
 \details{
 The Canadian Forest Fire Behavior Prediction (FBP) System (Forestry Canada
@@ -275,7 +275,7 @@ Model. Nat. Resour. Can., Can. For. Serv., North. For. Cent., Edmonton, AB.
 Inf. Rep. NOR-X-417.\url{https://d1ied5g1xfgpx8.cloudfront.net/pdfs/31775.pdf}
 }
 \seealso{
-\code{\link{FireWeatherIndices}, \link{fbpRaster}}
+\code{\link{fwi}, \link{fbpRaster}}
 }
 \author{
 Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry

@@ -3,8 +3,7 @@
 #' \code{gfmc} calculates both the moisture content of the surface of a fully
 #' cured matted grass layer and also an equivalent Grass Fuel Moisture Code
 #' (gfmc) (Wotton, 2009) to create a parallel with the hourly ffmc (see the
-#' \code{\link{FireWeatherIndices}} and \code{\link{hffmc}}
-#' functions). The calculation is
+#' \code{\link{fwi}} and \code{\link{hffmc}} functions). The calculation is
 #' based on hourly (or sub-hourly) weather observations of temperature,
 #' relative humidity, wind speed, rainfall, and solar radiation. The user must
 #' also estimate an initial value of the gfmc for the layer. This function
@@ -68,7 +67,7 @@
 #' @return \code{gfmc} returns GFMC and moisture content (MC) values
 #' collectively (default) or separately.
 #' @author Xianli Wang, Mike Wotton, Alan Cantin, and Mike Flannigan
-#' @seealso \code{\link{FireWeatherIndices}}, \code{\link{hffmc}}
+#' @seealso \code{\link{fwi}}, \code{\link{hffmc}}
 #' @references Wotton, B.M. 2009. A grass moisture model for the Canadian
 #' Forest Fire Danger Rating System. In: Proceedings 8th Fire and Forest
 #' Meteorology Symposium, Kalispell, MT Oct 13-15, 2009. Paper 3-2.

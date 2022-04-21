@@ -109,7 +109,7 @@ Meteorol., 29 Apr.-3 May 1985, Detroit, MI. Soc. Am. For., Bethesda, MD.
 \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/23550.pdf}
 }
 \seealso{
-\code{\link{FireWeatherIndices}}, \code{\link{FireSeason}}
+\code{\link{fwi}}, \code{\link{FireSeason}}
 }
 \author{
 Xianli Wang, Mike Wotton, Alan Cantin, and Mike Flannigan

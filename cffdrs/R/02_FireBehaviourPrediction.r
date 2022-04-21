@@ -172,7 +172,7 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
 #' observations of 10 m wind speed and direction at the time of the fire, and
 #' two associated outputs from the Fire Weather Index System, the Fine Fuel
 #' Moisture Content (FFMC) and Buildup Index (BUI). FWI System components can
-#' be calculated with the sister function \code{\link{FireWeatherIndices}}.
+#' be calculated with the sister function \code{\link{fwi}}.
 #' 
 #' The Canadian Forest Fire Behavior Prediction (FBP) System (Forestry Canada
 #' Fire Danger Group 1992) is a subsystem of the Canadian Forest Fire Danger
@@ -371,7 +371,7 @@ fctFBP <- Vectorize(function(FUELTYPE, output, ID, HR, LAT, LONG, CBH, SD, SH, C
 #' (2009).
 #' @author Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
 #' Anderson, and Mike Flannigan
-#' @seealso \code{\link{FireWeatherIndices}, \link{fbpRaster}}
+#' @seealso \code{\link{fwi}, \link{fbpRaster}}
 #' @references 1.  Hirsch K.G. 1996. Canadian Forest Fire Behavior Prediction
 #' (FBP) System: user's guide. Nat. Resour. Can., Can. For. Serv., Northwest
 #' Reg., North. For. Cent., Edmonton, Alberta. Spec. Rep. 7. 122p.

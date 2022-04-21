@@ -32,7 +32,7 @@
 #' (view table below)
 #' @return \code{OverwinterDroughtCode} returns either a single value or a vector of wDC values.
 #' @author Xianli Wang, Mike Wotton, Alan Cantin, and Mike Flannigan
-#' @seealso \code{\link{FireWeatherIndices}}, \code{\link{FireSeason}}
+#' @seealso \code{\link{fwi}}, \code{\link{FireSeason}}
 #' @references Lawson B.D. and Armitage O.B. 2008. Weather Guide for the
 #' Canadian Forest Fire Danger Rating System. Natural Resources Canada,
 #' Canadian Forest Service, Northern Forestry Centre, Edmonton, Alberta. 84 p.

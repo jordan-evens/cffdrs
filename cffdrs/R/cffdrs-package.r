@@ -34,7 +34,7 @@
 #'
 #' \tabular{ll}{ Package: \tab cffdrs\cr Type: \tab Package\cr Version: \tab
 #' 1.8.16\cr Date: \tab 2020-05-26\cr License: \tab GPL-2\cr } This package
-#' includes eleven functions. Seven functions, \code{\link{FireWeatherIndices}},
+#' includes eleven functions. Seven functions, \code{\link{fwi}},
 #' \code{\link{fwiRaster}}, \code{\link{hffmc}}, \code{\link{hffmcRaster}},
 #' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{gfmc}},
 #' and \code{\link{OverwinterDroughtCode}} are used for
@@ -65,7 +65,7 @@
 #'
 #' Maintainer: Jordan Evens \email{jordan.evens@nrcan-rncan.gc.ca}
 #' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{FireSeason}},
-#' \code{\link{FireWeatherIndices}},
+#' \code{\link{fwi}},
 #' \code{\link{fwiRaster}}, \code{\link{gfmc}},
 #' \code{\link{hffmc}},
 #' \code{\link{hffmcRaster}}, \code{\link{SimardRateOfSpreadLine}},

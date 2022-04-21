@@ -5,7 +5,7 @@
 #' is based on a calculation routine first described in detail by Van Wagner
 #' (1977) and which has been updated in minor ways by the Canadian Forest
 #' Service to have it agree with the calculation methodology for the daily FFMC
-#' (see \code{\link{FireWeatherIndices}}).  In its simplest typical use this current routine
+#' (see \code{\link{fwi}}).  In its simplest typical use this current routine
 #' calculates a value of FFMC based on a series of uninterrupted hourly weather
 #' observations of screen level (~1.4 m) temperature, relative humidity, 10 m
 #' wind speed, and 1-hour rainfall. This implementation of the function
@@ -17,7 +17,7 @@
 #' weather stations.
 #'
 #' The hourly FFMC is very similar in its structure and calculation to the
-#' Canadian Forest Fire Weather Index System's daily FFMC (\code{\link{FireWeatherIndices}})
+#' Canadian Forest Fire Weather Index System's daily FFMC (\code{\link{fwi}})
 #' but has an altered drying and wetting rate which more realistically reflects
 #' the drying and wetting of a pine needle litter layer sitting on a decaying
 #' organic layer.  This particular implementation of the Canadian Forest Fire
@@ -102,7 +102,7 @@
 #' weatherstream as well as the hourly or sub-hourly FFMC, ISI, FWI, and DSR.
 #' @author Xianli Wang, Mike Wotton, Alan Cantin, Brett Moore, and Mike
 #' Flannigan
-#' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{FireWeatherIndices}}, \code{\link{hffmcRaster}}
+#' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{fwi}}, \code{\link{hffmcRaster}}
 #' @references Van Wagner, C.E. 1977. A method of computing fine fuel moisture
 #' content throughout the diurnal cycle. Environment Canada, Canadian Forestry
 #' Service, Petawawa Forest Experiment Station, Chalk River, Ontario.
