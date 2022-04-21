@@ -236,17 +236,3 @@ wDC <- function(DCf = 100, rw = 200, a = 0.75, b = 0.75)
   .Deprecated("OverwinterDroughtCode")
   return(OverwinterDroughtCode(DCf, rw, a, b))
 }
-
-#' @noRd
-pros <- function(input)
-{
-  .Deprecated("SimardRateOfSpreadPoint")
-  return(SimardRateOfSpreadPoint(input))
-}
-
-#' @noRd
-lros <- function(input)
-{
-  .Deprecated("SimardRateOfSpreadLine")
-  return(SimardRateOfSpreadLine(input))
-}

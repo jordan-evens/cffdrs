@@ -48,8 +48,7 @@ and \code{\link{OverwinterDroughtCode}} are used for
 FWI System calculation, whereas two functions, \code{\link{fbp}} and
 \code{\link{fbpRaster}} are used for FBP System calculation. One function,
 \code{\link{fireSeason}} determines fire season start and end dates based on
-weather. Two functions \code{\link{SimardRateOfSpreadPoint}} and
-\code{\link{SimardRateOfSpreadLine}} are rate of
+weather. Two functions \code{\link{pros}} and \code{\link{lros}} are rate of
 spread and direction calculations across triangles. These functions are not
 fully independent: their inputs overlap greatly and the users will have to
 provide FWI System outputs to calculate FBP System outputs. The fwi,
@@ -182,8 +181,8 @@ Inf. Rep. NOR-X-417.
 \code{\link{fwi}},
 \code{\link{fwiRaster}}, \code{\link{gfmc}},
 \code{\link{hffmc}},
-\code{\link{hffmcRaster}}, \code{\link{SimardRateOfSpreadLine}},
-\code{\link{SimardRateOfSpreadPoint}},
+\code{\link{hffmcRaster}}, \code{\link{lros}},
+\code{\link{pros}},
 \code{\link{ShelteredDuffMoistureCode}}, \code{\link{OverwinterDroughtCode}}
 }
 \author{
