@@ -283,12 +283,3 @@ fwi <- function(input, init = data.frame(ffmc = 85, dmc = 6, dc = 15, lat = 55),
   .Deprecated("FireWeatherIndices")
   return(FireWeatherIndices(input, init, batch, out, lat.adjust, uppercase))
 }
-
-#' @noRd
-hffmc <- function(weatherstream, ffmc_old = 85, time.step = 1,
-                  calc.step = FALSE, batch = TRUE, hourlyFWI = FALSE)
-{
-  .Deprecated("HourlyFineFuelMoistureCode")
-  return(HourlyFineFuelMoistureCode(weatherstream, ffmc_old, time.step,
-                                    calc.step, batch, hourlyFWI))
-}

@@ -35,7 +35,7 @@
 #' \tabular{ll}{ Package: \tab cffdrs\cr Type: \tab Package\cr Version: \tab
 #' 1.8.16\cr Date: \tab 2020-05-26\cr License: \tab GPL-2\cr } This package
 #' includes eleven functions. Seven functions, \code{\link{FireWeatherIndices}},
-#' \code{\link{fwiRaster}}, \code{\link{HourlyFineFuelMoistureCode}}, \code{\link{hffmcRaster}},
+#' \code{\link{fwiRaster}}, \code{\link{hffmc}}, \code{\link{hffmcRaster}},
 #' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{gfmc}},
 #' and \code{\link{OverwinterDroughtCode}} are used for
 #' FWI System calculation, whereas two functions, \code{\link{FireBehaviourPrediction}} and
@@ -67,7 +67,7 @@
 #' @seealso \code{\link{FireBehaviourPrediction}}, \code{\link{FireSeason}},
 #' \code{\link{FireWeatherIndices}},
 #' \code{\link{fwiRaster}}, \code{\link{gfmc}},
-#' \code{\link{HourlyFineFuelMoistureCode}},
+#' \code{\link{hffmc}},
 #' \code{\link{hffmcRaster}}, \code{\link{SimardRateOfSpreadLine}},
 #' \code{\link{SimardRateOfSpreadPoint}},
 #' \code{\link{ShelteredDuffMoistureCode}}, \code{\link{OverwinterDroughtCode}}
