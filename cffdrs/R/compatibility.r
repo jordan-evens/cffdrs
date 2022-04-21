@@ -238,14 +238,6 @@ wDC <- function(DCf = 100, rw = 200, a = 0.75, b = 0.75)
 }
 
 #' @noRd
-fireSeason <- function(input, fs.start = 12, fs.end = 5, method = "WF93", 
-                       consistent.snow = FALSE, multi.year = FALSE)
-{
-  .Deprecated("FireSeason")
-  return(FireSeason(input, fs.start, fs.end, method, consistent.snow, multi.year))
-}
-
-#' @noRd
 pros <- function(input)
 {
   .Deprecated("SimardRateOfSpreadPoint")

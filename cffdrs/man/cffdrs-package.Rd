@@ -47,7 +47,7 @@ includes eleven functions. Seven functions, \code{\link{fwi}},
 and \code{\link{OverwinterDroughtCode}} are used for
 FWI System calculation, whereas two functions, \code{\link{fbp}} and
 \code{\link{fbpRaster}} are used for FBP System calculation. One function,
-\code{\link{FireSeason}} determines fire season start and end dates based on
+\code{\link{fireSeason}} determines fire season start and end dates based on
 weather. Two functions \code{\link{SimardRateOfSpreadPoint}} and
 \code{\link{SimardRateOfSpreadLine}} are rate of
 spread and direction calculations across triangles. These functions are not
@@ -178,7 +178,7 @@ Model. Nat. Resour. Can., Can. For. Serv., North. For. Cent., Edmonton, AB.
 Inf. Rep. NOR-X-417.
 }
 \seealso{
-\code{\link{fbp}}, \code{\link{FireSeason}},
+\code{\link{fbp}}, \code{\link{fireSeason}},
 \code{\link{fwi}},
 \code{\link{fwiRaster}}, \code{\link{gfmc}},
 \code{\link{hffmc}},
