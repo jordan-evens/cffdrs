@@ -1,6 +1,6 @@
 #' Overwintering Drought Code
 #'
-#' \code{OverwinterDroughtCode} calculates an initial or season starting Drought
+#' \code{wDC} calculates an initial or season starting Drought
 #' Code (DC) value based on a standard method of overwintering the Drought Code
 #' (Lawson and Armitage 2008).  This method uses the final DC value from
 #' previous year, over winter precipitation and estimates of how much
@@ -30,7 +30,7 @@
 #' below)
 #' @param b User selected values accountain for wetting efficiency fraction
 #' (view table below)
-#' @return \code{OverwinterDroughtCode} returns either a single value or a vector of wDC values.
+#' @return \code{wDC} returns either a single value or a vector of wDC values.
 #' @author Xianli Wang, Mike Wotton, Alan Cantin, and Mike Flannigan
 #' @seealso \code{\link{fwi}}, \code{\link{fireSeason}}
 #' @references Lawson B.D. and Armitage O.B. 2008. Weather Guide for the
@@ -50,14 +50,14 @@
 #' data("test_wDC")
 #' # (1) Simple case previous fall's DC was 300, overwinter
 #' # rain 110mm
-#' winter_DC <- OverwinterDroughtCode(DCf=300,rw=110)
+#' winter_DC <- wDC(DCf=300,rw=110)
 #' winter_DC
 #' #(2) modified a and b parameters. Find table values in listed
 #' # reference for Lawson and Armitage, 2008.
-#' winter_DC <- OverwinterDroughtCode(DCf=300,rw=110,a=1.0,b=0.9)
+#' winter_DC <- wDC(DCf=300,rw=110,a=1.0,b=0.9)
 #' winter_DC
 #' #(3)with multiple inputs:
-#' winter_DC <- OverwinterDroughtCode(DCf=c(400,300,250), rw=c(99,110,200),
+#' winter_DC <- wDC(DCf=c(400,300,250), rw=c(99,110,200),
 #'                    a=c(0.75,1.0,0.75), b=c(0.75,0.9,0.75))
 #' winter_DC
 #' #(4) A realistic example:
@@ -85,16 +85,16 @@
 #' #Assign a fall DC value
 #' fallDC <- 500
 #' #calculate winter DC
-#' winter_DC <- OverwinterDroughtCode(DCf=fallDC,rw=curYr.prec)
+#' winter_DC <- wDC(DCf=fallDC,rw=curYr.prec)
 #' winter_DC
 #' #Assign a different fall DC value
 #' fallDC <- 250
 #' #calculate winter DC
-#' winter_DC <- OverwinterDroughtCode(DCf=fallDC,rw=curYr.prec,a=1.0)
+#' winter_DC <- wDC(DCf=fallDC,rw=curYr.prec,a=1.0)
 #' winter_DC
 #'
-#' @export OverwinterDroughtCode
-OverwinterDroughtCode <- function(DCf = 100, rw = 200, a = 0.75, b = 0.75) {
+#' @export wDC
+wDC <- function(DCf = 100, rw = 200, a = 0.75, b = 0.75) {
   #############################################################################
   # Description:
   #   Computes the over wintering Drought Code (DC) value.

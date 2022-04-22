@@ -23,8 +23,8 @@
 #' calculations to proceed.
 #' 
 #' This fire season length definition can also feed in to the overwinter DC
-#' calculations (\link{OverwinterDroughtCode}). View the cffdrs package help files for an example
-#' of using the \code{fireSeason}, \link{OverwinterDroughtCode}, and \link{fwi} functions in
+#' calculations (\link{wDC}). View the cffdrs package help files for an example
+#' of using the \code{fireSeason}, \link{wDC}, and \link{fwi} functions in
 #' conjunction.
 #' 
 #' @param input A data.frame containing input variables of including the
@@ -60,7 +60,7 @@
 #' 
 #' @author Alan Cantin, Xianli Wang, Mike Wotton, and Mike Flannigan
 #' 
-#' @seealso \code{\link{fwi}, \link{OverwinterDroughtCode}}
+#' @seealso \code{\link{fwi}, \link{wDC}}
 #' 
 #' @references Wotton, B.M. and Flannigan, M.D. (1993). Length of the fire
 #' season in a changing climate. Forestry Chronicle, 69, 187-192.

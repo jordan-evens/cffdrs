@@ -44,7 +44,7 @@ major vegetation types in Canada.
 includes eleven functions. Seven functions, \code{\link{fwi}},
 \code{\link{fwiRaster}}, \code{\link{hffmc}}, \code{\link{hffmcRaster}},
 \code{\link{sdmc}}, \code{\link{gfmc}},
-and \code{\link{OverwinterDroughtCode}} are used for
+and \code{\link{wDC}} are used for
 FWI System calculation, whereas two functions, \code{\link{fbp}} and
 \code{\link{fbpRaster}} are used for FBP System calculation. One function,
 \code{\link{fireSeason}} determines fire season start and end dates based on
@@ -113,7 +113,7 @@ fwi_fs_wDC <- function(input){
       #accumulate precipitation for the period between end of last and start of current
       curYr.owdata <- sum(input[(input$date>curYr.owd[1,"date"] &
                           input$date < curYr.owd[2,"date"]),]$prec)
-      owDC <- OverwinterDroughtCode(DCf=tail(curYr.fwi$DC,n=1),rw=curYr.owdata) #calculate overwinter DC value
+      owDC <- wDC(DCf=tail(curYr.fwi$DC,n=1),rw=curYr.owdata) #calculate overwinter DC value
       curYr.init <- data.frame(ffmc=80,dmc=10,dc=owDC) #Initialize moisture codes
     }
 
@@ -132,7 +132,7 @@ fwi_fs_wDC <- function(input){
 }
 
 ##Usage of the custom function
-# Load the test dataset, which is also the test data for OverwinterDroughtCode:
+# Load the test dataset, which is also the test data for wDC:
 data("test_wDC")
 #select 1 weather station
 localWX_1 <- test_wDC[test_wDC$id==1,]
@@ -183,7 +183,7 @@ Inf. Rep. NOR-X-417.
 \code{\link{hffmc}},
 \code{\link{hffmcRaster}}, \code{\link{lros}},
 \code{\link{pros}},
-\code{\link{sdmc}}, \code{\link{OverwinterDroughtCode}}
+\code{\link{sdmc}}, \code{\link{wDC}}
 }
 \author{
 Xianli Wang, Alan Cantin, Marc-André Parisien, Mike Wotton, Kerry
