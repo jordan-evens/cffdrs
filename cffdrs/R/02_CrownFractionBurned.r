@@ -16,10 +16,10 @@
 #' 
 #' @return CFB
 #' @export CrownFractionBurned
-CrownFractionBurned <- function(FUELTYPE, ROS, RSO)
+CrownFractionBurned <- Vectorize(function(FUELTYPE, ROS, RSO)
 {
   return(.CrownFractionBurned(FUELS[[FUELTYPE]], ROS, RSO))
-}
+})
 .CrownFractionBurned..FuelBase <- function(this, ROS, RSO)
 {
   #Eq. 58 (FCFDG 1992) Crown fraction burned 

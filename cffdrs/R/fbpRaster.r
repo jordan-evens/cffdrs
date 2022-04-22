@@ -253,7 +253,7 @@
 #' # Rast doesn't hold the raster layer names, we have to assign
 #' # them:
 #' names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
-#' "PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
+#' "PDF","GFL","cc","theta","Accel","Aspect","BUIEFF","CBH","CFL","ISI")
 #' # Primary outputs:
 #' system.time(foo<-fbpRaster(input = input))
 #' # Using the "select" option:
@@ -283,6 +283,8 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
     detach(input)
   }
   input_raster <- F
+  input_orig <- input
+  input <- copy(input)
   # This will detect if the user has input rasters and will return rasters even
   # though the whole function will operate with terra. This will deprecate with
   # raster.
@@ -323,10 +325,380 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   }
   names(input) <- toupper(names(input))
   output <- toupper(output)
+  # callFBP <- Vectorize(function(FUELTYPE, LAT, LONG, ELV, FFMC, BUI, WS, WD, GS, DJ, D0, HR, PC, PDF, GFL, CC, THETA, ACCEL, ASPECT, BUIEFF, CBH, CFL, ISI)
+  # {
+  #   output <- "ALL"
+  #   ID <- 1
+  #   SD <- NULL
+  #   SH <- NULL
+  #   FMC <- NULL
+  #   return(.FireBehaviourPrediction(FUELS[[FUELTYPE]], output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WD, ASPECT, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA))
+  # }
+  # )
+  # FBP <- lapp(x = input,
+  #             fun = callFBP)
+  #             
   
-  FBP <- lapp(x = input,
-              fun = Vectorize(FireBehaviourPrediction))
-              
+  #######################################################################################################################
+  #######################
+  
+  #set local scope variables from the parameters for simpler to referencing
+  names(input) <- toupper(names(input))
+  ID <- input$ID
+  ############################################################################
+  #                         BEGIN
+  # Set warnings for missing and required input variables.
+  # Set defaults for inputs that are not already set.
+  ############################################################################
+  defaults <- c("FUELTYPE"=2,
+                "FFMC"=90,
+                "BUI"=60,
+                "WS"=10,
+                "GS"=0,
+                "LAT"=55,
+                "LONG"=-120,
+                "DJ"=180,
+                "ASPECT"=0)
+  for (i in 1:length(defaults))
+  {
+    name <- names(defaults)[[i]]
+    default <- defaults[[i]]
+    if (!(name %in% names(input)))
+    {
+      warning(paste0(name, " is a required input, default ", name, " = ",
+                     default, " is used in the calculation"))
+      input[[name]] <- default
+    }
+  }
+  non_null_defaults <- c("WD"=0,
+                         "FMC"=0,
+                         "ELV"=0,
+                         "SD"=0,
+                         "SH"=0,
+                         "D0"=0,
+                         "HR"=1,
+                         "PC"=50,
+                         "PDF"=35,
+                         "GFL"=0.35,
+                         "CC"=80,
+                         "THETA"=0,
+                         "BUIEFF"=1,
+                         "CBH"=0,
+                         "CFL"=0,
+                         "ISI"=0)
+  for (i in 1:length(non_null_defaults))
+  {
+    name <- names(non_null_defaults)[[i]]
+    default <- non_null_defaults[[i]]
+    if (!(name %in% names(input)))
+    {
+      warning(paste0(name, " is a required input, default ", name, " = ",
+                     default, " is used in the calculation"))
+      input[[name]] <- default
+    }
+    subst(input[[name]], NA, default)
+  }
+  #Convert Wind Direction from degrees to radians
+  input[["WD"]] <- input[["WD"]] * pi/180
+  #Convert Theta from degrees to radians
+  input[["THETA"]] <- input[["THETA"]] * pi/180
+  input[["ASPECT"]] <- subst(input[["ASPECT"]], NA, 0)
+  input[["ASPECT"]] <- input[["ASPECT"]] %% 360
+  #Convert Aspect from degrees to radians
+  input[["ASPECT"]] <- input[["ASPECT"]] * pi/180
+  # ACCEL <- ifelse(is.na(ACCEL) | ACCEL < 0, 0, ACCEL)
+  # if (length(ACCEL[!ACCEL %in% c(0, 1)]) > 0) 
+  #   warning("Input variable Accel is out of range, will be assigned to 1")
+  # ACCEL <- ifelse(!ACCEL %in% c(0, 1), 1, ACCEL)
+  input[["DJ"]] <- classify(input[["DJ"]], rbind(c(-Inf, 0, 0), c(366, Inf, 0)), right=NA)
+  input[["DJ"]] <- subst(input[["DJ"]], NA, 180)
+  input[["D0"]] <- classify(input[["D0"]], rbind(c(-Inf, 0, 0), c(366, Inf, 0)), right=NA)
+  input[["ELV"]] <- classify(input[["ELV"]], rbind(c(-Inf, 0, 0), c(10000, Inf, 0)), right=NA)
+  input[["ELV"]] <- subst(input[["ELV"]], NA, 0)
+  input[["BUIEFF"]] <- classify(input[["BUIEFF"]], c(-Inf, 0, 0))
+  input[["BUIEFF"]] <- subst(input[["BUIEFF"]], NA, 1)
+  input[["HR"]] <- abs(input[["HR"]])
+  input[["HR"]] <- classify(input[["HR"]], c(366 * 24, Inf, 24), right=NA)
+  input[["FFMC"]] <- classify(input[["FFMC"]], rbind(c(-Inf, 0, 0), c(101, Inf, 0)), right=NA)
+  input[["ISI"]] <- classify(input[["ISI"]], rbind(c(-Inf, 0, 0), c(300, Inf, 0)), right=NA)
+  input[["BUI"]] <- classify(input[["BUI"]], rbind(c(-Inf, 0, 0), c(1000, Inf, 0)), right=NA)
+  input[["WS"]] <- classify(input[["WS"]], rbind(c(-Inf, 0, 0), c(300, Inf, 0)), right=NA)
+  input[["WD"]] <- classify(input[["WD"]], rbind(c(-Inf, -2 * pi, 0), c(2 * pi, Inf, 0)), right=NA)
+  input[["GS"]] <- classify(input[["GS"]], rbind(c(-Inf, 0, 0), c(200, Inf, 0)), right=NA)
+  # GS <- ifelse(ASPECT < -2 * pi | ASPECT > 2 * pi, 0, GS)
+  input[["PC"]] <- classify(input[["PC"]], rbind(c(-Inf, 0, 50), c(100, Inf, 50)), right=NA)
+  input[["PDF"]] <- classify(input[["PDF"]], rbind(c(-Inf, 0, 35), c(100, Inf, 35)), right=NA)
+  input[["CC"]] <- classify(input[["CC"]], rbind(c(-Inf, 0, 95), c(100, Inf, 95)), right=FALSE)
+  input[["GFL"]] <- classify(input[["GFL"]], rbind(c(-Inf, 0, 0.35), c(100, Inf, 0.35)), right=FALSE)
+  input[["LAT"]] <- classify(input[["LAT"]], rbind(c(-Inf, -90, 0), c(90, Inf, 0)), right=NA)
+  input[["LONG"]] <- classify(input[["LONG"]], rbind(c(-Inf, -180, 0), c(360, Inf, 0)), right=NA)
+  input[["THETA"]] <- classify(input[["THETA"]], rbind(c(-Inf, -2 * pi, 0), c(2 * pi, Inf, 0)), right=NA)
+  input[["SD"]] <- classify(input[["SD"]], rbind(c(-Inf, 0, -999), c(1e+05, Inf, -999)), right=NA)
+  input[["SH"]] <- classify(input[["SH"]], rbind(c(-Inf, 0, -999), c(1e+05, Inf, -999)), right=NA)
+
+  ############################################################################
+  #                         END
+  ############################################################################
+  ############################################################################
+  #                         START
+  # Corrections
+  ############################################################################
+  #Convert hours to minutes
+  input[["HR"]] <- input[["HR"]] * 60
+  #Corrections to reorient Wind Azimuth(WAZ) and Uphill slope azimuth(SAZ)
+  input[["WAZ"]] <- input[["WD"]] + pi
+  # WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
+  input[["SAZ"]] <- input[["ASPECT"]] + pi
+  # SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
+  # FIX: why would you do this and not make everything 0 - 360?
+  # #Any negative longitudes (western hemisphere) are translated to positive 
+  # #  longitudes
+  # LONG <- ifelse(LONG < 0, -LONG, LONG)
+  input[["LONG"]] <- abs(input[["LONG"]])
+  # #Create an id field if it does not exist
+  # if (exists("ID") && !is.null(ID)) ID<-ID else ID <- row.names(input)
+  ############################################################################
+  #                         END
+  ############################################################################
+  #######################
+  
+  SFC <- TFC <- HFI <- CFB <- ROS <- 0
+  RAZ <- -999
+  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+      output == "A") {
+    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
+      BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
+    TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
+  }
+  # HACK: for now just put everything in one stack
+  input[["CBH"]] <- lapp(x=input[[c("FUELTYPE", "CBH", "SD", "SH")]],
+                         fun=CrownBaseHeight)
+  fctCFL <- Vectorize(function(FUELTYPE, CFL)
+  {
+    return(ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), FUELS[[FUELTYPE]]$CFL, CFL))
+  })
+  input[["CFL"]] <- lapp(x=input[[c("FUELTYPE", "CFL")]],
+                         fun=fctCFL)
+  fctFMC <- Vectorize(function(FUELTYPE, FMC, LAT, LONG, ELV, DJ, D0)
+  {
+    return(ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
+                  FoliarMoistureContent(FUELS[[FUELTYPE]], LAT, LONG, ELV, DJ, D0),
+                  FMC))
+  })
+  input[["FMC"]] <- lapp(x=input[[c("FUELTYPE", "FMC", "LAT", "LONG", "ELV", "DJ", "D0")]],
+                         fun=fctFMC)
+  ############################################################################
+  #                         END
+  ############################################################################
+  #Calculate Surface fuel consumption (SFC)
+  input[["SFC"]] <- lapp(x=input[[c("FUELTYPE", "FFMC", "BUI", "PC", "GFL")]],
+                         fun=SurfaceFuelConsumption)
+  #Disable BUI Effect if necessary
+  input[["BUI"]] <- lapp(x=input[[c("BUI", "BUIEFF")]],
+                         fun=Vectorize(function(BUI, BUIEFF) { return(ifelse(BUIEFF != 1, 0, BUI)) }))
+  # HACK: for now just do calculations twice I guess
+  fctWSV <- Vectorize(function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                               FMC, SFC, PC, PDF, CC, CBH, ISI)
+  {
+    return(SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)$WSV)
+  })
+  input[["WSV0"]] <- lapp(x=input[[c("FUELTYPE", "FFMC", "BUI", "WS", "WAZ", "GS", "SAZ", "FMC", "SFC", "PC", "PDF", "CC", "CBH", "ISI")]],
+                          fun=fctWSV)
+  fctRAZ <- Vectorize(function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
+                               FMC, SFC, PC, PDF, CC, CBH, ISI)
+  {
+    return(SlopeAdjust(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF, CC, CBH, ISI)$RAZ)
+  })
+  input[["RAZ0"]] <- lapp(x=input[[c("FUELTYPE", "FFMC", "BUI", "WS", "WAZ", "GS", "SAZ", "FMC", "SFC", "PC", "PDF", "CC", "CBH", "ISI")]],
+                          fun=fctRAZ)
+  #######################################
+  # FIX: do this
+  # WSV <- ifelse(GS > 0 & FFMC > 0, WSV0, WS)
+  # RAZ <- ifelse(GS > 0 & FFMC > 0, RAZ0, WAZ)
+  ##########
+  # NOT THIS
+  m <- (2 == ((input[["GS"]] > 0) + (input[["FFMC"]] > 0)))
+  not_m <- (1 != m)
+  input[["WSV"]] <- (input[["WS"]] * not_m) + (input[["WSV0"]] * m)
+  input[["RAZ"]] <- (input[["WAZ"]] * not_m) + (input[["RAZ0"]] * m)
+  #######################################
+  # Why wouldn't you calculate this all the time??
+  # #Calculate or keep Initial Spread Index (ISI)
+  # ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
+  input[["ISI"]] <- lapp(x=input[[c("FFMC", "WSV")]],
+                         fun=Vectorize(function(FFMC, WSV) { return(InitialSpreadIndex(FFMC, WSV, TRUE)) }))
+  input[["CSI"]] <- lapp(x=input[[c("FUELTYPE", "FMC", "CBH")]],
+                         fun=CriticalSurfaceIntensity)
+  input[["RSO"]] <- lapp(x=input[[c("CSI", "SFC")]],
+                         fun=CriticalSurfaceRateOfSpread)
+  input[["ROS"]] <- lapp(x=input[[c("FUELTYPE", "ISI", "BUI", "FMC", "SFC", "PC", "PDF", "CC", "CBH")]],
+                         fun=RateOfSpread)
+  fctCFB <- Vectorize(function(FUELTYPE, CFL, ROS, RSO)
+  { return(ifelse(CFL > 0,
+                  CrownFractionBurned(FUELTYPE, ROS, RSO),
+                  0))
+  })
+  input[["CFB"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "ROS", "RSO")]],
+                         fun=fctCFB)
+  input[["CFC"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "CFB", "PC", "PDF")]],
+                         fun=CrownFuelConsumption)
+  input[["TFC"]] <- lapp(x=input[[c("CFC", "SFC")]],
+                         fun=TotalFuelConsumption)
+  input[["HFI"]] <- lapp(x=input[[c("TFC", "ROS")]],
+                         fun=FireIntensity)
+  # #Adjust Crown Fraction Burned
+  # CFB <- ifelse(HR < 0, -CFB, CFB)
+  # HACK: assuming you'd only get negative CFB if HR < 0?
+  input[["CFB"]] <- abs(input[["CFB"]])
+  input[["RAZ"]] <- input[["RAZ"]] * 180/pi
+  input[["RAZ"]] <- subst(input[["RAZ"]], 360, 0)
+  #Calculate Fire Type (S = Surface, C = Crowning, I = Intermittent Crowning)
+  # FD <- ifelse(CFB < 0.1, "S", ifelse(CFB >= 0.9, "C", "I"))
+  input[["FD"]] <- copy(input[["CFB"]])
+  input[["FD"]] <- classify(input[["FD"]], rbind(c(0, 0.1, 1), c(0.1, 0.9, 2), c(0.9, 1.0, 3)))
+  #Calculate the Secondary Outputs
+  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+      output == "A") {
+    m <- input[["GS"]] >= 70
+    not_m <- (1 != m)
+    #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
+    input[["SF"]] <- exp(3.533 * (input[["GS"]]/100)^1.2) * not_m + 10 * m
+    input[["BE"]] <- lapp(x=input[[c("FUELTYPE", "BUI")]],
+                          fun=BuildupEffect)
+    input[["LB"]] <- lapp(x=input[[c("FUELTYPE", "WSV")]],
+                          fun=LengthToBreadthRatio)
+    m <- input[["ACCEL"]] == 0
+    not_m <- (1 != m)
+    input[["LBt"]] <- m * input[["LB"]] +
+                      not_m * lapp(x=input[[c("FUELTYPE", "LB", "HR", "CFB")]],
+                                   fun=LengthToBreadthRatioAtTime)
+    input[["BROS"]] <- lapp(x=input[[c("FUELTYPE", "FFMC", "BUI", "WSV", "FMC", "SFC", "PC", "PDF", "CC", "CBH")]],
+                            fun=BackRateOfSpread)
+    input[["FROS"]] <- lapp(x=input[[c("ROS", "BROS", "LB")]],
+                            fun=FlankRateOfSpread)
+    #Calculate the eccentricity  
+    input[["E"]] <- sqrt(1 - 1/input[["LB"]]/input[["LB"]])
+    #Calculate the rate of spread towards angle theta (TROS)
+    input[["TROS"]] <- input[["ROS"]] * (1 - input[["E"]])/(1 - input[["E"]] * cos(input[["THETA"]] - input[["RAZ"]]))
+    #Calculate rate of spread at time t for Flank, Back of fire and at angle 
+    #  theta.
+    m <- input[["ACCEL"]] == 0
+    not_m <- (1 != m)
+    input[["ROSt"]] <- m * input[["ROS"]] +
+      not_m * lapp(x=input[[c("FUELTYPE", "ROS", "HR", "CFB")]],
+                   fun=RateOfSpreadAtTime)
+    input[["BROSt"]] <- m * input[["BROS"]] +
+      not_m * lapp(x=input[[c("FUELTYPE", "BROS", "HR", "CFB")]],
+                   fun=RateOfSpreadAtTime)
+    input[["FROSt"]] <- m * input[["FROS"]] +
+      not_m * lapp(x=input[[c("ROSt", "BROSt", "LBt")]],
+                   fun=FlankRateOfSpread)
+    #Calculate rate of spread towards angle theta at time t (TROSt)
+    input[["TROSt"]] <- m * input[["TROS"]] +
+      not_m * (input[["ROSt"]] * (1 - sqrt(1 - 1/input[["LBt"]]/input[["LBt"]])) /
+                 (1 - sqrt(1 - 1/input[["LBt"]]/input[["LBt"]]) * cos(input[["THETA"]] - input[["RAZ"]])))
+    #Calculate Crown Fraction Burned for Flank, Back of fire and at angle theta.
+    m <- input[["CFL"]] != 0
+    input[["FCFB"]] <- m * lapp(x=input[[c("FUELTYPE", "FROS", "RSO")]],
+                                fun=CrownFractionBurned)
+    input[["BCFB"]] <- m * lapp(x=input[[c("FUELTYPE", "BROS", "RSO")]],
+                                fun=CrownFractionBurned)
+    input[["TCFB"]] <- m * lapp(x=input[[c("FUELTYPE", "TROS", "RSO")]],
+                                fun=CrownFractionBurned)
+    fctTFC <- Vectorize(function(FUELTYPE, CFL, CFB, PC, PDF, SFC)
+    {
+      return(TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF), SFC))
+    })
+    input
+    #Calculate Total fuel consumption for the Flank fire, Back fire and at
+    #  angle theta
+    input[["FTFC"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "FCFB", "PC", "PDF", "SFC")]],
+                            fun=fctTFC)
+    input[["BTFC"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "BCFB", "PC", "PDF", "SFC")]],
+                            fun=fctTFC)
+    input[["TTFC"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "TCFB", "PC", "PDF", "SFC")]],
+                            fun=fctTFC)
+    #Calculate the Fire Intensity at the Flank, Back and at angle theta fire
+    input[["FFI"]] <- lapp(x=input[[c("FTFC", "FROS")]],
+                           fun=FireIntensity)
+    input[["BFI"]] <- lapp(x=input[[c("BTFC", "BROS")]],
+                           fun=FireIntensity)
+    input[["TFI"]] <- lapp(x=input[[c("TTFC", "TROS")]],
+                           fun=FireIntensity)
+    #Calculate Rate of spread at time t for the Head, Flank, Back of fire and
+    #  at angle theta.
+    # HACK: assume HR <0 is only reason these would be negative
+    # HROSt <- ifelse(HR < 0, -ROSt, ROSt)
+    # FROSt <- ifelse(HR < 0, -FROSt, FROSt)
+    # BROSt <- ifelse(HR < 0, -BROSt, BROSt)
+    # TROSt <- ifelse(HR < 0, -TROSt, TROSt)
+    input[["HROSt"]] <- abs(input[["ROSt"]])
+    input[["FROSt"]] <- abs(input[["FROSt"]])
+    input[["BROSt"]] <- abs(input[["BROSt"]])
+    input[["TROSt"]] <- abs(input[["TROSt"]])
+    
+    #Calculate the elapsed time to crown fire initiation for Head, Flank, Back
+    # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
+    # Back and at angle theta used in the *TI equations)
+    # HACK: old version used non-constant equation for every FUELTYPE
+    fctTI <- Vectorize(function(FUELTYPE, RSO, ROS, CFB)
+    {
+      return(log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha..FuelBase(FUELS[[FUELTYPE]], CFB)))
+    })
+    input[["TI"]] <- lapp(x=input[[c("FUELTYPE", "RSO", "ROS", "CFB")]],
+                          fun=fctTI)
+    input[["FTI"]] <- lapp(x=input[[c("FUELTYPE", "RSO", "FROS", "FCFB")]],
+                           fun=fctTI)
+    input[["BTI"]] <- lapp(x=input[[c("FUELTYPE", "RSO", "BROS", "BCFB")]],
+                           fun=fctTI)
+    input[["TTI"]] <- lapp(x=input[[c("FUELTYPE", "RSO", "TROS", "TCFB")]],
+                           fun=fctTI)
+
+    # FIX: shouldn't it be this?
+    # TI <- log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(this, CFB))
+    # FTI <- log(ifelse(1 - RSO/FROS > 0, 1 - RSO/FROS, 1))/(-.Alpha(this, FCFB))
+    # BTI <- log(ifelse(1 - RSO/BROS > 0, 1 - RSO/BROS, 1))/(-.Alpha(this, BCFB))
+    # TTI <- log(ifelse(1 - RSO/TROS > 0, 1 - RSO/TROS, 1))/(-.Alpha(this, TCFB))
+    
+    m <- input[["ACCEL"]] == 0
+    not_m <- (1 != m)
+    #Fire spread distance for Head, Back, and Flank of fire
+    input[["DH"]] <- m * (input[["ROS"]] * input[["HR"]]) +
+      not_m * lapp(x=input[[c("FUELTYPE", "ROS", "HR", "CFB")]],
+                   fun=DistanceAtTime)
+    input[["DB"]] <- m * (input[["BROS"]] * input[["HR"]]) +
+      not_m * lapp(x=input[[c("FUELTYPE", "BROS", "HR", "CFB")]],
+                   fun=DistanceAtTime)
+    input[["DF"]] <- m * ((input[["DH"]] + input[["DB"]])/(input[["LB"]] * 2)) +
+      not_m * ((input[["DH"]] + input[["DB"]])/(input[["LBt"]] * 2))
+  }
+  #######################################
+  # seems okay until here so far
+  #######################################
+  #if Primary is selected, wrap the primary outputs into a data frame and
+  #  return them
+  if (output == "PRIMARY" | output == "P") {
+    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC, 
+                TFC=TFC)
+  }
+  #If Secondary is selected, wrap the secondary outputs into a data frame
+  #  and return them.
+  else if (output == "SECONDARY" | output == "S") {
+    FBP <- list(ID=ID, BE=BE, SF=SF, ISI=ISI, FFMC=FFMC, FMC=FMC, D0=D0, RSO=RSO,
+                CSI=CSI, FROS=FROS, BROS=BROS, HROSt=HROSt, FROSt=FROSt, BROSt=BROSt, FCFB=FCFB, BCFB=BCFB,
+                FFI=FFI, BFI=BFI, FTFC=FTFC, BTFC=BTFC, TI=TI, FTI=FTI, BTI=BTI, LB=LB, LBt=LBt, WSV=WSV,
+                DH=DH, DB=DB, DF=DF, TROS=TROS, TROSt=TROSt, TCFB=TCFB, TFI=TFI, TTFC=TTFC, TTI=TTI)
+  }
+  #If all outputs are selected, then wrap all outputs into a data frame and
+  #  return it.
+  else if (output == "ALL" | output == "A") {
+    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC,
+                TFC=TFC, BE=BE, SF=SF, ISI=ISI, FFMC=FFMC, FMC=FMC, D0=D0, RSO=RSO, CSI=CSI, FROS=FROS,
+                BROS=BROS, HROSt=HROSt, FROSt=FROSt, BROSt=BROSt, FCFB=FCFB, BCFB=BCFB, FFI=FFI, BFI=BFI,
+                FTFC=FTFC, BTFC=BTFC, TI=TI, FTI=FTI, BTI=BTI, LB=LB, LBt=LBt, WSV=WSV, DH=DH, DB=DB, DF=DF,
+                TROS=TROS, TROSt=TROSt, TCFB=TCFB, TFI=TFI, TTFC=TTFC, TTI=TTI)
+  }
+  #######################################################################################################################
   #If secondary output selected then we need to reassign character
   #  represenation of Fire Type S/I/C to a numeric value 1/2/3
   if (!(output == "SECONDARY" | output == "S")){

@@ -16,10 +16,10 @@
 #' 
 #' @return CSI
 #' @export CriticalSurfaceIntensity
-CriticalSurfaceIntensity <- function(FUELTYPE, FMC, CBH)
+CriticalSurfaceIntensity <- Vectorize(function(FUELTYPE, FMC, CBH)
 {
   return(.CriticalSurfaceIntensity(FUELS[[FUELTYPE]], FMC, CBH))
-}
+})
 .CriticalSurfaceIntensity..FuelBase <- function(this, FMC, CBH)
 {
   # FIX: .FuelNF returns non-NA values from this

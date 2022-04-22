@@ -17,8 +17,8 @@
 #' 
 #' @return RSO
 #' @export CriticalSurfaceRateOfSpread
-CriticalSurfaceRateOfSpread <- function(CSI, SFC)
+CriticalSurfaceRateOfSpread <- Vectorize(function(CSI, SFC)
 {
   #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
   return (CSI / (300 * SFC))
-}
+})

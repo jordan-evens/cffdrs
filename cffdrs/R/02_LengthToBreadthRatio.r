@@ -20,10 +20,10 @@
 #' @returns Length to Breadth ratio value
 #' 
 #' @export LengthToBreadthRatio
-LengthToBreadthRatio <- function(FUELTYPE, WSV)
+LengthToBreadthRatio <- Vectorize(function(FUELTYPE, WSV)
 {
   return(.LengthToBreadthRatio(FUELS[[FUELTYPE]], WSV))
-}
+})
 .LengthToBreadthRatio..FuelBase <- function(this, WSV)
 {
   #Eq. 79

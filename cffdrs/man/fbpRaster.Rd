@@ -242,7 +242,7 @@ input<-test_fbpRaster
 # Rast doesn't hold the raster layer names, we have to assign
 # them:
 names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
-"PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
+"PDF","GFL","cc","theta","Accel","Aspect","BUIEFF","CBH","CFL","ISI")
 # Primary outputs:
 system.time(foo<-fbpRaster(input = input))
 # Using the "select" option:

@@ -20,10 +20,10 @@
 #' 
 #' @return BROS: Back Fire Rate of Spread
 #' @export BackRateOfSpread
-BackRateOfSpread <- function(FUELTYPE, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
+BackRateOfSpread <- Vectorize(function(FUELTYPE, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
 {
   return(.BackRateOfSpread(FUELS[[FUELTYPE]], FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH))
-}
+})
 .BackRateOfSpread..FuelBase <- function(this, FFMC, BUI, WSV, FMC, SFC, PC, PDF, CC, CBH)
 {
   #Eq. 46 (FCFDG 1992)

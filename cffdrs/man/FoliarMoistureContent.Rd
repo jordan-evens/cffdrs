@@ -4,7 +4,7 @@
 \alias{FoliarMoistureContent}
 \title{Foliar Moisture Content Calculator}
 \usage{
-FoliarMoistureContent(LAT, LONG, ELV, DJ, D0)
+FoliarMoistureContent(FUELTYPE, FMC, LAT, LONG, ELV, DJ, D0)
 }
 \arguments{
 \item{LAT}{Latitude (decimal degrees)}
