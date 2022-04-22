@@ -384,7 +384,8 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
                          "BUIEFF"=1,
                          "CBH"=0,
                          "CFL"=0,
-                         "ISI"=0)
+                         "ISI"=0,
+                         "ACCEL"=0)
   for (i in 1:length(non_null_defaults))
   {
     name <- names(non_null_defaults)[[i]]

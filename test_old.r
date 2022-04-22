@@ -1,16 +1,10 @@
-library("terra")
-library("devtools")
-devtools::load_all()
-test_fbpRaster <- rast(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
+library("cffdrs")
+test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
 input<-test_fbpRaster
-# Rast doesn't hold the raster layer names, we have to assign
+# Stack doesn't hold the raster layer names, we have to assign
 # them:
 names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
-"PDF","GFL","cc","theta","Accel","Aspect","BUIEFF","CBH","CFL","ISI")
-# Primary outputs:
-# system.time(foo<-fbpRaster(input = input))
-output = "ALL"
-select=NULL
+"PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
 # Primary outputs:
 system.time(foo1<-fbpRaster(input = input))
 # Using the "select" option:
