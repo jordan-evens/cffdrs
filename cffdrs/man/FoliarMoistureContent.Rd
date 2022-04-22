@@ -4,7 +4,7 @@
 \alias{FoliarMoistureContent}
 \title{Foliar Moisture Content Calculator}
 \usage{
-FoliarMoistureContent(FUELTYPE, FMC, LAT, LONG, ELV, DJ, D0)
+FoliarMoistureContent(LAT, LONG, ELV, DJ, D0)
 }
 \arguments{
 \item{LAT}{Latitude (decimal degrees)}
@@ -23,7 +23,7 @@ FMC: Foliar Moisture Content value
 \description{
 Calculate Foliar Moisture Content on a specified day.
 All variables names are laid out in the same manner as Forestry Canada
-Fire Danger Group (FCFDG) (1992). Development and Structure of the 
-Canadian Forest Fire Behavior Prediction System." Technical Report 
+Fire Danger Group (FCFDG) (1992). Development and Structure of the
+Canadian Forest Fire Behavior Prediction System." Technical Report
 ST-X-3, Forestry Canada, Ottawa, Ontario.
 }

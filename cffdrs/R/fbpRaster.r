@@ -344,7 +344,6 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   
   #set local scope variables from the parameters for simpler to referencing
   names(input) <- toupper(names(input))
-  ID <- input$ID
   ############################################################################
   #                         BEGIN
   # Set warnings for missing and required input variables.
@@ -482,10 +481,10 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   fctFMC <- Vectorize(function(FUELTYPE, FMC, LAT, LONG, ELV, DJ, D0)
   {
     return(ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
-                  FoliarMoistureContent(FUELS[[FUELTYPE]], LAT, LONG, ELV, DJ, D0),
+                  FoliarMoistureContent(LAT, LONG, ELV, DJ, D0),
                   FMC))
   })
-  input[["FMC"]] <- lapp(x=input[[c("FUELTYPE", "FMC", "LAT", "LONG", "ELV", "DJ", "D0")]],
+  input[["FMC"]] <- lapp(x=input[[c("FMC", "LAT", "LONG", "ELV", "DJ", "D0")]],
                          fun=fctFMC)
   ############################################################################
   #                         END
@@ -675,83 +674,53 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   #######################################
   # seems okay until here so far
   #######################################
-  #if Primary is selected, wrap the primary outputs into a data frame and
-  #  return them
-  if (output == "PRIMARY" | output == "P") {
-    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC, 
-                TFC=TFC)
-  }
-  #If Secondary is selected, wrap the secondary outputs into a data frame
-  #  and return them.
-  else if (output == "SECONDARY" | output == "S") {
-    FBP <- list(ID=ID, BE=BE, SF=SF, ISI=ISI, FFMC=FFMC, FMC=FMC, D0=D0, RSO=RSO,
-                CSI=CSI, FROS=FROS, BROS=BROS, HROSt=HROSt, FROSt=FROSt, BROSt=BROSt, FCFB=FCFB, BCFB=BCFB,
-                FFI=FFI, BFI=BFI, FTFC=FTFC, BTFC=BTFC, TI=TI, FTI=FTI, BTI=BTI, LB=LB, LBt=LBt, WSV=WSV,
-                DH=DH, DB=DB, DF=DF, TROS=TROS, TROSt=TROSt, TCFB=TCFB, TFI=TFI, TTFC=TTFC, TTI=TTI)
-  }
-  #If all outputs are selected, then wrap all outputs into a data frame and
-  #  return it.
-  else if (output == "ALL" | output == "A") {
-    FBP <- list(ID=ID, CFB=CFB, CFC=CFC, FD=as.character(FD), HFI=HFI, RAZ=RAZ, ROS=ROS, SFC=SFC,
-                TFC=TFC, BE=BE, SF=SF, ISI=ISI, FFMC=FFMC, FMC=FMC, D0=D0, RSO=RSO, CSI=CSI, FROS=FROS,
-                BROS=BROS, HROSt=HROSt, FROSt=FROSt, BROSt=BROSt, FCFB=FCFB, BCFB=BCFB, FFI=FFI, BFI=BFI,
-                FTFC=FTFC, BTFC=BTFC, TI=TI, FTI=FTI, BTI=BTI, LB=LB, LBt=LBt, WSV=WSV, DH=DH, DB=DB, DF=DF,
-                TROS=TROS, TROSt=TROSt, TCFB=TCFB, TFI=TFI, TTFC=TTFC, TTI=TTI)
-  }
-  #######################################################################################################################
-  #If secondary output selected then we need to reassign character
-  #  represenation of Fire Type S/I/C to a numeric value 1/2/3
-  if (!(output == "SECONDARY" | output == "S")){
-    FBP$FD <- ifelse(FBP$FD == "I", 2, FBP$FD)
-    FBP$FD <- ifelse(FBP$FD == "C", 3, FBP$FD)
-    FBP$FD <- ifelse(FBP$FD == "S", 1, FBP$FD)
-    FBP$FD <- as.numeric(FBP$FD)
-  }
+  # #if Primary is selected, wrap the primary outputs into a data frame and
+  # #  return them
+  # if (output == "PRIMARY" | output == "P") {
+  #   message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
+  #   FBP <- input[[c("CFB", "CFC", "FD", "HFI", "RAZ", "ROS", "SFC", "TFC")]]
+  # }
+  # #If Secondary is selected, wrap the secondary outputs into a data frame
+  # #  and return them.
+  # else if (output == "SECONDARY" | output == "S") {
+  #   FBP <- input[[c("BE", "SF", "ISI", "FFMC", "FMC", "D0", "RSO",
+  #                   "CSI", "FROS", "BROS", "HROSt", "FROSt", "BROSt", "FCFB", "BCFB",
+  #                   "FFI", "BFI", "FTFC", "BTFC", "TI", "FTI", "BTI", "LB", "LBt", "WSV",
+  #                   "DH", "DB", "DF", "TROS", "TROSt", "TCFB", "TFI", "TTFC", "TTI")]]
+  # }
+  # #If all outputs are selected, then wrap all outputs into a data frame and
+  # #  return it.
+  # else if (output == "ALL" | output == "A") {
+  #   message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
+  #   FBP <- input[[c("CFB", "CFC", "FD", "HFI", "RAZ", "ROS", "SFC", "TFC",
+  #                   "BE", "SF", "ISI", "FFMC", "FMC", "D0", "RSO",
+  #                   "CSI", "FROS", "BROS", "HROSt", "FROSt", "BROSt", "FCFB", "BCFB",
+  #                   "FFI", "BFI", "FTFC", "BTFC", "TI", "FTI", "BTI", "LB", "LBt", "WSV",
+  #                   "DH", "DB", "DF", "TROS", "TROSt", "TCFB", "TFI", "TTFC", "TTI")]]
+  # }
+  # 
   #If caller specifies select outputs, then create a raster stack that contains
   #  only those outputs
-  if (!is.null(select)){
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[, select[1]]
-    if (length(select) > 1){
-      for (i in 2:length(select)){
-        values(out0) <- FBP[,select[i]]
-        out <- rast(out, out0)
-      }
+  FBP <- NULL
+  if (!is.null(select))
+  {
+    FBP <- input[[select]]
+    if ("FD" %in% select)
+    {
+      message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
     }
-    names(out)<-select 
-    #If caller specified Primary outputs, then create raster stack that contains
-    #  only primary outputs
-  }else if (output == "PRIMARY" | output == "P") {
+  } else if (output == "PRIMARY" | output == "P")
+  {
     message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[,primaryNames[1]]
-    for (i in 2:length(primaryNames)){
-      values(out0) <- FBP[, primaryNames[i]]
-      out <- stack(out,out0)
-    }
-    names(out)<-primaryNames
-    #If caller specified Secondary outputs, then create raster stack that contains
-    #  only secondary outputs
-  }else if(output == "SECONDARY" | output == "S") {
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[, secondaryNames[1]]
-    for (i in 2:length(secondaryNames)){
-      values(out0) <- FBP[, secondaryNames[i]]
-      out <- stack(out, out0)
-    }
-    names(out)<-secondaryNames
-    #If caller specified All outputs, then create a raster stack that contains
-    #  both primary and secondary outputs
-  }else if(output == "ALL" | output == "A") {
+    FBP <- input[[primaryNames]]
+  } else if(output == "SECONDARY" | output == "S")
+  {
+    FBP <- input[[secondaryNames]]
+  } else if(output == "ALL" | output == "A")
+  {
     message("FD = 1,2,3 representing Surface (S),Intermittent (I), and Crown (C) fire")
-    out <- out0 <- input[[1]]
-    values(out) <- FBP[, allNames[1]]
-    for (i in 2:length(allNames)){
-      values(out0) <- FBP[, allNames[i]]
-      out <- stack(out, out0)
-    }
-    names(out) <- allNames
+    FBP <- input[[allNames]]
   }
   #return the raster stack to the caller
-  return(out)
+  return(FBP)
 }
