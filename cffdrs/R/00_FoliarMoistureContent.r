@@ -17,8 +17,8 @@
 FoliarMoistureContent <- Vectorize(function(LAT, LONG, ELV, DJ, D0) {
 
   #Initialize vectors
-  FMC <- rep(-1, length(LAT))
-  LATN <- rep(0, length(LAT))
+  FMC <- -1
+  LATN <- 0
   #Calculate Normalized Latitude
   #Eqs. 1 & 3 (FCFDG 1992)
   LATN <- ifelse(D0 <= 0,
