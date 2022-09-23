@@ -49,15 +49,15 @@ Fuel <- structure(.Data=list(
 .FuelOpen <- structure(.Data=list(name=".FuelOpen"), class=c(".FuelOpen", "Fuel", ".FuelBase"))
 
 #HACK: keep old behaviour for FuelNF
-.Alpha..FuelBase <- function(this, CBH)
+.Alpha..FuelBase <- function(this, CFB)
 #.Alpha..FuelClosed <- function(this, CBH)
 {
   #Eq. 72 (FCFDG 1992)
   #Calculate the alpha constant for the DISTt calculation
-  alpha <- 0.115 - 18.8 * (CBH**2.5) * exp(-8* CBH)
+  alpha <- 0.115 - 18.8 * (CFB**2.5) * exp(-8* CFB)
   return (alpha)
 }
-.Alpha..FuelOpen <- function(this, CBH)
+.Alpha..FuelOpen <- function(this, CFB)
 {
   #Eq. 72 (FCFDG 1992)
   #Calculate the alpha constant for the DISTt calculation
