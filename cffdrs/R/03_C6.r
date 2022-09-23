@@ -34,7 +34,6 @@
   ROS <- RateOfSpreadC6(RSC, RSS, CFB)
   ROS <- ifelse(ROS <= 0, 0.000001, ROS)
   return(ROS)
-  return(ROS)
 }
 .FireBehaviourPrediction..C6 <- function(this, output, ID, HR, LAT, LONG, CBH, SD, SH, CFL, FMC, D0, ELV, DJ, WS, WAZ, SAZ, FFMC, ISI, BUI, PC, PDF, GFL, BUIEFF, GS, CC, ACCEL, THETA)
 {
