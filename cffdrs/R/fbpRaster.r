@@ -282,20 +282,18 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
     warning("Attached dataset 'input' is being detached to use fbp() function.")
     detach(input)
   }
-  input_raster <- F
-  input_orig <- input
-  input <- copy(input)
-  # This will detect if the user has input rasters and will return rasters even
-  # though the whole function will operate with terra. This will deprecate with
-  # raster.
+  # # input_orig <- input
+  # # input <- copy(input)
+  # # This will detect if the user has input rasters and will return rasters even
+  # # though the whole function will operate with terra. This will deprecate with
+  # # raster.
   if(class(input) %in% c("Raster","RasterStack","RasterBrick")){
-    input_raster <- T
+    old_names <- names(input)
     input <- rast(input)
+    names(input) <- old_names
   }
-  if(class(init) %in% c("Raster","RasterStack","RasterBrick")){
-    init <- rast(init)
-  }
-  names(input) <- tolower(names(input))
+  # input <- rast(input)
+  # names(input) <- tolower(names(input))
 
   #Setup correct output names
   allNames <- c("CFB","CFC","FD","HFI","RAZ","ROS","SFC","TFC","BE","SF","ISI",
@@ -343,7 +341,7 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   #######################
   
   #set local scope variables from the parameters for simpler to referencing
-  names(input) <- toupper(names(input))
+  # names(input) <- toupper(names(input))
   ############################################################################
   #                         BEGIN
   # Set warnings for missing and required input variables.
@@ -399,6 +397,7 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
     subst(input[[name]], NA, default)
   }
   #Convert Wind Direction from degrees to radians
+  input[["WD"]] <- subst(input[["WD"]], NA, 0)
   input[["WD"]] <- input[["WD"]] * pi/180
   #Convert Theta from degrees to radians
   input[["THETA"]] <- input[["THETA"]] * pi/180
@@ -413,6 +412,7 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   input[["DJ"]] <- classify(input[["DJ"]], rbind(c(-Inf, 0, 0), c(366, Inf, 0)), right=NA)
   input[["DJ"]] <- subst(input[["DJ"]], NA, 180)
   input[["D0"]] <- classify(input[["D0"]], rbind(c(-Inf, 0, 0), c(366, Inf, 0)), right=NA)
+  input[["D0"]] <- subst(input[["D0"]], NA, 0)
   input[["ELV"]] <- classify(input[["ELV"]], rbind(c(-Inf, 0, 0), c(10000, Inf, 0)), right=NA)
   input[["ELV"]] <- subst(input[["ELV"]], NA, 0)
   input[["BUIEFF"]] <- classify(input[["BUIEFF"]], c(-Inf, 0, 0))
@@ -447,8 +447,13 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   input[["HR"]] <- input[["HR"]] * 60
   #Corrections to reorient Wind Azimuth(WAZ) and Uphill slope azimuth(SAZ)
   input[["WAZ"]] <- input[["WD"]] + pi
-  # WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
+  fctRadians <- Vectorize(function(v) { return(ifelse(v >= 2 * pi, v - 2 * pi, v))})
+  # WAZ <- ifelse(input[["WAZ"]] > 2 * pi, input[["WAZ"]] - 2 * pi, input[["WAZ"]])
+  input[["WAZ"]] <- lapp(x=input[["WAZ"]],
+                         fun=fctRadians)
   input[["SAZ"]] <- input[["ASPECT"]] + pi
+  input[["SAZ"]] <- lapp(x=input[["SAZ"]],
+                         fun=fctRadians)
   # SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
   # FIX: why would you do this and not make everything 0 - 360?
   # #Any negative longitudes (western hemisphere) are translated to positive 
@@ -461,15 +466,15 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   #                         END
   ############################################################################
   #######################
-  
-  SFC <- TFC <- HFI <- CFB <- ROS <- 0
-  RAZ <- -999
-  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
-      output == "A") {
-    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
-      BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
-    TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
-  }
+  # 
+  # SFC <- TFC <- HFI <- CFB <- ROS <- 0
+  # RAZ <- -999
+  # if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+  #     output == "A") {
+  #   FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
+  #     BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
+  #   TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
+  # }
   # HACK: for now just put everything in one stack
   input[["CBH"]] <- lapp(x=input[[c("FUELTYPE", "CBH", "SD", "SH")]],
                          fun=CrownBaseHeight)
@@ -481,11 +486,15 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
                          fun=fctCFL)
   fctFMC <- Vectorize(function(FUELTYPE, FMC, LAT, LONG, ELV, DJ, D0)
   {
+    if (FUELS[[FUELTYPE]]$name %in% c("D1", "S1", "S2", "S3", "O1A", "O1B"))
+    {
+      return(0)
+    }
     return(ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),
                   FoliarMoistureContent(LAT, LONG, ELV, DJ, D0),
                   FMC))
   })
-  input[["FMC"]] <- lapp(x=input[[c("FMC", "LAT", "LONG", "ELV", "DJ", "D0")]],
+  input[["FMC"]] <- lapp(x=input[[c("FUELTYPE", "FMC", "LAT", "LONG", "ELV", "DJ", "D0")]],
                          fun=fctFMC)
   ############################################################################
   #                         END
@@ -517,7 +526,7 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   # RAZ <- ifelse(GS > 0 & FFMC > 0, RAZ0, WAZ)
   ##########
   # NOT THIS
-  m <- (2 == ((input[["GS"]] > 0) + (input[["FFMC"]] > 0)))
+  m <- ((input[["GS"]] > 0) & (input[["FFMC"]] > 0))
   not_m <- (1 != m)
   input[["WSV"]] <- (input[["WS"]] * not_m) + (input[["WSV0"]] * m)
   input[["RAZ"]] <- (input[["WAZ"]] * not_m) + (input[["RAZ0"]] * m)
@@ -538,7 +547,25 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
                   CrownFractionBurned(FUELTYPE, ROS, RSO),
                   0))
   })
-  input[["CFB"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "ROS", "RSO")]],
+  # HACK: this was producing the wrong result for C6 because it double counts the CFB since it gets used to calculate the ROS
+  fctCFB <- Vectorize(function(FUELTYPE, CFL, ROS, RSO, ISI, FMC, BUI, CBH, SFC)
+  {
+    if (FUELTYPE == 6) {
+      # HACK: special case for C6 because it doesn't use final ROS for CFB since final ROS uses CFB
+      RSI <- IntermediateSurfaceRateOfSpreadC6(ISI, FMC)
+      RSS <- SurfaceRateOfSpreadC6(RSI, BUI)
+      RSC <- CrownRateOfSpreadC6(ISI, FMC)
+      CSI <- CriticalSurfaceIntensity(FUELTYPE, FMC, CBH)
+      #Eq. 57 (FCFDG 1992) Surface fire rate of spread (m/min)
+      RSO <- CSI / (300 * SFC)
+      CFB <- ifelse(RSC > RSS, CrownFractionBurned(FUELTYPE, RSS, RSO), 0)
+      return(CFB)
+    }
+    return(ifelse(CFL > 0,
+                  CrownFractionBurned(FUELTYPE, ROS, RSO),
+                  0))
+  })
+  input[["CFB"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "ROS", "RSO", "ISI", "FMC", "BUI", "CBH", "SFC")]],
                          fun=fctCFB)
   input[["CFC"]] <- lapp(x=input[[c("FUELTYPE", "CFL", "CFB", "PC", "PDF")]],
                          fun=CrownFuelConsumption)
@@ -549,13 +576,16 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   # #Adjust Crown Fraction Burned
   # CFB <- ifelse(HR < 0, -CFB, CFB)
   # HACK: assuming you'd only get negative CFB if HR < 0?
-  input[["CFB"]] <- abs(input[["CFB"]])
+  # for some reason this results in TI getting all 0's for CFB
+  #input[["CFB"]] <- abs(input[["CFB"]])
   input[["RAZ"]] <- input[["RAZ"]] * 180/pi
   input[["RAZ"]] <- subst(input[["RAZ"]], 360, 0)
   #Calculate Fire Type (S = Surface, C = Crowning, I = Intermittent Crowning)
   # FD <- ifelse(CFB < 0.1, "S", ifelse(CFB >= 0.9, "C", "I"))
-  input[["FD"]] <- copy(input[["CFB"]])
-  input[["FD"]] <- classify(input[["FD"]], rbind(c(0, 0.1, 1), c(0.1, 0.9, 2), c(0.9, 1.0, 3)))
+  # input[["FD"]] <- copy(input[["CFB"]])
+  input[["FD"]] <- input[["CFB"]]
+  # HACK: need to include 0 in classification for 1, so go below it
+  input[["FD"]] <- classify(input[["FD"]], rbind(c(-Inf, 0.1, 1), c(0.1, 0.9, 2), c(0.9, 1.0, 3)))
   #Calculate the Secondary Outputs
   if (output == "SECONDARY" | output == "ALL" | output == "S" | 
       output == "A") {
@@ -643,7 +673,12 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
     # HACK: old version used non-constant equation for every FUELTYPE
     fctTI <- Vectorize(function(FUELTYPE, RSO, ROS, CFB)
     {
+      # print(paste(FUELTYPE, RSO, ROS, CFB))
+      # # HACK: using .Alpha is giving different results
+      # a1 <- 0.115 - (18.8 * CFB^2.5 * exp(-8 * CFB))
+      # return(log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-a1))
       return(log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha..FuelBase(FUELS[[FUELTYPE]], CFB)))
+      #    return(log(ifelse(1 - RSO/ROS > 0, 1 - RSO/ROS, 1))/(-.Alpha(FUELS[[FUELTYPE]], CFB)))
     })
     input[["TI"]] <- lapp(x=input[[c("FUELTYPE", "RSO", "ROS", "CFB")]],
                           fun=fctTI)
