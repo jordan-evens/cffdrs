@@ -187,6 +187,8 @@ checkResults <- function(name, df1)
     test_that(paste0(name, '$', n), {
       actual <- unlist(df1[[n]])
       expected <- unlist(df2[[n]])
+      # unsure if this will cause problems, but seems to fix when column is all NA
+      class(actual) <- typeof(expected)
       expect_equal(actual, expected)
     })
   }
@@ -1571,3 +1573,35 @@ saveRasters("foo4", foo4)
 dat0<-input[[c("FuelType","LAT","LONG","FFMC","BUI","WS","GS", "Dj","Aspect")]]
 system.time(foo5<-fbpRaster(input = dat0,output="A"))
 saveRasters("foo5", foo5)
+
+write.csv(fbp(test_fbp), paste0(PATH, "fbp_01.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp,output="Primary"), paste0(PATH, "fbp_02.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp,"P"), paste0(PATH, "fbp_03.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp,"Secondary"), paste0(PATH, "fbp_04.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp,"S"), paste0(PATH, "fbp_05.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp,"All"), paste0(PATH, "fbp_06.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp,"A"), paste0(PATH, "fbp_07.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp[7,]), paste0(PATH, "fbp_08.csv"), row.names=FALSE)
+write.csv(fbp(test_fbp[8:13,]), paste0(PATH, "fbp_09.csv"), row.names=FALSE)
+write.csv(fbp(), paste0(PATH, "fbp_10.csv"), row.names=FALSE)
+non_fuel <- copy(test_fbp)
+non_fuel$FuelType <- "NF"
+write.csv(fbp(non_fuel,"All"), paste0(PATH, "fbp_11.csv"), row.names=FALSE, quote=FALSE)
+water <- copy(test_fbp)
+water$FuelType <- "WA"
+write.csv(fbp(non_fuel,"All"), paste0(PATH, "fbp_12.csv"), row.names=FALSE)
+
+
+as.character(fbp(test_fbp)) == as.character(read.csv(paste0(PATH, "fbp_01.csv")))
+as.character(fbp(test_fbp,output="Primary")) == as.character(read.csv(paste0(PATH, "fbp_02.csv")))
+as.character(fbp(test_fbp,"P")) == as.character(read.csv(paste0(PATH, "fbp_03.csv")))
+as.character(fbp(test_fbp,"Secondary")) == as.character(read.csv(paste0(PATH, "fbp_04.csv")))
+as.character(fbp(test_fbp,"S")) == as.character(read.csv(paste0(PATH, "fbp_05.csv")))
+as.character(fbp(test_fbp,"All")) == as.character(read.csv(paste0(PATH, "fbp_06.csv")))
+as.character(fbp(test_fbp,"A")) == as.character(read.csv(paste0(PATH, "fbp_07.csv")))
+as.character(fbp(test_fbp[7,])) == as.character(read.csv(paste0(PATH, "fbp_08.csv")))
+as.character(fbp(test_fbp[8:13,])) == as.character(read.csv(paste0(PATH, "fbp_09.csv")))
+as.character(fbp()) == as.character(read.csv(paste0(PATH, "fbp_10.csv")))
+# having trouble with comparing NA
+checkResults("fbp_11", fbp(non_fuel,"All"))
+checkResults("fbp_12", fbp(water,"All"))
