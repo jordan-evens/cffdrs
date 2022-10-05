@@ -396,6 +396,9 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
     }
     subst(input[[name]], NA, default)
   }
+  is_fuel <- (input[["FUELTYPE"]] != 19) * (input[["FUELTYPE"]] != 13)
+  # HACK: fix 0 FFMC being returned from non-fuel
+  input[["FFMC"]] <- input[["FFMC"]] * is_fuel
   #Convert Wind Direction from degrees to radians
   input[["WD"]] <- subst(input[["WD"]], NA, 0)
   input[["WD"]] <- input[["WD"]] * pi/180
@@ -413,12 +416,29 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   input[["DJ"]] <- subst(input[["DJ"]], NA, 180)
   input[["D0"]] <- classify(input[["D0"]], rbind(c(-Inf, 0, 0), c(366, Inf, 0)), right=NA)
   input[["D0"]] <- subst(input[["D0"]], NA, 0)
+  # HACK: replicate old behaviour
+  input[["D0"]] <- input[["D0"]] * is_fuel
   input[["ELV"]] <- classify(input[["ELV"]], rbind(c(-Inf, 0, 0), c(10000, Inf, 0)), right=NA)
   input[["ELV"]] <- subst(input[["ELV"]], NA, 0)
   input[["BUIEFF"]] <- classify(input[["BUIEFF"]], c(-Inf, 0, 0))
-  input[["BUIEFF"]] <- subst(input[["BUIEFF"]], NA, 1)
-  input[["HR"]] <- abs(input[["HR"]])
-  input[["HR"]] <- classify(input[["HR"]], c(366 * 24, Inf, 24), right=NA)
+  # HACK: can't replace NA if everything is NA for some reason. Get:
+  # Warning message:
+  # [subst] all 'from' values are missing, returning a copy of 'x'
+  if (all(is.na(input[["BUIEFF"]][,]))) {
+    input[["BUIEFF"]] <- 1
+  } else {
+    input[["BUIEFF"]] <- subst(input[["BUIEFF"]], NA, 1)
+  }
+  # originally:
+  # HR <- ifelse(HR < 0, -HR, HR)
+  # HR <- ifelse(HR > 366 * 24, 24, HR)
+  # HACK: for some reason abs(<SpatRaster>) is causing a lot of issues
+  fix_abs <- Vectorize(function(x) {ifelse(x < 0, -x, x)})
+  #input[["HR"]] <- abs(input[["HR"]])
+  #input[["HR"]] <- classify(input[["HR"]], c(366 * 24, Inf, 24), right=NA)
+  #input[["HR"]] <- lapp(input[["HR"]], fun=function(x){ifelse(x > 366 * 24.0, 24.0, x)})
+  input[["HR"]] <- lapp(input[["HR"]], fun=fix_abs)
+  input[["HR"]] <- lapp(input[["HR"]], fun=function(x){ifelse(x > 366 * 24.0, 24.0, x)})
   input[["FFMC"]] <- classify(input[["FFMC"]], rbind(c(-Inf, 0, 0), c(101, Inf, 0)), right=NA)
   input[["ISI"]] <- classify(input[["ISI"]], rbind(c(-Inf, 0, 0), c(300, Inf, 0)), right=NA)
   input[["BUI"]] <- classify(input[["BUI"]], rbind(c(-Inf, 0, 0), c(1000, Inf, 0)), right=NA)
@@ -459,7 +479,7 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   # #Any negative longitudes (western hemisphere) are translated to positive 
   # #  longitudes
   # LONG <- ifelse(LONG < 0, -LONG, LONG)
-  input[["LONG"]] <- abs(input[["LONG"]])
+  input[["LONG"]] <- lapp(input[["LONG"]], fun=fix_abs)
   # #Create an id field if it does not exist
   # if (exists("ID") && !is.null(ID)) ID<-ID else ID <- row.names(input)
   ############################################################################
@@ -486,7 +506,9 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
                          fun=fctCFL)
   fctFMC <- Vectorize(function(FUELTYPE, FMC, LAT, LONG, ELV, DJ, D0)
   {
-    if (FUELS[[FUELTYPE]]$name %in% c("D1", "S1", "S2", "S3", "O1A", "O1B"))
+    # if (FUELS[[FUELTYPE]]$name %in% c("D1", "S1", "S2", "S3", "O1A", "O1B"))
+    # HACK: include non-fuel as well to match original behaviour
+    if (FUELS[[FUELTYPE]]$name %in% c("D1", "S1", "S2", "S3", "O1A", "O1B", "WA", "NF"))
     {
       return(0)
     }
@@ -586,6 +608,8 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   input[["FD"]] <- input[["CFB"]]
   # HACK: need to include 0 in classification for 1, so go below it
   input[["FD"]] <- classify(input[["FD"]], rbind(c(-Inf, 0.1, 1), c(0.1, 0.9, 2), c(0.9, 1.0, 3)))
+  # HACK: set non-fuel to have NaN for FD
+  input[["FD"]] <- input[["FD"]] * subst(is_fuel, 0, NaN)
   #Calculate the Secondary Outputs
   if (output == "SECONDARY" | output == "ALL" | output == "S" | 
       output == "A") {
@@ -593,6 +617,8 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
     not_m <- (1 != m)
     #Eq. 39 (FCFDG 1992) Calculate Spread Factor (GS is group slope)
     input[["SF"]] <- exp(3.533 * (input[["GS"]]/100)^1.2) * not_m + 10 * m
+    # HACK: replicate original behaviour for WA and NF
+    input[["SF"]] <- input[["SF"]] * is_fuel
     input[["BE"]] <- lapp(x=input[[c("FUELTYPE", "BUI")]],
                           fun=BuildupEffect)
     input[["LB"]] <- lapp(x=input[[c("FUELTYPE", "WSV")]],
@@ -629,12 +655,18 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
                  (1 - sqrt(1 - 1/input[["LBt"]]/input[["LBt"]]) * cos(input[["THETA"]] - input[["RAZ"]])))
     #Calculate Crown Fraction Burned for Flank, Back of fire and at angle theta.
     m <- input[["CFL"]] != 0
+    # HACK: maintain previous behaviour
+    fctCFBC6 <- Vectorize(function(FUELTYPE, ROS, RSO)
+    { return(ifelse(6 == FUELTYPE,
+                    0,
+                    CrownFractionBurned(FUELTYPE, ROS, RSO)))
+    })
     input[["FCFB"]] <- m * lapp(x=input[[c("FUELTYPE", "FROS", "RSO")]],
-                                fun=CrownFractionBurned)
+                                fun=fctCFBC6)
     input[["BCFB"]] <- m * lapp(x=input[[c("FUELTYPE", "BROS", "RSO")]],
-                                fun=CrownFractionBurned)
+                                fun=fctCFBC6)
     input[["TCFB"]] <- m * lapp(x=input[[c("FUELTYPE", "TROS", "RSO")]],
-                                fun=CrownFractionBurned)
+                                fun=fctCFBC6)
     fctTFC <- Vectorize(function(FUELTYPE, CFL, CFB, PC, PDF, SFC)
     {
       return(TotalFuelConsumption(CrownFuelConsumption(FUELTYPE, CFL, CFB, PC, PDF), SFC))
@@ -662,10 +694,10 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
     # FROSt <- ifelse(HR < 0, -FROSt, FROSt)
     # BROSt <- ifelse(HR < 0, -BROSt, BROSt)
     # TROSt <- ifelse(HR < 0, -TROSt, TROSt)
-    input[["HROSt"]] <- abs(input[["ROSt"]])
-    input[["FROSt"]] <- abs(input[["FROSt"]])
-    input[["BROSt"]] <- abs(input[["BROSt"]])
-    input[["TROSt"]] <- abs(input[["TROSt"]])
+    input[["HROSt"]] <- lapp(input[["ROSt"]], fun=fix_abs)
+    input[["FROSt"]] <- lapp(input[["FROSt"]], fun=fix_abs)
+    input[["BROSt"]] <- lapp(input[["BROSt"]], fun=fix_abs)
+    input[["TROSt"]] <- lapp(input[["TROSt"]], fun=fix_abs)
     
     #Calculate the elapsed time to crown fire initiation for Head, Flank, Back
     # fire and at angle theta. The (a# variable is a constant for Head, Flank, 
@@ -735,6 +767,14 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   #                   "DH", "DB", "DF", "TROS", "TROSt", "TCFB", "TFI", "TTFC", "TTI")]]
   # }
   # 
+  # HACK: set everything to 0 if using non-fuel
+  for (lyr in names(input)) {
+    if (!(lyr %in% c("FUELTYPE", "FD"))) {
+      # this doesn't work if lyr already has NaN values in it
+      #input[[lyr]] <- input[[lyr]] * is_fuel
+      input[[lyr]] <- lapp(c(input[[lyr]], is_fuel), fun=function(x,y) { ifelse(0==y,0,x)})
+    }
+  }
   #If caller specifies select outputs, then create a raster stack that contains
   #  only those outputs
   FBP <- NULL
