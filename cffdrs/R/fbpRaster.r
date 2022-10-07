@@ -405,7 +405,9 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   #Convert Theta from degrees to radians
   input[["THETA"]] <- input[["THETA"]] * pi/180
   input[["ASPECT"]] <- subst(input[["ASPECT"]], NA, 0)
-  input[["ASPECT"]] <- input[["ASPECT"]] %% 360
+  # input[["ASPECT"]] <- input[["ASPECT"]] %% 360
+  # keep old behaviour
+  input[["ASPECT"]] <- lapp(input[["ASPECT"]], fun=function(x){ifelse(x < 0, x + 360, x)})
   #Convert Aspect from degrees to radians
   input[["ASPECT"]] <- input[["ASPECT"]] * pi/180
   # ACCEL <- ifelse(is.na(ACCEL) | ACCEL < 0, 0, ACCEL)
@@ -420,7 +422,8 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   input[["D0"]] <- input[["D0"]] * is_fuel
   input[["ELV"]] <- classify(input[["ELV"]], rbind(c(-Inf, 0, 0), c(10000, Inf, 0)), right=NA)
   input[["ELV"]] <- subst(input[["ELV"]], NA, 0)
-  input[["BUIEFF"]] <- classify(input[["BUIEFF"]], c(-Inf, 0, 0))
+  #input[["BUIEFF"]] <- classify(input[["BUIEFF"]], c(-Inf, 0, 0))
+  input[["BUIEFF"]] <- lapp(input[["BUIEFF"]], fun=function(x){ifelse(x <= 0, 0, 1)})
   # HACK: can't replace NA if everything is NA for some reason. Get:
   # Warning message:
   # [subst] all 'from' values are missing, returning a copy of 'x'
@@ -445,7 +448,9 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   input[["WS"]] <- classify(input[["WS"]], rbind(c(-Inf, 0, 0), c(300, Inf, 0)), right=NA)
   input[["WD"]] <- classify(input[["WD"]], rbind(c(-Inf, -2 * pi, 0), c(2 * pi, Inf, 0)), right=NA)
   input[["GS"]] <- classify(input[["GS"]], rbind(c(-Inf, 0, 0), c(200, Inf, 0)), right=NA)
+  # keep old behaviour
   # GS <- ifelse(ASPECT < -2 * pi | ASPECT > 2 * pi, 0, GS)
+  input[["GS"]] <- lapp(input[[c("GS", "ASPECT")]], fun=function(GS, ASPECT){ifelse(ASPECT < -2 * pi | ASPECT > 2 * pi, 0, GS)})
   input[["PC"]] <- classify(input[["PC"]], rbind(c(-Inf, 0, 50), c(100, Inf, 50)), right=NA)
   input[["PDF"]] <- classify(input[["PDF"]], rbind(c(-Inf, 0, 35), c(100, Inf, 35)), right=NA)
   input[["CC"]] <- classify(input[["CC"]], rbind(c(-Inf, 0, 95), c(100, Inf, 95)), right=FALSE)
@@ -556,8 +561,11 @@ fbpRaster <- function(input, output = "Primary", select=NULL){
   # Why wouldn't you calculate this all the time??
   # #Calculate or keep Initial Spread Index (ISI)
   # ISI <- ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))
-  input[["ISI"]] <- lapp(x=input[[c("FFMC", "WSV")]],
-                         fun=Vectorize(function(FFMC, WSV) { return(InitialSpreadIndex(FFMC, WSV, TRUE)) }))
+  # input[["ISI"]] <- lapp(x=input[[c("FFMC", "WSV")]],
+  #                        fun=Vectorize(function(FFMC, WSV) { return(InitialSpreadIndex(FFMC, WSV, TRUE)) }))
+  # keep old behaviour of only calculating ISI when it's not > 0
+  input[["ISI"]] <- lapp(x=input[[c("ISI", "FFMC", "WSV")]],
+                         fun=Vectorize(function(ISI, FFMC, WSV) { return(ifelse(ISI > 0, ISI, InitialSpreadIndex(FFMC, WSV, TRUE))) }))
   input[["CSI"]] <- lapp(x=input[[c("FUELTYPE", "FMC", "CBH")]],
                          fun=CriticalSurfaceIntensity)
   input[["RSO"]] <- lapp(x=input[[c("CSI", "SFC")]],
