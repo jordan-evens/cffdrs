@@ -289,7 +289,7 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
   #Eq. 24 - Wind Effect
   fW <- exp(0.05039 * ws)
   #Eq. 10 - Moisture content
-  fm <- 147.2 * (101 - ffmc) / (59.5 + ffmc)
+  fm <- 147.27723 * (101 - ffmc) / (59.5 + ffmc)
   #Eq. 25 - Fine Fuel Moisture
   fF <- 91.9 * exp(-0.1386 * fm) * (1 + (fm^5.31) / 49300000)
   #Eq. 26 - Spread Index Equation
