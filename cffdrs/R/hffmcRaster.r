@@ -206,7 +206,7 @@ hffmcRaster <- function(weatherstream, ffmc_old = 85, time.step = 1,
 
       #Calculate ISI
       fW <- exp(0.05039 * W)
-      fm <- 147.2 * (101 - fo) / (59.5 + fo)
+      fm <- 147.27723 * (101 - fo) / (59.5 + fo)
       fF <- 91.9 * exp(-0.1386 * fm) * (1 + (fm^5.31) / 49300000)
       isi <- 0.208 * fW * fF
       
