@@ -115,7 +115,7 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
   #                    Fine Fuel Moisture Code (FFMC)
   ###########################################################################
   #Eq. 1
-  wmo <- 147.2 * (101 - ffmc_yda)/(59.5 + ffmc_yda)
+  wmo <- 147.27723 * (101 - ffmc_yda)/(59.5 + ffmc_yda)
   #Eq. 2 Rain reduction to allow for loss in overhead canopy
   ra1 <- prec
   ra1[ra1 <= 0.5] <- NA
@@ -203,7 +203,7 @@ fwiRaster <- function(input, init = c(ffmc = 85, dmc = 6, dc = 15), mon = 7,
   wm <- cover(wm0, wm1)
   rm(ed0, x0, wm0, wm1, wmo0)
   #Eq. 10 Final FFMC calculation
-  ffmc <- (59.5 * (250 - wm))/(147.2 + wm)
+  ffmc <- (59.5 * (250 - wm))/(147.27723 + wm)
   #Constraints
   ffmc[ffmc>101] <- 101 
   ffmc[ffmc<0] <- 0
