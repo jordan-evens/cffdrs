@@ -3,6 +3,9 @@ library(data.table)
 library(testthat)
 #setwd("cffdrs/tests/testthat")
 PATH <- 'cffdrs/tests/data/'
+dir.create(PATH, showWarnings = FALSE, recursive = TRUE)
+library(raster)
+
 DESIRED_ROWS <- 5000
 
 DAY <- seq(0, 366)
