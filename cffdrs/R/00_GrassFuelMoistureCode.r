@@ -1,13 +1,13 @@
 GrassFuelMoistureCode <- function(grass_moisture)
 {
-  return(59.5 * ((250 - grass_moisture) / (147.2772 + grass_moisture)))
+  return(59.5 * ((250 - grass_moisture) / (147.27723 + grass_moisture)))
 }
 
 GrassFuelMoisture <- function(GFMCold, temp, rh, ws, prec, isol, time.step = 1, roFL = 0.3)
 {
   t0 <- time.step
   #Eq. 13 - Calculate previous moisture code
-  MCold <- 147.2772 * ((101 - GFMCold) / (59.5 + GFMCold))
+  MCold <- 147.27723 * ((101 - GFMCold) / (59.5 + GFMCold))
   #Eq. 11 - Calculate the moisture content of the layer in % after rainfall
   MCr <- ifelse(prec > 0, MCold + 100 * (prec / roFL), MCold)
   #Constrain to 250
