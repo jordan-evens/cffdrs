@@ -90,15 +90,13 @@ FBP_ARGS <- list(data.table(ID=1),
                  data.table(CFL=CFL),
                  data.table(ISI=ISI))
 
-pickRows <- function(d1, num_rows=DESIRED_ROWS)
-{
+pickRows <- function(d1, num_rows=DESIRED_ROWS) {
   d1 <- data.table(d1)
   #print(d1)
   #print(nrow(d1))
   #print(MAX_ROWS)
   old_names <- colnames(d1)
-  while (nrow(d1) > num_rows)
-  {
+  while (nrow(d1) > num_rows) {
     #print('loop')
     #print(seq(1, nrow(d1), by=3))
     #print(d1[seq(1, nrow(d1), by=3), ])
@@ -113,14 +111,11 @@ pickRows <- function(d1, num_rows=DESIRED_ROWS)
   return(d1)
 }
 
-makeInput <- function(arguments)
-{
+makeInput <- function(arguments) {
   #print(arguments)
   d1 <- pickRows(arguments[[1]])
-  if (1 < length(arguments))
-  {
-    for (n in 2:length(arguments))
-    {
+  if (1 < length(arguments)) {
+    for (n in 2:length(arguments)) {
       #print(n)
       #print(arguments[[n]])
       d2 <- pickRows(arguments[[n]], ceiling(3 * DESIRED_ROWS / nrow(d1)))
@@ -130,11 +125,9 @@ makeInput <- function(arguments)
   return(data.table(d1))
 }
 
-makeData <- function(name, fct, arguments, split_args)
-{
+makeData <- function(name, fct, arguments, split_args) {
   i <- makeInput(arguments)
-  if (!split_args)
-  {
+  if (!split_args) {
     stopifnot(is.data.table(i))
     values <- fct(i)
     i[, c(name)] <- values
@@ -144,21 +137,16 @@ makeData <- function(name, fct, arguments, split_args)
   #i[, c(name)] <- do.call(fct, i)
   r <- list(do.call(fct, i[1, ]))
   isRow <- length(r[[1]]) > 1
-  if (isRow)
-  {
+  if (isRow) {
     r <- r[[1]]
-    for (n in 2:nrow(i))
-    {
+    for (n in 2:nrow(i)) {
       r2 <- do.call(fct, i[n, ])
       r <- rbind(r, r2)
     }
     stopifnot(nrow(i) == n0)
     return(r)
-  }
-  else
-  {
-    for (n in 2:nrow(i))
-    {
+  } else {
+    for (n in 2:nrow(i)) {
       r <- append(r, do.call(fct, i[n, ]))
     }
     i[, c(name)] <- unlist(r)
@@ -167,26 +155,22 @@ makeData <- function(name, fct, arguments, split_args)
   }
 }
 
-saveResults <- function(name, data)
-{
+saveResults <- function(name, data) {
   #data <- apply(data, 2, as.character)
   write.csv(data, paste0(PATH, name, '.csv'), row.names=FALSE)
 }
 
-saveData <- function(name, fct, arguments, split_args=TRUE)
-{
+saveData <- function(name, fct, arguments, split_args=TRUE) {
   saveResults(name, makeData(name, fct, arguments, split_args))
   print(paste0("Checking ", name))
   checkData(name, fct, arguments, split_args)
 }
 
-checkResults <- function(name, df1)
-{
+checkResults <- function(name, df1) {
   df1 <- data.table(df1)
   df2 <- data.table(read.csv(paste0(PATH, name, '.csv')))
   expect_equal(colnames(df1), colnames(df2))
-  for (n in sort(colnames(df1)))
-  {
+  for (n in sort(colnames(df1))) {
     test_that(paste0(name, '$', n), {
       actual <- unlist(df1[[n]])
       expected <- unlist(df2[[n]])
@@ -197,30 +181,22 @@ checkResults <- function(name, df1)
   }
 }
 
-checkData <- function(name, fct, arguments, split_args=TRUE)
-{
+checkData <- function(name, fct, arguments, split_args=TRUE) {
   df1 <- makeData(name, fct, arguments, split_args)
   df2 <- read.csv(paste0(PATH, name, '.csv'))
-  if (is.null(nrow(df1)))
-  {
+  if (is.null(nrow(df1))) {
     # it's just an array so don't compare column names
     expect_equal(df1, df2[[1]])
-  }
-  else
-  {
+  } else {
     df1 <- data.table(df1)
     df2 <- data.table(df2)
-    if (split_args)
-    {
+    if (split_args) {
       actual <- df1[[name]]
       expected <- df2[[name]]
       expect_equal(actual, expected)
-    }
-    else
-    {
+    } else {
       expect_equal(colnames(df1), colnames(df2))
-      for (n in sort(colnames(df1)))
-      {
+      for (n in sort(colnames(df1))) {
         test_that(paste0(name, '$', n), {
           actual <- unlist(df1[[n]])
           expected <- unlist(df2[[n]])
@@ -231,12 +207,10 @@ checkData <- function(name, fct, arguments, split_args=TRUE)
   }
 }
 
-fctOnInput <- function(fct)
-{
+fctOnInput <- function(fct) {
   return(function(ID, FUELTYPE, FFMC, BUI, WS, WD, FMC, GS, LAT, LONG, ELV, DJ, D0,
                   SD, SH, HR, PC, PDF, GFL, CC, THETA, ACCEL, ASPECT, BUIEFF,
-                  CBH, CFL, ISI)
-  {
+                  CBH, CFL, ISI) {
     input <- data.frame(ID=ID,
                         FUELTYPE=FUELTYPE,
                         FFMC=FFMC,
@@ -401,8 +375,7 @@ saveData('hffmc',
               data.table(rh=RH),
               data.table(ws=WS)),
          split_args=FALSE)
-fctGFMC <- function(input)
-{
+fctGFMC <- function(input) {
   return(cffdrs::gfmc(input, GFMCold=rep(85, length(input$temp)), out="GFMC", batch=FALSE))
 }
 saveData('gfmcGFMC',
@@ -414,8 +387,7 @@ saveData('gfmcGFMC',
               data.table(isol=seq(0, 10000)),
               data.table(mon=MON)),
          split_args=FALSE)
-fctMC <- function(input)
-{
+fctMC <- function(input) {
   return(cffdrs::gfmc(input, GFMCold=rep(85, length(input$temp)), out="MC", batch=FALSE))
 }
 saveData('gfmcMC',
@@ -427,8 +399,7 @@ saveData('gfmcMC',
               data.table(isol=seq(0, 10000)),
               data.table(mon=MON)),
          split_args=FALSE)
-fctHFFMC <- function(input)
-{
+fctHFFMC <- function(input) {
   return(cffdrs::hffmc(input, ffmc_old=input$ffmc_old, time.step=input$time.step, calc.step=FALSE, batch=FALSE, hourlyFWI=FALSE))
 }
 saveData('HourlyFineFuelMoistureCode',
@@ -459,7 +430,6 @@ saveResults('fbp_07', cffdrs::fbp(test_fbp,"A"))
 saveResults('fbp_08', cffdrs::fbp(test_fbp[7,]))
 saveResults('fbp_09', cffdrs::fbp(test_fbp[8:13,]))
 saveResults('fbp_10', cffdrs::fbp())
-
 saveData('FireBehaviourPrediction',
          fctOnInput(cffdrs:::.FBPcalc),
          FBP_ARGS)
@@ -523,8 +493,7 @@ saveData('C6CrownRateOfSpread',
               data.table(CFB=CFB),
               data.table(RSC=ROS),
               data.table(option=c("RSC"))))
-fctRSSC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
-{
+fctRSSC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option) {
   stopifnot("C6" == FUELTYPE)
   RSI <- cffdrs:::.C6calc(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
   RSS <- RSI * cffdrs:::.BEcalc(FUELTYPE, BUI)
@@ -554,8 +523,7 @@ saveData('C6CrownFractionBurned',
               data.table(CFB=CFB),
               data.table(RSC=ROS),
               data.table(option=c("CFB"))))
-fctCSIC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
-{
+fctCSIC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option) {
   stopifnot("C6" == FUELTYPE)
   stopifnot("RSC" == option)
   CSI <- cffdrs:::.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH, "CSI")
@@ -573,8 +541,7 @@ saveData('C6CriticalSurfaceIntensity',
               data.table(CFB=CFB),
               data.table(RSC=ROS),
               data.table(option=c("RSC"))))
-fctRSOC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option)
-{
+fctRSOC6 <- function(FUELTYPE, ISI, BUI, FMC, SFC, CBH, ROS, CFB, RSC, option) {
   stopifnot("C6" == FUELTYPE)
   stopifnot("RSC" == option)
   RSO <- cffdrs:::.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH, "RSO")
@@ -662,14 +629,14 @@ saveData('SlopeAdjustWSV',
 fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                         CC, CBH, ISI, output = "RAZ") {
   # output options include: RAZ and WSV
-  
+
   #check for valid output types
   validOutTypes = c("RAZ", "WAZ", "WSV")
   if(!(output %in% validOutTypes)){
-    stop(paste("In 'slopecalc()', '",output, "' is an invalid 'output' type.", 
+    stop(paste("In 'slopecalc()', '",output, "' is an invalid 'output' type.",
                sep=""))
   }
-  
+
   NoBUI <- rep(-1,length(FFMC))
   #Eq. 39 (FCFDG 1992) - Calculate Spread Factor
   SF <- ifelse (GS >= 70, 10, exp(3.533 * (GS / 100)^1.2))
@@ -682,14 +649,14 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   #setup some reference vectors
   d <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "D1", "M1", "M2", "M3", "M4",
          "S1", "S2", "S3", "O1A", "O1B")
-  a <- c(90, 110, 110, 110, 30, 30, 45, 30, 0, 0, 120, 100, 75, 40, 55, 190, 
+  a <- c(90, 110, 110, 110, 30, 30, 45, 30, 0, 0, 120, 100, 75, 40, 55, 190,
          250)
-  b <- c(0.0649, 0.0282, 0.0444, 0.0293, 0.0697, 0.0800, 0.0305, 0.0232, 0, 0, 
+  b <- c(0.0649, 0.0282, 0.0444, 0.0293, 0.0697, 0.0800, 0.0305, 0.0232, 0, 0,
          0.0572, 0.0404, 0.0297, 0.0438, 0.0829, 0.0310, 0.0350)
-  c0 <- c(4.5, 1.5, 3.0, 1.5, 4.0, 3.0, 2.0, 1.6, 0, 0, 1.4, 1.48, 1.3, 1.7, 
+  c0 <- c(4.5, 1.5, 3.0, 1.5, 4.0, 3.0, 2.0, 1.6, 0, 0, 1.4, 1.48, 1.3, 1.7,
           3.2, 1.4, 1.7)
   names(a) <- names(b) <- names(c0) <- d
-  
+
   #initialize some local vars
   RSZ <- rep(-99,length(FFMC))
   RSF_C2 <- rep(-99,length(FFMC))
@@ -702,33 +669,33 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   ISF_D1 <- rep(-99,length(FFMC))
   ISF_M3 <- rep(-99,length(FFMC))
   ISF_M4 <- rep(-99,length(FFMC))
-  
+
   #Eqs. 41a, 41b (Wotton 2009) - Calculate the slope equivalend ISI
-  ISF <- ifelse(FUELTYPE %in% c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "D1", 
+  ISF <- ifelse(FUELTYPE %in% c("C1", "C2", "C3", "C4", "C5", "C6", "C7", "D1",
                                 "S1", "S2", "S3"),
                 ifelse((1 - (RSF / a[FUELTYPE])**(1 / c0[FUELTYPE])) >= 0.01,
                        log(1 - (RSF / a[FUELTYPE])**(1 / c0[FUELTYPE])) / (-b[FUELTYPE]),
                        log(0.01)/(-b[FUELTYPE])),
                 ISF)
-  
+
   #When calculating the M1/M2 types, we are going to calculate for both C2
   # and D1 types, and combine
   #Surface spread rate with 0 wind on level ground
   RSZ <- ifelse(FUELTYPE %in% c("M1", "M2"),
-                cffdrs:::.ROScalc(rep("C2", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, PDF, 
+                cffdrs:::.ROScalc(rep("C2", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, PDF,
                                   CC, CBH),
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for C2
   RSF_C2 <- ifelse(FUELTYPE %in% c("M1", "M2"), RSZ * SF, RSF_C2)
   RSZ <- ifelse(FUELTYPE %in% c("M1", "M2"),
-                cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, 
+                cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC,
                                   PDF, CC, CBH),RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for D1
   RSF_D1 <- ifelse(FUELTYPE %in% c("M1", "M2"), RSZ * SF, RSF_D1)
   RSF0 <- 1 - (RSF_C2 / a[["C2"]])^(1 / c0[["C2"]])
   #Eq. 41a (Wotton 2009) - Calculate the slope equivalent ISI
   ISF_C2 <- ifelse(FUELTYPE %in% c("M1", "M2") & RSF0 >= 0.01,
-                   log(1 - (RSF_C2 / a[["C2"]])**(1 / c0[["C2"]])) / (-b[["C2"]]), 
+                   log(1 - (RSF_C2 / a[["C2"]])**(1 / c0[["C2"]])) / (-b[["C2"]]),
                    ISF_C2)
   #Eq. 41b (Wotton 2009) - Calculate the slope equivalent ISI
   ISF_C2 <- ifelse(FUELTYPE %in% c("M1", "M2") & RSF0 < 0.01,
@@ -744,23 +711,23 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
                    log(0.01) / (-b[["D1"]]),
                    ISF_D1)
   #Eq. 42a (Wotton 2009) - Calculate weighted average for the M1/M2 types
-  ISF <- ifelse(FUELTYPE %in% c("M1", "M2"), PC / 100 * ISF_C2 + 
-                  (1 - PC / 100) * ISF_D1, 
+  ISF <- ifelse(FUELTYPE %in% c("M1", "M2"), PC / 100 * ISF_C2 +
+                  (1 - PC / 100) * ISF_D1,
                 ISF)
-  
+
   #Set % Dead Balsam Fir to 100%
   PDF100 <- rep(100, length(ISI))
   #Surface spread rate with 0 wind on level ground
-  RSZ <- ifelse(FUELTYPE %in% c("M3"), 
-                cffdrs:::.ROScalc(rep("M3", length(FMC)), ISI = ISZ, BUI = NoBUI, FMC, SFC, 
-                                  PC, PDF100, CC, CBH), 
+  RSZ <- ifelse(FUELTYPE %in% c("M3"),
+                cffdrs:::.ROScalc(rep("M3", length(FMC)), ISI = ISZ, BUI = NoBUI, FMC, SFC,
+                                  PC, PDF100, CC, CBH),
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for M3
   RSF_M3 <- ifelse(FUELTYPE %in% c("M3"), RSZ * SF, RSF_M3)
   #Surface spread rate with 0 wind on level ground, using D1
-  RSZ <- ifelse(FUELTYPE %in% c("M3"), 
-                cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, 
-                                  PDF100, CC, CBH), 
+  RSZ <- ifelse(FUELTYPE %in% c("M3"),
+                cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC,
+                                  PDF100, CC, CBH),
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for M3
   RSF_D1 <- ifelse(FUELTYPE %in% c("M3"), RSZ * SF, RSF_D1)
@@ -783,20 +750,20 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
                    log(0.01) / (-b[["D1"]]),
                    ISF_D1)
   #Eq. 42b (Wotton 2009) - Calculate weighted average for the M3 type
-  ISF <- ifelse(FUELTYPE %in% c("M3"), 
-                PDF / 100 * ISF_M3 + (1 - PDF / 100) * ISF_D1, 
+  ISF <- ifelse(FUELTYPE %in% c("M3"),
+                PDF / 100 * ISF_M3 + (1 - PDF / 100) * ISF_D1,
                 ISF)
   #Surface spread rate with 0 wind on level ground, using M4
-  RSZ <- ifelse(FUELTYPE %in% c("M4"), 
-                cffdrs:::.ROScalc(rep("M4", length(FMC)), ISI = ISZ, BUI = NoBUI, FMC, SFC, 
-                                  PC, PDF100, CC, CBH), 
+  RSZ <- ifelse(FUELTYPE %in% c("M4"),
+                cffdrs:::.ROScalc(rep("M4", length(FMC)), ISI = ISZ, BUI = NoBUI, FMC, SFC,
+                                  PC, PDF100, CC, CBH),
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for M4
   RSF_M4 <- ifelse(FUELTYPE %in% c("M4"), RSZ * SF, RSF_M4)
   #Surface spread rate with 0 wind on level ground, using M4
-  RSZ <- ifelse(FUELTYPE %in% c("M4"), 
-                cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC, 
-                                  PDF100, CC, CBH), 
+  RSZ <- ifelse(FUELTYPE %in% c("M4"),
+                cffdrs:::.ROScalc(rep("D1", length(ISZ)), ISZ, BUI = NoBUI, FMC, SFC, PC,
+                                  PDF100, CC, CBH),
                 RSZ)
   #Eq. 40 (FCFDG 1992) - Surface spread rate with 0 wind upslope for D1
   RSF_D1 <- ifelse(FUELTYPE %in% c("M4"), RSZ * SF,RSF_D1)
@@ -821,18 +788,18 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
                    log(0.01) / (-b[["D1"]]),
                    ISF_D1)
   #Eq. 42c (Wotton 2009) - Calculate weighted average for the M4 type
-  ISF <- ifelse(FUELTYPE %in% c("M4"), PDF / 100 * ISF_M4 + (1 - PDF / 100.) * 
-                  ISF_D1, 
+  ISF <- ifelse(FUELTYPE %in% c("M4"), PDF / 100 * ISF_M4 + (1 - PDF / 100.) *
+                  ISF_D1,
                 ISF)
   #Eqs. 35a, 35b (Wotton 2009) - Curing Factor pivoting around % 58.8
-  CF <- ifelse(FUELTYPE %in% c("O1A", "O1B"), 
-               ifelse(CC < 58.8, 0.005 * (exp(0.061 * CC) - 1), 
+  CF <- ifelse(FUELTYPE %in% c("O1A", "O1B"),
+               ifelse(CC < 58.8, 0.005 * (exp(0.061 * CC) - 1),
                       0.176 + 0.02 * (CC-58.8)),
                CF)
   #Eqs. 43a, 43b (Wotton 2009) - slope equivilent ISI for Grass
   ISF <- ifelse(FUELTYPE %in% c("O1A", "O1B"),
                 ifelse((1 - (RSF / (CF * a[FUELTYPE]))**(1 / c0[FUELTYPE])) >= 0.01,
-                       log(1 - (RSF / (CF * a[FUELTYPE]))**(1 / c0[FUELTYPE])) / 
+                       log(1 - (RSF / (CF * a[FUELTYPE]))**(1 / c0[FUELTYPE])) /
                          (-b[FUELTYPE]),
                        log(0.01) / (-b[FUELTYPE])),
                 ISF)
@@ -856,12 +823,10 @@ saveData('SlopeEquivalentInitialSpreadIndex',
               data.table(ISI=ISI),
               data.table(output = "RAZ")))
 fctSlopeWSE <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                        CC, CBH, ISI, output = "RAZ")
-{
+                        CC, CBH, ISI, output = "RAZ") {
   ISF <- fctSlopeISI(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC,
                      PDF, CC, CBH, ISI, output)
-  if (is.na(ISF) || -99.0 == ISF)
-  {
+  if (is.na(ISF) || -99.0 == ISF) {
     return(NA)
   }
   #Eq. 46 (FCFDG 1992)
@@ -896,8 +861,7 @@ saveData('SlopeEquivalentWindSpeed',
               data.table(ISI=ISI),
               data.table(output = "RAZ")))
 fctSlopeWSX <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                        CC, CBH, ISI, output = "RAZ")
-{
+                        CC, CBH, ISI, output = "RAZ") {
   WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                      CC, CBH, ISI, output)
   #Eq. 47 (FCFDG 1992) - resultant vector magnitude in the x-direction
@@ -905,8 +869,7 @@ fctSlopeWSX <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   return(WSX)
 }
 fctSlopeWSY <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                        CC, CBH, ISI, output)
-{
+                        CC, CBH, ISI, output) {
   WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                      CC, CBH, ISI, output)
   #Eq. 48 (FCFDG 1992) - resultant vector magnitude in the y-direction
@@ -914,8 +877,7 @@ fctSlopeWSY <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   return(WSY)
 }
 fctSlopeWSV <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                        CC, CBH, ISI, output)
-{
+                        CC, CBH, ISI, output) {
   WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                      CC, CBH, ISI, output)
   #Eq. 47 (FCFDG 1992) - resultant vector magnitude in the x-direction
@@ -927,8 +889,7 @@ fctSlopeWSV <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   return(WSV)
 }
 fctSlopeRAZ <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
-                        CC, CBH, ISI, output)
-{
+                        CC, CBH, ISI, output) {
   WSE <- fctSlopeWSE(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                      CC, CBH, ISI, output)
   #Eq. 47 (FCFDG 1992) - resultant vector magnitude in the x-direction
@@ -1028,8 +989,8 @@ saveData('TotalFuelConsumption',
               data.table(PC=PC),
               data.table(PDF=PDF),
               data.table(option="TFC")))
-fctWSV0  <- function(input=NULL, output="Primary") {                                                                                           
-  
+fctWSV0  <- function(input=NULL, output="Primary") {
+
   #  Quite often users will have a data frame called "input" already attached
   #  to the workspace. To mitigate this, we remove that if it exists, and warn
   #  the user of this case.
@@ -1081,70 +1042,70 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   # Set warnings for missing and required input variables.
   # Set defaults for inputs that are not already set.
   ############################################################################
-  if (!exists("FUELTYPE") | is.null(FUELTYPE)){ 
-    warning("FuelType is a required input, default FuelType = C2 is used in the 
+  if (!exists("FUELTYPE") | is.null(FUELTYPE)){
+    warning("FuelType is a required input, default FuelType = C2 is used in the
             calculation")
     FUELTYPE <- "C2"}
-  if (!exists("FFMC") | is.null(FFMC)){ 
-    warning("FFMC is a required input, default FFMC = 90 is used in the 
+  if (!exists("FFMC") | is.null(FFMC)){
+    warning("FFMC is a required input, default FFMC = 90 is used in the
             calculation")
     FFMC <- 90}
-  if (!exists("BUI") | is.null(BUI)){ 
-    warning("BUI is a required input, default BUI = 60 is used in the 
+  if (!exists("BUI") | is.null(BUI)){
+    warning("BUI is a required input, default BUI = 60 is used in the
             calculation")
     BUI <- 60}
-  if (!exists("WS") | is.null(WS)){ 
+  if (!exists("WS") | is.null(WS)){
     warning("WS is a required input, WS = 10 km/hr is used in the calculation")
     WS <- 10}
-  if (!exists("GS") | is.null(GS)){ 
+  if (!exists("GS") | is.null(GS)){
     warning("GS is a required input,GS = 0 is used in the calculation")
     GS <- 0}
-  if (!exists("LAT") | is.null(LAT)){ 
-    warning("LAT is a required input, default LAT=55 is used in the 
+  if (!exists("LAT") | is.null(LAT)){
+    warning("LAT is a required input, default LAT=55 is used in the
             calculation")
     LAT <- 55}
-  if (!exists("LONG") | is.null(LONG)){ 
+  if (!exists("LONG") | is.null(LONG)){
     warning("LONG is a required input, LONG = -120 is used in the calculation")
     LONG <- -120}
-  if (!exists("DJ") | is.null(DJ)){ 
+  if (!exists("DJ") | is.null(DJ)){
     warning("Dj is a required input, Dj = 180 is used in the calculation")
     DJ <- 180}
-  if (!exists("ASPECT") | is.null(ASPECT)){ 
+  if (!exists("ASPECT") | is.null(ASPECT)){
     warning("Aspect is a required input, Aspect = 0 is used in the calculation")
     ASPECT <- 0}
-  if (!exists("WD") | is.null(WD)) 
+  if (!exists("WD") | is.null(WD))
     WD <- 0
-  if (!exists("FMC") | is.null(FMC)) 
+  if (!exists("FMC") | is.null(FMC))
     FMC <- 0
-  if (!exists("ELV") | is.null(ELV)) 
+  if (!exists("ELV") | is.null(ELV))
     ELV <- 0
-  if (!exists("SD") | is.null(SD)) 
+  if (!exists("SD") | is.null(SD))
     SD <- 0
-  if (!exists("SH") | is.null(SH)) 
+  if (!exists("SH") | is.null(SH))
     SH <- 0
-  if (!exists("D0") | is.null(D0)) 
+  if (!exists("D0") | is.null(D0))
     D0 <- 0
-  if (!exists("HR") | is.null(HR)) 
+  if (!exists("HR") | is.null(HR))
     HR <- 1
-  if (!exists("PC") | is.null(PC)) 
+  if (!exists("PC") | is.null(PC))
     PC <- 50
-  if (!exists("PDF") | is.null(PDF)) 
+  if (!exists("PDF") | is.null(PDF))
     PDF <- 35
-  if (!exists("GFL") | is.null(GFL)) 
+  if (!exists("GFL") | is.null(GFL))
     GFL <- 0.35
-  if (!exists("CC") | is.null(CC)) 
+  if (!exists("CC") | is.null(CC))
     CC <- 80
-  if (!exists("THETA") | is.null(THETA)) 
+  if (!exists("THETA") | is.null(THETA))
     THETA <- 0
-  if (!exists("ACCEL") | is.null(ACCEL)) 
+  if (!exists("ACCEL") | is.null(ACCEL))
     ACCEL <- 0
-  if (!exists("BUIEFF") | is.null(BUIEFF)) 
+  if (!exists("BUIEFF") | is.null(BUIEFF))
     BUIEFF <- 1
-  if (!exists("CBH") | is.null(CBH)) 
+  if (!exists("CBH") | is.null(CBH))
     CBH <- 0
-  if (!exists("CFL") | is.null(CFL)) 
+  if (!exists("CFL") | is.null(CFL))
     CFL <- 0
-  if (!exists("ISI") | is.null(ISI)) 
+  if (!exists("ISI") | is.null(ISI))
     ISI <- 0
   #Convert Wind Direction from degress to radians
   WD <- WD * pi/180
@@ -1155,7 +1116,7 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   #Convert Aspect from degress to radians
   ASPECT <- ASPECT * pi/180
   ACCEL <- ifelse(is.na(ACCEL) | ACCEL < 0, 0, ACCEL)
-  if (length(ACCEL[!ACCEL %in% c(0, 1)]) > 0) 
+  if (length(ACCEL[!ACCEL %in% c(0, 1)]) > 0)
     warning("Input variable Accel is out of range, will be assigned to 1")
   ACCEL <- ifelse(!ACCEL %in% c(0, 1), 1, ACCEL)
   DJ <- ifelse(DJ < 0 | DJ > 366, 0, DJ)
@@ -1175,7 +1136,7 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   BUI <- ifelse(is.na(BUI), 60, BUI)
   WS <- ifelse(WS < 0 | WS > 300, 0, WS)
   WS <- ifelse(is.na(WS), 10, WS)
-  WD <- ifelse(is.na(WD) | WD < -2 * pi | WD > 2 * pi, 
+  WD <- ifelse(is.na(WD) | WD < -2 * pi | WD > 2 * pi,
                0, WD)
   GS <- ifelse(is.na(GS) | GS < 0 | GS > 200, 0, GS)
   GS <- ifelse(ASPECT < -2 * pi | ASPECT > 2 * pi, 0, GS)
@@ -1183,19 +1144,19 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   PDF <- ifelse(is.na(PDF) | PDF < 0 | PDF > 100, 35, PDF)
   CC <- ifelse(CC <= 0 | CC > 100, 95, CC)
   CC <- ifelse(is.na(CC), 80, CC)
-  GFL <- ifelse(is.na(GFL) | GFL <= 0 | GFL > 100, 0.35, 
+  GFL <- ifelse(is.na(GFL) | GFL <= 0 | GFL > 100, 0.35,
                 GFL)
   LAT <- ifelse(LAT < -90 | LAT > 90, 0, LAT)
   LAT <- ifelse(is.na(LAT), 55, LAT)
   LONG <- ifelse(LONG < -180 | LONG > 360, 0, LONG)
   LONG <- ifelse(is.na(LONG), -120, LONG)
-  THETA <- ifelse(is.na(THETA) | THETA < -2 * pi | THETA > 
+  THETA <- ifelse(is.na(THETA) | THETA < -2 * pi | THETA >
                     2 * pi, 0, THETA)
   SD <- ifelse(SD < 0 | SD > 1e+05, -999, SD)
   SD <- ifelse(is.na(SD), 0, SD)
   SH <- ifelse(SH < 0 | SH > 100, -999, SH)
   SH <- ifelse(is.na(SH), 0, SH)
-  
+
   FUELTYPE <- sub("-", "", FUELTYPE)
   FUELTYPE <- sub(" ", "", FUELTYPE)
   if(length(FUELTYPE[is.na(FUELTYPE)])>0){
@@ -1215,7 +1176,7 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
   SAZ <- ASPECT + pi
   SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
-  #Any negative longitudes (western hemisphere) are translated to positive 
+  #Any negative longitudes (western hemisphere) are translated to positive
   #  longitudes
   LONG <- ifelse(LONG < 0, -LONG, LONG)
   ############################################################################
@@ -1227,27 +1188,27 @@ fctWSV0  <- function(input=NULL, output="Primary") {
   ############################################################################
   SFC <- TFC <- HFI <- CFB <- ROS <- 0
   RAZ <- -999
-  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+  if (output == "SECONDARY" | output == "ALL" | output == "S" |
       output == "A") {
-    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
+    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <-
       BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
-  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0, 
+  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0,
             0, 0)
-  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
-                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7",
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A",
                    "O1B")
-  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in% 
-                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 * 
+  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in%
+                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 *
                                                            SD, CBHs[FUELTYPE]), CBH)
   CBH <- ifelse(CBH < 0, 1e-07, CBH)
-  CFLs <- c(0.75, 0.8, 1.15, 1.2, 1.2, 1.8, 0.5, 0, 0.8, 0.8, 
+  CFLs <- c(0.75, 0.8, 1.15, 1.2, 1.2, 1.8, 0.5, 0, 0.8, 0.8,
             0.8, 0.8, 0, 0, 0, 0, 0)
-  names(CFLs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
-                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+  names(CFLs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7",
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A",
                    "O1B")
-  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), CFLs[FUELTYPE], 
+  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), CFLs[FUELTYPE],
                 CFL)
   FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC), cffdrs:::.FMCcalc(LAT,
                                                             LONG, ELV, DJ, D0), FMC)
@@ -1269,8 +1230,7 @@ fctWSV0  <- function(input=NULL, output="Primary") {
 saveData('FireBehaviourPrediction_WSV0',
          fctOnInput(fctWSV0),
          FBP_ARGS)
-fctRAZ0  <- function(input=NULL, output="Primary")
-{                                                                                           
+fctRAZ0  <- function(input=NULL, output="Primary") {
   #  Quite often users will have a data frame called "input" already attached
   #  to the workspace. To mitigate this, we remove that if it exists, and warn
   #  the user of this case.
@@ -1323,70 +1283,70 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   # Set warnings for missing and required input variables.
   # Set defaults for inputs that are not already set.
   ############################################################################
-  if (!exists("FUELTYPE") | is.null(FUELTYPE)){ 
-    warning("FuelType is a required input, default FuelType = C2 is used in the 
+  if (!exists("FUELTYPE") | is.null(FUELTYPE)){
+    warning("FuelType is a required input, default FuelType = C2 is used in the
             calculation")
     FUELTYPE <- "C2"}
-  if (!exists("FFMC") | is.null(FFMC)){ 
-    warning("FFMC is a required input, default FFMC = 90 is used in the 
+  if (!exists("FFMC") | is.null(FFMC)){
+    warning("FFMC is a required input, default FFMC = 90 is used in the
             calculation")
     FFMC <- 90}
-  if (!exists("BUI") | is.null(BUI)){ 
-    warning("BUI is a required input, default BUI = 60 is used in the 
+  if (!exists("BUI") | is.null(BUI)){
+    warning("BUI is a required input, default BUI = 60 is used in the
             calculation")
     BUI <- 60}
-  if (!exists("WS") | is.null(WS)){ 
+  if (!exists("WS") | is.null(WS)){
     warning("WS is a required input, WS = 10 km/hr is used in the calculation")
     WS <- 10}
-  if (!exists("GS") | is.null(GS)){ 
+  if (!exists("GS") | is.null(GS)){
     warning("GS is a required input,GS = 0 is used in the calculation")
     GS <- 0}
-  if (!exists("LAT") | is.null(LAT)){ 
-    warning("LAT is a required input, default LAT=55 is used in the 
+  if (!exists("LAT") | is.null(LAT)){
+    warning("LAT is a required input, default LAT=55 is used in the
             calculation")
     LAT <- 55}
-  if (!exists("LONG") | is.null(LONG)){ 
+  if (!exists("LONG") | is.null(LONG)){
     warning("LONG is a required input, LONG = -120 is used in the calculation")
     LONG <- -120}
-  if (!exists("DJ") | is.null(DJ)){ 
+  if (!exists("DJ") | is.null(DJ)){
     warning("Dj is a required input, Dj = 180 is used in the calculation")
     DJ <- 180}
-  if (!exists("ASPECT") | is.null(ASPECT)){ 
+  if (!exists("ASPECT") | is.null(ASPECT)){
     warning("Aspect is a required input, Aspect = 0 is used in the calculation")
     ASPECT <- 0}
-  if (!exists("WD") | is.null(WD)) 
+  if (!exists("WD") | is.null(WD))
     WD <- 0
-  if (!exists("FMC") | is.null(FMC)) 
+  if (!exists("FMC") | is.null(FMC))
     FMC <- 0
-  if (!exists("ELV") | is.null(ELV)) 
+  if (!exists("ELV") | is.null(ELV))
     ELV <- 0
-  if (!exists("SD") | is.null(SD)) 
+  if (!exists("SD") | is.null(SD))
     SD <- 0
-  if (!exists("SH") | is.null(SH)) 
+  if (!exists("SH") | is.null(SH))
     SH <- 0
-  if (!exists("D0") | is.null(D0)) 
+  if (!exists("D0") | is.null(D0))
     D0 <- 0
-  if (!exists("HR") | is.null(HR)) 
+  if (!exists("HR") | is.null(HR))
     HR <- 1
-  if (!exists("PC") | is.null(PC)) 
+  if (!exists("PC") | is.null(PC))
     PC <- 50
-  if (!exists("PDF") | is.null(PDF)) 
+  if (!exists("PDF") | is.null(PDF))
     PDF <- 35
-  if (!exists("GFL") | is.null(GFL)) 
+  if (!exists("GFL") | is.null(GFL))
     GFL <- 0.35
-  if (!exists("CC") | is.null(CC)) 
+  if (!exists("CC") | is.null(CC))
     CC <- 80
-  if (!exists("THETA") | is.null(THETA)) 
+  if (!exists("THETA") | is.null(THETA))
     THETA <- 0
-  if (!exists("ACCEL") | is.null(ACCEL)) 
+  if (!exists("ACCEL") | is.null(ACCEL))
     ACCEL <- 0
-  if (!exists("BUIEFF") | is.null(BUIEFF)) 
+  if (!exists("BUIEFF") | is.null(BUIEFF))
     BUIEFF <- 1
-  if (!exists("CBH") | is.null(CBH)) 
+  if (!exists("CBH") | is.null(CBH))
     CBH <- 0
-  if (!exists("CFL") | is.null(CFL)) 
+  if (!exists("CFL") | is.null(CFL))
     CFL <- 0
-  if (!exists("ISI") | is.null(ISI)) 
+  if (!exists("ISI") | is.null(ISI))
     ISI <- 0
   #Convert Wind Direction from degress to radians
   WD <- WD * pi/180
@@ -1397,7 +1357,7 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   #Convert Aspect from degress to radians
   ASPECT <- ASPECT * pi/180
   ACCEL <- ifelse(is.na(ACCEL) | ACCEL < 0, 0, ACCEL)
-  if (length(ACCEL[!ACCEL %in% c(0, 1)]) > 0) 
+  if (length(ACCEL[!ACCEL %in% c(0, 1)]) > 0)
     warning("Input variable Accel is out of range, will be assigned to 1")
   ACCEL <- ifelse(!ACCEL %in% c(0, 1), 1, ACCEL)
   DJ <- ifelse(DJ < 0 | DJ > 366, 0, DJ)
@@ -1417,7 +1377,7 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   BUI <- ifelse(is.na(BUI), 60, BUI)
   WS <- ifelse(WS < 0 | WS > 300, 0, WS)
   WS <- ifelse(is.na(WS), 10, WS)
-  WD <- ifelse(is.na(WD) | WD < -2 * pi | WD > 2 * pi, 
+  WD <- ifelse(is.na(WD) | WD < -2 * pi | WD > 2 * pi,
                0, WD)
   GS <- ifelse(is.na(GS) | GS < 0 | GS > 200, 0, GS)
   GS <- ifelse(ASPECT < -2 * pi | ASPECT > 2 * pi, 0, GS)
@@ -1425,13 +1385,13 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   PDF <- ifelse(is.na(PDF) | PDF < 0 | PDF > 100, 35, PDF)
   CC <- ifelse(CC <= 0 | CC > 100, 95, CC)
   CC <- ifelse(is.na(CC), 80, CC)
-  GFL <- ifelse(is.na(GFL) | GFL <= 0 | GFL > 100, 0.35, 
+  GFL <- ifelse(is.na(GFL) | GFL <= 0 | GFL > 100, 0.35,
                 GFL)
   LAT <- ifelse(LAT < -90 | LAT > 90, 0, LAT)
   LAT <- ifelse(is.na(LAT), 55, LAT)
   LONG <- ifelse(LONG < -180 | LONG > 360, 0, LONG)
   LONG <- ifelse(is.na(LONG), -120, LONG)
-  THETA <- ifelse(is.na(THETA) | THETA < -2 * pi | THETA > 
+  THETA <- ifelse(is.na(THETA) | THETA < -2 * pi | THETA >
                     2 * pi, 0, THETA)
   SD <- ifelse(SD < 0 | SD > 1e+05, -999.0, as.numeric(SD))
   SD <- ifelse(is.na(SD), 0.0, SD)
@@ -1457,7 +1417,7 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   WAZ <- ifelse(WAZ > 2 * pi, WAZ - 2 * pi, WAZ)
   SAZ <- ASPECT + pi
   SAZ <- ifelse(SAZ > 2 * pi, SAZ - 2 * pi, SAZ)
-  #Any negative longitudes (western hemisphere) are translated to positive 
+  #Any negative longitudes (western hemisphere) are translated to positive
   #  longitudes
   LONG <- ifelse(LONG < 0, -LONG, LONG)
   ############################################################################
@@ -1469,27 +1429,27 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   ############################################################################
   SFC <- TFC <- HFI <- CFB <- ROS <- 0
   RAZ <- -999
-  if (output == "SECONDARY" | output == "ALL" | output == "S" | 
+  if (output == "SECONDARY" | output == "ALL" | output == "S" |
       output == "A") {
-    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <- 
+    FROS <- BROS <- TROS <- HROSt <- FROSt <- BROSt <- TROSt <- FCFB <-
       BCFB <- TCFB <- FFI <- BFI <- TFI <- FTFC <- BTFC <- TTFC <- 0
     TI <- FTI <- BTI <- TTI <- LB <- WSV <- -999
   }
-  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0, 
+  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0,
             0, 0)
-  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
-                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7",
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A",
                    "O1B")
-  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in% 
-                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 * 
+  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in%
+                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 *
                                                            SD, CBHs[FUELTYPE]), CBH)
   CBH <- ifelse(CBH < 0, 1e-07, CBH)
-  CFLs <- c(0.75, 0.8, 1.15, 1.2, 1.2, 1.8, 0.5, 0, 0.8, 0.8, 
+  CFLs <- c(0.75, 0.8, 1.15, 1.2, 1.2, 1.8, 0.5, 0, 0.8, 0.8,
             0.8, 0.8, 0, 0, 0, 0, 0)
-  names(CFLs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
-                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+  names(CFLs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7",
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A",
                    "O1B")
-  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), CFLs[FUELTYPE], 
+  CFL <- ifelse(CFL <= 0 | CFL > 2 | is.na(CFL), CFLs[FUELTYPE],
                 CFL)
   FMC <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC), cffdrs:::.FMCcalc(LAT,
                                                                      LONG, ELV, DJ, D0), FMC)
@@ -1498,28 +1458,27 @@ fctRAZ0  <- function(input=NULL, output="Primary")
   ############################################################################
   #                         END
   ############################################################################
-  
+
   #Calculate Surface fuel consumption (SFC)
   SFC <- cffdrs:::.SFCcalc(FUELTYPE, FFMC, BUI, PC, GFL)
   #Disable BUI Effect if necessary
   BUI <- ifelse(BUIEFF != 1, 0, BUI)
   #Calculate the net effective windspeed (WSV)
-  RAZ0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, 
+  RAZ0 <- cffdrs:::.Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ,
                      FMC, SFC, PC, PDF, CC, CBH, ISI, "RAZ")
   return(RAZ0)
 }
 saveData('FireBehaviourPrediction_RAZ0',
          fctOnInput(fctRAZ0),
          FBP_ARGS)
-fctCBH <-function(FUELTYPE, CBH, SD, SH)
-{
-  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0, 
+fctCBH <-function(FUELTYPE, CBH, SD, SH) {
+  CBHs <- c(2, 3, 8, 4, 18, 7, 10, 0, 6, 6, 6, 6, 0, 0, 0,
             0, 0)
-  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7", 
-                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A", 
+  names(CBHs) <- c("C1", "C2", "C3", "C4", "C5", "C6", "C7",
+                   "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1A",
                    "O1B")
-  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in% 
-                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 * 
+  CBH <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in%
+                                                           c("C6") & SD > 0 & SH > 0, -11.2 + 1.06 * SH + 0.0017 *
                                                            SD, CBHs[FUELTYPE]), CBH)
   CBH <- ifelse(CBH < 0, 1e-07, CBH)
   return(CBH)
@@ -1539,12 +1498,10 @@ saveResults('SimardRateOfSpreadPoint',
 ###########################################################################
 # Raster tests
 ###########################################################################
-saveRasters <- function(name, rasters)
-{
+saveRasters <- function(name, rasters) {
   out_dir <- paste0(PATH, "/rasters/", name, "/")
   dir.create(out_dir, showWarnings=FALSE, recursive=TRUE)
-  for(i in 1:length(names(rasters)))
-  {
+  for(i in 1:length(names(rasters))) {
     n <- names(rasters)[[i]]
     lyr <- rasters[[n]]
     write.csv(as.data.frame(lyr), paste0(out_dir, n, ".csv"), row.names=FALSE)
