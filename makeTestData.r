@@ -163,7 +163,7 @@ saveResults <- function(name, data, path = PATH) {
   write.csv(data,
     paste0(path, name, ".csv"),
     row.names = FALSE,
-    quote = TRUE
+    quote = FALSE
   )
 }
 
@@ -1905,26 +1905,10 @@ saveResults("fbp_09", cffdrs::fbp(test_fbp[8:13, ]))
 saveResults("fbp_10", cffdrs::fbp())
 non_fuel <- copy(test_fbp)
 non_fuel$FuelType <- "NF"
-# saveResults("fbp_11", fbp(non_fuel, "All"))
-write.csv(fbp(non_fuel, "All"), paste0(PATH, "fbp_11.csv"), row.names = FALSE, quote = FALSE)
+saveResults("fbp_11", fbp(non_fuel, "All"))
 water <- copy(test_fbp)
 water$FuelType <- "WA"
 saveResults("fbp_12", fbp(water, "All"))
-
-# make sure things match right now, or test data isn't useful
-stopifnot(all(as.character(fbp(test_fbp)) == as.character(read.csv(paste0(PATH, "fbp_01.csv")))))
-stopifnot(all(as.character(fbp(test_fbp, output = "Primary")) == as.character(read.csv(paste0(PATH, "fbp_02.csv")))))
-stopifnot(all(as.character(fbp(test_fbp, "P")) == as.character(read.csv(paste0(PATH, "fbp_03.csv")))))
-stopifnot(all(as.character(fbp(test_fbp, "Secondary")) == as.character(read.csv(paste0(PATH, "fbp_04.csv")))))
-stopifnot(all(as.character(fbp(test_fbp, "S")) == as.character(read.csv(paste0(PATH, "fbp_05.csv")))))
-stopifnot(all(as.character(fbp(test_fbp, "All")) == as.character(read.csv(paste0(PATH, "fbp_06.csv")))))
-stopifnot(all(as.character(fbp(test_fbp, "A")) == as.character(read.csv(paste0(PATH, "fbp_07.csv")))))
-stopifnot(all(as.character(fbp(test_fbp[7, ])) == as.character(read.csv(paste0(PATH, "fbp_08.csv")))))
-stopifnot(all(as.character(fbp(test_fbp[8:13, ])) == as.character(read.csv(paste0(PATH, "fbp_09.csv")))))
-stopifnot(all(as.character(fbp()) == as.character(read.csv(paste0(PATH, "fbp_10.csv")))))
-stopifnot(all(as.character(fbp(non_fuel, "All")) == as.character(read.csv(paste0(PATH, "fbp_11.csv")))))
-stopifnot(all(as.character(fbp(water, "All")) == as.character(read.csv(paste0(PATH, "fbp_12.csv")))))
-
 
 data("test_fwi", package = "cffdrs")
 test_fwi$long <- as.numeric(test_fwi$long)
@@ -1949,14 +1933,38 @@ saveResults("fwi_10", fwi(test_fwi[8:13, ]))
 # saveResults("fwi_11", fwi(test_fwi, batch = FALSE))
 
 
-stopifnot(all(as.character(fwi(test_fwi)) == as.character(read.csv(paste0(PATH, "fwi_01.csv")))))
-stopifnot(all(as.character(fwi(test_fwi, out = "all")) == as.character(read.csv(paste0(PATH, "fwi_02.csv")))))
-stopifnot(all(as.character(fwi(test_fwi, out = "fwi")) == as.character(read.csv(paste0(PATH, "fwi_03.csv")))))
-stopifnot(all(as.character(fwi(test_fwi, init = data.frame(ffmc = 85, dmc = 6, dc = 15, lat = 55))) == as.character(read.csv(paste0(PATH, "fwi_04.csv")))))
-stopifnot(all(as.character(fwi(test_fwi, init = data.frame(ffmc = 0, dmc = 0, dc = 0, lat = 55))) == as.character(read.csv(paste0(PATH, "fwi_05.csv")))))
-stopifnot(all(as.character(fwi(test_fwi, init = data.frame(ffmc = 200, dmc = 1000, dc = 10000, lat = 55))) == as.character(read.csv(paste0(PATH, "fwi_06.csv")))))
-stopifnot(all(as.character(fwi(test_fwi, lat.adjust = FALSE)) == as.character(read.csv(paste0(PATH, "fwi_07.csv")))))
-stopifnot(all(as.character(fwi(test_fwi, uppercase = FALSE)) == as.character(read.csv(paste0(PATH, "fwi_08.csv")))))
-stopifnot(all(as.character(fwi(test_fwi[7, ])) == as.character(read.csv(paste0(PATH, "fwi_09.csv")))))
-# HACK: the date range gets converted to '20:25' if as.character() is called directly on the data.frame
-stopifnot(all(as.character(lapply(fwi(test_fwi[8:13, ]), as.character)) == as.character(lapply(read.csv(paste0(PATH, "fwi_10.csv")), as.character))))
+
+cmp_text <- function(data, name) {
+  # comparing NA doesn't work
+  df2 <- read.csv(paste0(PATH, name), na.strings = NULL)
+  # HACK: the date range gets converted to '20:25' if as.character() is called directly on the data.frame
+  stopifnot(all(as.character(lapply(data, as.character)) == as.character(lapply(df2, as.character))))
+}
+
+# make sure things match right now, or test data isn't useful
+cmp_text(fbp(test_fbp), "fbp_01.csv")
+cmp_text(fbp(test_fbp, output = "Primary"), "fbp_02.csv")
+cmp_text(fbp(test_fbp, "P"), "fbp_03.csv")
+cmp_text(fbp(test_fbp, "Secondary"), "fbp_04.csv")
+cmp_text(fbp(test_fbp, "S"), "fbp_05.csv")
+cmp_text(fbp(test_fbp, "All"), "fbp_06.csv")
+cmp_text(fbp(test_fbp, "A"), "fbp_07.csv")
+cmp_text(fbp(test_fbp[7, ]), "fbp_08.csv")
+cmp_text(fbp(test_fbp[8:13, ]), "fbp_09.csv")
+cmp_text(fbp(), "fbp_10.csv")
+cmp_text(fbp(non_fuel, "All"), "fbp_11.csv")
+cmp_text(fbp(water, "All"), "fbp_12.csv")
+
+
+cmp_text(fwi(test_fwi), "fwi_01.csv")
+cmp_text(fwi(test_fwi, out = "all"), "fwi_02.csv")
+cmp_text(fwi(test_fwi, out = "fwi"), "fwi_03.csv")
+cmp_text(fwi(test_fwi, init = data.frame(ffmc = 85, dmc = 6, dc = 15, lat = 55)), "fwi_04.csv")
+cmp_text(fwi(test_fwi, init = data.frame(ffmc = 0, dmc = 0, dc = 0, lat = 55)), "fwi_05.csv")
+cmp_text(fwi(test_fwi, init = data.frame(ffmc = 200, dmc = 1000, dc = 10000, lat = 55)), "fwi_06.csv")
+cmp_text(fwi(test_fwi, lat.adjust = FALSE), "fwi_07.csv")
+cmp_text(fwi(test_fwi, uppercase = FALSE), "fwi_08.csv")
+cmp_text(fwi(test_fwi[7, ]), "fwi_09.csv")
+cmp_text(fwi(test_fwi[8:13, ]), "fwi_10.csv")
+
+print("Done")
