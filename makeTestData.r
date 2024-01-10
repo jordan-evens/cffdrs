@@ -159,9 +159,12 @@ makeData <- function(name, fct, arguments, split_args) {
   }
 }
 
-saveResults <- function(name, data) {
-  # data <- apply(data, 2, as.character)
-  write.csv(data, paste0(PATH, name, ".csv"), row.names = FALSE)
+saveResults <- function(name, data, path = PATH) {
+  write.csv(data,
+    paste0(path, name, ".csv"),
+    row.names = FALSE,
+    quote = TRUE
+  )
 }
 
 saveData <- function(name, fct, arguments, split_args = TRUE) {
@@ -490,27 +493,7 @@ saveData("HourlyFineFuelMoistureCode",
   ),
   split_args = FALSE
 )
-data("test_fbp", package = "cffdrs")
-test_fbp$FFMC <- as.numeric(test_fbp$FFMC)
-test_fbp$hr <- as.numeric(test_fbp$hr)
-test_fbp$WS <- as.numeric(test_fbp$WS)
-test_fbp$GFL <- as.numeric(test_fbp$GFL)
-test_fbp$CBH <- as.numeric(test_fbp$CBH)
-test_fbp$CFL <- as.numeric(test_fbp$CFL)
-saveResults(
-  "FireBehaviourPrediction_test_fbp",
-  cffdrs:::.FBPcalc(test_fbp, "A")
-)
-saveResults("fbp_01", cffdrs::fbp(test_fbp))
-saveResults("fbp_02", cffdrs::fbp(test_fbp, output = "Primary"))
-saveResults("fbp_03", cffdrs::fbp(test_fbp, "P"))
-saveResults("fbp_04", cffdrs::fbp(test_fbp, "Secondary"))
-saveResults("fbp_05", cffdrs::fbp(test_fbp, "S"))
-saveResults("fbp_06", cffdrs::fbp(test_fbp, "All"))
-saveResults("fbp_07", cffdrs::fbp(test_fbp, "A"))
-saveResults("fbp_08", cffdrs::fbp(test_fbp[7, ]))
-saveResults("fbp_09", cffdrs::fbp(test_fbp[8:13, ]))
-saveResults("fbp_10", cffdrs::fbp())
+
 saveData(
   "FireBehaviourPrediction",
   fctOnInput(cffdrs:::.FBPcalc),
@@ -1014,6 +997,7 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   )
   return(ISF)
 }
+
 saveData(
   "SlopeEquivalentInitialSpreadIndex",
   fctSlopeISI,
@@ -1865,7 +1849,7 @@ saveRasters <- function(name, rasters) {
   for (i in 1:length(names(rasters))) {
     n <- names(rasters)[[i]]
     lyr <- rasters[[n]]
-    write.csv(as.data.frame(lyr), paste0(out_dir, n, ".csv"), row.names = FALSE)
+    saveResults(as.character(n), as.data.frame(lyr), path = out_dir)
   }
 }
 
@@ -1897,34 +1881,46 @@ dat0 <- input[[c("FuelType", "LAT", "LONG", "FFMC", "BUI", "WS", "GS", "Dj", "As
 system.time(foo5 <- fbpRaster(input = dat0, output = "A"))
 saveRasters("foo5", foo5)
 
-write.csv(fbp(test_fbp), paste0(PATH, "fbp_01.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp, output = "Primary"), paste0(PATH, "fbp_02.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp, "P"), paste0(PATH, "fbp_03.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp, "Secondary"), paste0(PATH, "fbp_04.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp, "S"), paste0(PATH, "fbp_05.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp, "All"), paste0(PATH, "fbp_06.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp, "A"), paste0(PATH, "fbp_07.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp[7, ]), paste0(PATH, "fbp_08.csv"), row.names = FALSE)
-write.csv(fbp(test_fbp[8:13, ]), paste0(PATH, "fbp_09.csv"), row.names = FALSE)
-write.csv(fbp(), paste0(PATH, "fbp_10.csv"), row.names = FALSE)
+
+data("test_fbp", package = "cffdrs")
+test_fbp$FFMC <- as.numeric(test_fbp$FFMC)
+test_fbp$hr <- as.numeric(test_fbp$hr)
+test_fbp$WS <- as.numeric(test_fbp$WS)
+test_fbp$GFL <- as.numeric(test_fbp$GFL)
+test_fbp$CBH <- as.numeric(test_fbp$CBH)
+test_fbp$CFL <- as.numeric(test_fbp$CFL)
+saveResults(
+  "FireBehaviourPrediction_test_fbp",
+  cffdrs:::.FBPcalc(test_fbp, "A")
+)
+saveResults("fbp_01", cffdrs::fbp(test_fbp))
+saveResults("fbp_02", cffdrs::fbp(test_fbp, output = "Primary"))
+saveResults("fbp_03", cffdrs::fbp(test_fbp, "P"))
+saveResults("fbp_04", cffdrs::fbp(test_fbp, "Secondary"))
+saveResults("fbp_05", cffdrs::fbp(test_fbp, "S"))
+saveResults("fbp_06", cffdrs::fbp(test_fbp, "All"))
+saveResults("fbp_07", cffdrs::fbp(test_fbp, "A"))
+saveResults("fbp_08", cffdrs::fbp(test_fbp[7, ]))
+saveResults("fbp_09", cffdrs::fbp(test_fbp[8:13, ]))
+saveResults("fbp_10", cffdrs::fbp())
 non_fuel <- copy(test_fbp)
 non_fuel$FuelType <- "NF"
+# saveResults("fbp_11", fbp(non_fuel, "All"))
 write.csv(fbp(non_fuel, "All"), paste0(PATH, "fbp_11.csv"), row.names = FALSE, quote = FALSE)
 water <- copy(test_fbp)
 water$FuelType <- "WA"
-write.csv(fbp(non_fuel, "All"), paste0(PATH, "fbp_12.csv"), row.names = FALSE)
+saveResults("fbp_12", fbp(water, "All"))
 
-
-as.character(fbp(test_fbp)) == as.character(read.csv(paste0(PATH, "fbp_01.csv")))
-as.character(fbp(test_fbp, output = "Primary")) == as.character(read.csv(paste0(PATH, "fbp_02.csv")))
-as.character(fbp(test_fbp, "P")) == as.character(read.csv(paste0(PATH, "fbp_03.csv")))
-as.character(fbp(test_fbp, "Secondary")) == as.character(read.csv(paste0(PATH, "fbp_04.csv")))
-as.character(fbp(test_fbp, "S")) == as.character(read.csv(paste0(PATH, "fbp_05.csv")))
-as.character(fbp(test_fbp, "All")) == as.character(read.csv(paste0(PATH, "fbp_06.csv")))
-as.character(fbp(test_fbp, "A")) == as.character(read.csv(paste0(PATH, "fbp_07.csv")))
-as.character(fbp(test_fbp[7, ])) == as.character(read.csv(paste0(PATH, "fbp_08.csv")))
-as.character(fbp(test_fbp[8:13, ])) == as.character(read.csv(paste0(PATH, "fbp_09.csv")))
-as.character(fbp()) == as.character(read.csv(paste0(PATH, "fbp_10.csv")))
-# having trouble with comparing NA
-checkResults("fbp_11", fbp(non_fuel, "All"))
-checkResults("fbp_12", fbp(water, "All"))
+# make sure things match right now, or test data isn't useful
+stopifnot(all(as.character(fbp(test_fbp)) == as.character(read.csv(paste0(PATH, "fbp_01.csv")))))
+stopifnot(all(as.character(fbp(test_fbp, output = "Primary")) == as.character(read.csv(paste0(PATH, "fbp_02.csv")))))
+stopifnot(all(as.character(fbp(test_fbp, "P")) == as.character(read.csv(paste0(PATH, "fbp_03.csv")))))
+stopifnot(all(as.character(fbp(test_fbp, "Secondary")) == as.character(read.csv(paste0(PATH, "fbp_04.csv")))))
+stopifnot(all(as.character(fbp(test_fbp, "S")) == as.character(read.csv(paste0(PATH, "fbp_05.csv")))))
+stopifnot(all(as.character(fbp(test_fbp, "All")) == as.character(read.csv(paste0(PATH, "fbp_06.csv")))))
+stopifnot(all(as.character(fbp(test_fbp, "A")) == as.character(read.csv(paste0(PATH, "fbp_07.csv")))))
+stopifnot(all(as.character(fbp(test_fbp[7, ])) == as.character(read.csv(paste0(PATH, "fbp_08.csv")))))
+stopifnot(all(as.character(fbp(test_fbp[8:13, ])) == as.character(read.csv(paste0(PATH, "fbp_09.csv")))))
+stopifnot(all(as.character(fbp()) == as.character(read.csv(paste0(PATH, "fbp_10.csv")))))
+stopifnot(all(as.character(fbp(non_fuel, "All")) == as.character(read.csv(paste0(PATH, "fbp_11.csv")))))
+stopifnot(all(as.character(fbp(water, "All")) == as.character(read.csv(paste0(PATH, "fbp_12.csv")))))
