@@ -1843,43 +1843,52 @@ saveResults(
 ###########################################################################
 # Raster tests
 ###########################################################################
-saveRasters <- function(name, rasters) {
+saveRasters <- function(name, rasters)
+{
   out_dir <- paste0(PATH, "/rasters/", name, "/")
-  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-  for (i in 1:length(names(rasters))) {
-    n <- names(rasters)[[i]]
-    lyr <- rasters[[n]]
-    saveResults(as.character(n), as.data.frame(lyr), path = out_dir)
-  }
+  dir.create(out_dir, showWarnings=FALSE, recursive=TRUE)
+
+  terra::writeRaster(rasters, paste0(out_dir, name, ".tif"), overwrite=T)
+
 }
 
-test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package = "cffdrs"))
-input <- test_fbpRaster
+test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
+input<-test_fbpRaster
 # Stack doesn't hold the raster layer names, we have to assign
 # them:
-names(input) <- c(
-  "FuelType", "LAT", "LONG", "ELV", "FFMC", "BUI", "WS", "WD", "GS", "Dj", "D0", "hr", "PC",
-  "PDF", "GFL", "cc", "theta", "Accel", "Aspect", "BUIEff", "CBH", "CFL", "ISI"
-)
+names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
+                "PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
 # Primary outputs:
-system.time(foo1 <- fbpRaster(input = input))
-saveRasters("foo1", foo1)
+system.time(foo1<-fbpRaster(input = input2))
+saveRasters("fbpRaster_test1", foo1)
 # Using the "select" option:
-system.time(foo2 <- fbpRaster(input = input, select = c("HFI", "TFC", "ROS")))
-saveRasters("foo2", foo2)
+system.time(foo2<-fbpRaster(input = input,select=c("HFI","TFC", "ROS")))
+saveRasters("fbpRaster_test2", foo2)
 # Secondary outputs:
-system.time(foo3 <- fbpRaster(input = input, output = "S"))
-saveRasters("foo3", foo3)
+system.time(foo3<-fbpRaster(input = input,output="S"))
+saveRasters("fbpRaster_test3", foo3)
 # All outputs:
-system.time(foo4 <- fbpRaster(input = input, output = "A"))
-saveRasters("foo4", foo4)
+system.time(foo4<-fbpRaster(input = input,output="A"))
+saveRasters("fbpRaster_test4", foo4)
 ### Additional, longer running examples  ###
 # Keep only the required input layers, the other layers would be
 # assigned with default values:
 # keep only the required inputs:
-dat0 <- input[[c("FuelType", "LAT", "LONG", "FFMC", "BUI", "WS", "GS", "Dj", "Aspect")]]
-system.time(foo5 <- fbpRaster(input = dat0, output = "A"))
-saveRasters("foo5", foo5)
+dat0<-input[[c("FuelType","LAT","LONG","FFMC","BUI","WS","GS", "Dj","Aspect")]]
+system.time(foo5<-fbpRaster(input = dat0,output="A"))
+saveRasters("fbpRaster_test5", foo5)
+
+test_fwiRaster <- stack(system.file("extdata", "test_rast_day01.tif", package="cffdrs"))
+names(test_fwiRaster) <- c("temp", "rh", "ws", "prec")
+
+system.time(foo1 <- fwiRaster(input = test_fwiRaster))
+saveRasters("fwiRaster_test1", foo1)
+
+system.time(foo2 <- fwiRaster(input = test_fwiRaster,out = "all"))
+saveRasters("fwiRaster_test2", foo2)
+
+system.time(foo3 <- fwiRaster(input = test_fwiRaster,out = "fwi"))
+saveRasters("fwiRaster_test3", foo3)
 
 
 data("test_fbp", package = "cffdrs")
