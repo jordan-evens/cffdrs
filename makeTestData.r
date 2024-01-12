@@ -1859,7 +1859,7 @@ input<-test_fbpRaster
 names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
                 "PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
 # Primary outputs:
-system.time(foo1<-fbpRaster(input = input2))
+system.time(foo1<-fbpRaster(input = input))
 saveRasters("fbpRaster_test1", foo1)
 # Using the "select" option:
 system.time(foo2<-fbpRaster(input = input,select=c("HFI","TFC", "ROS")))
