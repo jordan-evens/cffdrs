@@ -2,9 +2,11 @@ library(cffdrs)
 library(data.table)
 library(testthat)
 # setwd("cffdrs/tests/testthat")
-PATH <- "cffdrs/tests/data/"
+PATH <- "cffdrs/tests/data"
 dir.create(PATH, showWarnings = FALSE, recursive = TRUE)
 library(raster)
+
+SIG_DIGS <- 6
 
 DESIRED_ROWS <- 5000
 
@@ -159,26 +161,45 @@ makeData <- function(name, fct, arguments, split_args) {
   }
 }
 
-saveResults <- function(name, data, path = PATH) {
-  write.csv(data,
-    paste0(path, name, ".csv"),
+roundData <- function(data) {
+  for (col in names(data)) {
+    if (is.numeric(data[[col]])) {
+      data[[col]] <- signif(data[[col]], SIG_DIGS)
+    }
+  }
+  return(data)
+}
+
+saveResults <- function(name, data) {
+  write.csv(roundData(data),
+    get_data_path(sprintf("%s.csv", name)),
     row.names = FALSE,
     quote = FALSE
   )
 }
 
 saveData <- function(name, fct, arguments, split_args = TRUE) {
+  print(paste0("Creating ", name))
   saveResults(name, makeData(name, fct, arguments, split_args))
-  print(paste0("Checking ", name))
   checkData(name, fct, arguments, split_args)
 }
 
-checkResults <- function(name, df1) {
-  df1 <- data.table(df1)
-  df2 <- data.table(read.csv(paste0(PATH, name, ".csv")))
-  expect_equal(colnames(df1), colnames(df2))
-  for (n in sort(colnames(df1))) {
-    test_that(paste0(name, "$", n), {
+checkEqual <- function(name, df1, df2) {
+  ignore_names <- is.vector(df1)
+  df1 <- as.data.table(df1)
+  df2 <- as.data.table(df2)
+  expect_equal(length(colnames(df1)), length(colnames(df2)))
+  if (ignore_names)
+  {
+    colnames(df2) <- colnames(df1)
+  }
+  else
+  {
+    expect_equal(colnames(df1), colnames(df2))
+  }
+  for (n in sort(colnames(df1)))
+  {
+    test_that(paste0(name, '$', n), {
       actual <- unlist(df1[[n]])
       expected <- unlist(df2[[n]])
       # unsure if this will cause problems, but seems to fix when column is all NA
@@ -188,9 +209,30 @@ checkResults <- function(name, df1) {
   }
 }
 
+get_data_path <- function(name) {
+  return(fs::path_abs(sprintf("%s/%s", PATH, name)))
+}
+
+read_data <- function(name) {
+  return(read.csv(get_data_path(sprintf("%s.csv", name))))
+}
+
+read_raster <- function(name) {
+  return(rast(get_data_path(sprintf("rasters/%s/%s.tif", name, name))))
+}
+
+read_raster <- function(name) {
+  return(rast(get_data_path(sprintf("rasters/%s/%s.tif", name, name))))
+}
+
+checkResults <- function(name, df1)
+{
+  checkEqual(name, df1, read_data(name))
+}
+
 checkData <- function(name, fct, arguments, split_args = TRUE) {
-  df1 <- makeData(name, fct, arguments, split_args)
-  df2 <- read.csv(paste0(PATH, name, ".csv"))
+  df1 <- roundData(makeData(name, fct, arguments, split_args))
+  df2 <- read_data(name)
   if (is.null(nrow(df1))) {
     # it's just an array so don't compare column names
     expect_equal(df1, df2[[1]])
@@ -1845,11 +1887,12 @@ saveResults(
 ###########################################################################
 saveRasters <- function(name, rasters)
 {
-  out_dir <- paste0(PATH, "/rasters/", name, "/")
+  out_dir <- get_data_path(sprintf("rasters/%s/", name))
   dir.create(out_dir, showWarnings=FALSE, recursive=TRUE)
-
-  terra::writeRaster(rasters, paste0(out_dir, name, ".tif"), overwrite=T)
-
+  print(paste0("Creating ", name))
+  terra::writeRaster(rasters,
+                     sprintf("%s/%s.tif", out_dir, name),
+                     overwrite=T)
 }
 
 test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
@@ -1944,8 +1987,9 @@ saveResults("fwi_11", fwi(test_fwi, batch = FALSE))
 
 
 cmp_text <- function(data, name) {
+  data <- roundData(data)
   # comparing NA doesn't work
-  df2 <- read.csv(paste0(PATH, name), na.strings = NULL)
+  df2 <- read.csv(get_data_path(name), na.strings = NULL)
   # HACK: the date range gets converted to '20:25' if as.character() is called directly on the data.frame
   stopifnot(all(as.character(lapply(data, as.character)) == as.character(lapply(df2, as.character))))
 }
