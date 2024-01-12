@@ -1939,7 +1939,7 @@ saveResults("fwi_07", fwi(test_fwi, lat.adjust = FALSE))
 saveResults("fwi_08", fwi(test_fwi, uppercase = FALSE))
 saveResults("fwi_09", fwi(test_fwi[7, ]))
 saveResults("fwi_10", fwi(test_fwi[8:13, ]))
-# saveResults("fwi_11", fwi(test_fwi, batch = FALSE))
+saveResults("fwi_11", fwi(test_fwi, batch = FALSE))
 
 
 
