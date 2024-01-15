@@ -131,7 +131,7 @@ makeInput <- function(arguments) {
   return(data.table(d1))
 }
 
-makeData <- function(name, fct, arguments, split_args) {
+makeData <- function(name, fct, arguments, split_args, with_input = FALSE) {
   i <- makeInput(arguments)
   if (!split_args) {
     stopifnot(is.data.table(i))
@@ -150,6 +150,9 @@ makeData <- function(name, fct, arguments, split_args) {
       r <- rbind(r, r2)
     }
     stopifnot(nrow(i) == n0)
+    if (with_input) {
+      r <- cbind(i, r)
+    }
     return(r)
   } else {
     for (n in 2:nrow(i)) {
@@ -178,9 +181,9 @@ saveResults <- function(name, data) {
   )
 }
 
-saveData <- function(name, fct, arguments, split_args = TRUE) {
+saveData <- function(name, fct, arguments, split_args = TRUE, with_input = FALSE) {
   print(paste0("Creating ", name))
-  saveResults(name, makeData(name, fct, arguments, split_args))
+  saveResults(name, makeData(name, fct, arguments, split_args, with_input))
   checkData(name, fct, arguments, split_args)
 }
 
@@ -230,8 +233,8 @@ checkResults <- function(name, df1)
   checkEqual(name, df1, read_data(name))
 }
 
-checkData <- function(name, fct, arguments, split_args = TRUE) {
-  df1 <- roundData(makeData(name, fct, arguments, split_args))
+checkData <- function(name, fct, arguments, split_args = TRUE, with_input = FALSE) {
+  df1 <- roundData(makeData(name, fct, arguments, split_args, with_input))
   df2 <- read_data(name)
   if (is.null(nrow(df1))) {
     # it's just an array so don't compare column names
@@ -768,48 +771,6 @@ saveData(
     data.table(CFB = CFB)
   )
 )
-saveData(
-  "SlopeAdjustRAZ",
-  cffdrs:::.Slopecalc,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "RAZ")
-  )
-)
-saveData(
-  "SlopeAdjustWSV",
-  cffdrs:::.Slopecalc,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "WSV")
-  )
-)
 fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                         CC, CBH, ISI, output = "RAZ") {
   # output options include: RAZ and WSV
@@ -1039,28 +1000,6 @@ fctSlopeISI <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   )
   return(ISF)
 }
-
-saveData(
-  "SlopeEquivalentInitialSpreadIndex",
-  fctSlopeISI,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "RAZ")
-  )
-)
 fctSlopeWSE <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                         CC, CBH, ISI, output = "RAZ") {
   ISF <- fctSlopeISI(
@@ -1085,27 +1024,6 @@ fctSlopeWSE <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   WSE <- ifelse(WSE > 40 & ISF >= (0.999 * 2.496 * fF), 112.45, WSE)
   return(WSE)
 }
-saveData(
-  "SlopeEquivalentWindSpeed",
-  fctSlopeWSE,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "RAZ")
-  )
-)
 fctSlopeWSX <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF,
                         CC, CBH, ISI, output = "RAZ") {
   WSE <- fctSlopeWSE(
@@ -1159,90 +1077,46 @@ fctSlopeRAZ <- function(FUELTYPE, FFMC, BUI, WS, WAZ, GS, SAZ, FMC, SFC, PC, PDF
   RAZ <- ifelse(WSX < 0, 2 * pi - RAZ, RAZ)
   return(RAZ)
 }
-saveData(
-  "SlopeAdjustWSX",
-  fctSlopeWSX,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "RAZ")
+makeSlopeData <- function(name, fct = cffdrs:::.Slopecalc, output = "RAZ") {
+  return(makeData(
+    name,
+    fct,
+    list(
+      data.table(FUELTYPE = FUELTYPE),
+      data.table(FFMC = FFMC),
+      data.table(BUI = BUI),
+      data.table(WS = WS),
+      data.table(WAZ = WAZ),
+      data.table(GS = GS),
+      data.table(SAZ = SAZ),
+      data.table(FMC = FMC),
+      data.table(SFC = SFC),
+      data.table(PC = PC),
+      data.table(PDF = PDF),
+      data.table(CC = CC),
+      data.table(CBH = CBH),
+      data.table(ISI = ISI),
+      data.table(output = output)
+    ),
+    split_args = TRUE,
+    with_input = TRUE
+  ))
+}
+# generate individually, but save as a group since arguments are mostly identical
+slope_values <- makeSlopeData("SlopeAdjustRAZ")
+addSlopeData <- function(name, fct = cffdrs:::.Slopecalc, output = "RAZ") {
+  slope_values <<- merge(
+    slope_values,
+    makeSlopeData(name, fct, output)[, -c("output")]
   )
-)
-saveData(
-  "SlopeAdjustWSY",
-  fctSlopeWSY,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "RAZ")
-  )
-)
-saveData(
-  "SlopeAdjust_WSV",
-  fctSlopeWSV,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "RAZ")
-  )
-)
-saveData(
-  "SlopeAdjust_RAZ",
-  fctSlopeRAZ,
-  list(
-    data.table(FUELTYPE = FUELTYPE),
-    data.table(FFMC = FFMC),
-    data.table(BUI = BUI),
-    data.table(WS = WS),
-    data.table(WAZ = WAZ),
-    data.table(GS = GS),
-    data.table(SAZ = SAZ),
-    data.table(FMC = FMC),
-    data.table(SFC = SFC),
-    data.table(PC = PC),
-    data.table(PDF = PDF),
-    data.table(CC = CC),
-    data.table(CBH = CBH),
-    data.table(ISI = ISI),
-    data.table(output = "RAZ")
-  )
-)
+}
+addSlopeData("SlopeAdjustWSV", output = "WSV")
+addSlopeData("SlopeEquivalentInitialSpreadIndex", fctSlopeISI)
+addSlopeData("SlopeAdjustWSX", fctSlopeWSX)
+addSlopeData("SlopeAdjustWSY", fctSlopeWSY)
+addSlopeData("SlopeAdjust_WSV", fctSlopeWSV)
+addSlopeData("SlopeAdjust_RAZ", fctSlopeRAZ)
+saveResults("Slope", slope_values)
 saveData(
   "SurfaceFuelConsumption",
   cffdrs:::.SFCcalc,
