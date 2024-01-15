@@ -165,6 +165,7 @@ makeData <- function(name, fct, arguments, split_args, with_input = FALSE) {
 }
 
 roundData <- function(data) {
+  data <- as.data.table(data)
   for (col in names(data)) {
     if (is.numeric(data[[col]])) {
       data[[col]] <- signif(data[[col]], SIG_DIGS)
@@ -174,10 +175,13 @@ roundData <- function(data) {
 }
 
 saveResults <- function(name, data) {
-  write.csv(roundData(data),
+  # need to specify eol so OS doesn't affect it
+  fwrite(roundData(data),
     get_data_path(sprintf("%s.csv", name)),
     row.names = FALSE,
-    quote = FALSE
+    na = "NA",
+    quote = FALSE,
+    eol = "\r\n"
   )
 }
 
