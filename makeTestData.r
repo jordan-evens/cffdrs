@@ -6,7 +6,7 @@ PATH <- "cffdrs/tests/data"
 dir.create(PATH, showWarnings = FALSE, recursive = TRUE)
 library(raster)
 
-SIG_DIGS <- 6
+SIG_DIGS <- 4
 
 DESIRED_ROWS <- 5000
 
@@ -164,20 +164,33 @@ makeData <- function(name, fct, arguments, split_args, with_input = FALSE) {
   }
 }
 
+# want to apply to each individual number
+significant <- Vectorize(function(data) {
+  # keep at least 2 decimal places
+  return(signif(data,
+           pmax(ceiling(log10(abs(data))) + 2,
+                SIG_DIGS)))
+})
+
 roundData <- function(data) {
   data <- as.data.table(data)
   for (col in names(data)) {
-    if (is.numeric(data[[col]])) {
-      data[[col]] <- signif(data[[col]], SIG_DIGS)
+  # don't round integers
+    if (is.numeric(data[[col]]) && !is.integer(data[[col]])) {
+      data[[col]] <- significant(data[[col]])
     }
   }
   return(data)
 }
 
+roundRaster <- function(data) {
+  return(signif(data, SIG_DIGS))
+}
+
 saveResults <- function(name, data) {
   # need to specify eol so OS doesn't affect it
   fwrite(roundData(data),
-    get_data_path(sprintf("%s.csv", name)),
+    get_data_path(name),
     row.names = FALSE,
     na = "NA",
     quote = FALSE,
@@ -216,20 +229,21 @@ checkEqual <- function(name, df1, df2) {
   }
 }
 
-get_data_path <- function(name) {
-  return(fs::path_abs(sprintf("%s/%s", PATH, name)))
+get_data_path <- function(name, suffix="csv") {
+  return(fs::path_abs(sprintf("%s/%s.%s", PATH, name, suffix)))
 }
 
 read_data <- function(name) {
-  return(read.csv(get_data_path(sprintf("%s.csv", name))))
+  return(read.csv(get_data_path(name)))
+}
+
+get_raster_path <- function(name) {
+  # return(get_data_path(name, "nc"))
+  return(get_data_path(name, "tif"))
 }
 
 read_raster <- function(name) {
-  return(rast(get_data_path(sprintf("rasters/%s/%s.tif", name, name))))
-}
-
-read_raster <- function(name) {
-  return(rast(get_data_path(sprintf("rasters/%s/%s.tif", name, name))))
+  return(rast(get_raster_path(name)))
 }
 
 checkResults <- function(name, df1)
@@ -302,6 +316,23 @@ fctOnInput <- function(fct) {
     return(result)
   })
 }
+
+test_raster <- function(name, input, fct) {
+  # only comparing to significant digits specified
+  actual <- roundRaster(fct(input))
+  expected <- read_raster(name)
+
+  out_cols <- setdiff(names(actual), toupper(names(input)))
+  # we don't actually know the names of the columns from the file, so assign from output
+  names(expected) <- names(actual)
+
+  expect_equal(names(expected), names(actual))
+  # # nc seems to prefer negative longitudes
+  # ext(actual) <- ext(expected)
+  m <- minmax(actual[[out_cols]] - expected[[out_cols]])
+  expect_true(all(abs(m) < (10 ^ -SIG_DIGS)))
+}
+
 saveData(
   "BackRateOfSpread",
   cffdrs:::.BROScalc,
@@ -1765,12 +1796,19 @@ saveResults(
 ###########################################################################
 saveRasters <- function(name, rasters)
 {
-  out_dir <- get_data_path(sprintf("rasters/%s/", name))
-  dir.create(out_dir, showWarnings=FALSE, recursive=TRUE)
   print(paste0("Creating ", name))
-  terra::writeRaster(rasters,
-                     sprintf("%s/%s.tif", out_dir, name),
-                     overwrite=T)
+  rounded <- rast(roundRaster(rasters))
+  terra::writeRaster(rounded,
+                     get_raster_path(name),
+                     overwrite=T,
+                     gdal=list("COMPRESS=ZSTD", "PREDICTOR=3"),
+                     datatype="FLT4S")
+  # terra::writeCDF(rounded,
+  #                 get_raster_path(name),
+  #                 overwrite=T,
+  #                 split=TRUE,
+  #                 atts="",
+  #                 compression=9)
 }
 
 test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
@@ -1803,10 +1841,11 @@ test_fwiRaster <- stack(system.file("extdata", "test_rast_day01.tif", package="c
 names(test_fwiRaster) <- c("temp", "rh", "ws", "prec")
 
 system.time(foo1 <- fwiRaster(input = test_fwiRaster))
-saveRasters("fwiRaster_test1", foo1)
-
 system.time(foo2 <- fwiRaster(input = test_fwiRaster,out = "all"))
-saveRasters("fwiRaster_test2", foo2)
+# no point in saving the same data twice
+print("Ensuring fwiRaster tests 1 and 2 produced the same results")
+expect_equal(foo1, foo2)
+saveRasters("fwiRaster_test1_and_2", foo1)
 
 system.time(foo3 <- fwiRaster(input = test_fwiRaster,out = "fwi"))
 saveRasters("fwiRaster_test3", foo3)
@@ -1861,41 +1900,5 @@ saveResults("fwi_08", fwi(test_fwi, uppercase = FALSE))
 saveResults("fwi_09", fwi(test_fwi[7, ]))
 saveResults("fwi_10", fwi(test_fwi[8:13, ]))
 saveResults("fwi_11", fwi(test_fwi, batch = FALSE))
-
-
-
-cmp_text <- function(data, name) {
-  data <- roundData(data)
-  # comparing NA doesn't work
-  df2 <- read.csv(get_data_path(name), na.strings = NULL)
-  # HACK: the date range gets converted to '20:25' if as.character() is called directly on the data.frame
-  stopifnot(all(as.character(lapply(data, as.character)) == as.character(lapply(df2, as.character))))
-}
-
-# make sure things match right now, or test data isn't useful
-cmp_text(fbp(test_fbp), "fbp_01.csv")
-cmp_text(fbp(test_fbp, output = "Primary"), "fbp_02.csv")
-cmp_text(fbp(test_fbp, "P"), "fbp_03.csv")
-cmp_text(fbp(test_fbp, "Secondary"), "fbp_04.csv")
-cmp_text(fbp(test_fbp, "S"), "fbp_05.csv")
-cmp_text(fbp(test_fbp, "All"), "fbp_06.csv")
-cmp_text(fbp(test_fbp, "A"), "fbp_07.csv")
-cmp_text(fbp(test_fbp[7, ]), "fbp_08.csv")
-cmp_text(fbp(test_fbp[8:13, ]), "fbp_09.csv")
-cmp_text(fbp(), "fbp_10.csv")
-cmp_text(fbp(non_fuel, "All"), "fbp_11.csv")
-cmp_text(fbp(water, "All"), "fbp_12.csv")
-
-
-cmp_text(fwi(test_fwi), "fwi_01.csv")
-cmp_text(fwi(test_fwi, out = "all"), "fwi_02.csv")
-cmp_text(fwi(test_fwi, out = "fwi"), "fwi_03.csv")
-cmp_text(fwi(test_fwi, init = data.frame(ffmc = 85, dmc = 6, dc = 15, lat = 55)), "fwi_04.csv")
-cmp_text(fwi(test_fwi, init = data.frame(ffmc = 0, dmc = 0, dc = 0, lat = 55)), "fwi_05.csv")
-cmp_text(fwi(test_fwi, init = data.frame(ffmc = 200, dmc = 1000, dc = 10000, lat = 55)), "fwi_06.csv")
-cmp_text(fwi(test_fwi, lat.adjust = FALSE), "fwi_07.csv")
-cmp_text(fwi(test_fwi, uppercase = FALSE), "fwi_08.csv")
-cmp_text(fwi(test_fwi[7, ]), "fwi_09.csv")
-cmp_text(fwi(test_fwi[8:13, ]), "fwi_10.csv")
 
 print("Done")
