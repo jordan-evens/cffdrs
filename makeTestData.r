@@ -1850,6 +1850,37 @@ saveRasters("fwiRaster_test1_and_2", foo1)
 system.time(foo3 <- fwiRaster(input = test_fwiRaster,out = "fwi"))
 saveRasters("fwiRaster_test3", foo3)
 
+test_hffmcRaster <- stack(system.file("extdata", "test_rast_hour01.tif", package = "cffdrs"))
+names(test_hffmcRaster) <- c("temp", "rh", "ws", "prec")
+
+system.time(foo1 <- hffmcRaster(test_hffmcRaster))
+saveRasters("hffmcRaster_test1", foo1)
+
+hour02 <- stack(system.file(  "extdata","test_rast_hour02.tif", package = "cffdrs"))
+# Assign variable names to the layers:
+names(hour02) <- c("temp", "rh", "ws", "prec")
+system.time(foo2 <- hffmcRaster(hour02, ffmc_old = foo1))
+saveRasters("hffmcRaster_test2", foo2)
+
+hour02 <- stack(hour02, setValues(hour02$temp,50))
+# Re-assign variable names to the layers:
+names(hour02) <- c("temp", "rh", "ws", "prec", "bui")
+system.time(foo3 <- hffmcRaster(hour02, ffmc_old = foo1, hourlyFWI = TRUE))
+saveRasters("hffmcRaster_test3", foo3)
+
+set.seed(666)
+test_gfmc_r <- raster(  nrows = 25,  ncols = 25,  crs = "EPSG:3402",  resolution = 100,  ymn = 5652012,  ymx = 5652012 + (25 * 100),  xmn = 565550,  xmx = 565550 + (25 * 100),  vals = sample(x = 19:27, size = 25 * 25, replace = TRUE))
+
+test_gfmc_r <- stack(  test_gfmc_r,  setValues(test_gfmc_r, sample(x = 0:3, size = 25 * 25, replace = TRUE)),  setValues(test_gfmc_r, sample(x = 10:20, size = 25 * 25, replace = TRUE)),  setValues(test_gfmc_r, sample(x = 30:70, size = 25 * 25, replace = TRUE)),  setValues(test_gfmc_r,sample(x = (5:950) / 1000,size = 25 * 25,replace = TRUE)
+  )
+)
+names(test_gfmc_r) <- c("temp", "prec", "ws", "rh", "isol")
+
+system.time(foo1 <- gfmcRaster(test_gfmc_r))
+saveRasters("hffmcRaster_test1", foo1)
+
+system.time(foo2 <- gfmcRaster(test_gfmc_r, GFMCold = foo1[["GFMC"]]))
+saveRasters("hffmcRaster_test2", foo2)
 
 data("test_fbp", package = "cffdrs")
 test_fbp$FFMC <- as.numeric(test_fbp$FFMC)
