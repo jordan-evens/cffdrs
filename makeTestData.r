@@ -167,15 +167,19 @@ makeData <- function(name, fct, arguments, split_args, with_input = FALSE) {
 # want to apply to each individual number
 significant <- Vectorize(function(data) {
   # keep at least 2 decimal places
-  return(signif(data,
-           pmax(ceiling(log10(abs(data))) + 2,
-                SIG_DIGS)))
+  return(signif(
+    data,
+    pmax(
+      ceiling(log10(abs(data))) + 2,
+      SIG_DIGS
+    )
+  ))
 })
 
 roundData <- function(data) {
   data <- as.data.table(data)
   for (col in names(data)) {
-  # don't round integers
+    # don't round integers
     if (is.numeric(data[[col]]) && !is.integer(data[[col]])) {
       data[[col]] <- significant(data[[col]])
     }
@@ -209,17 +213,14 @@ checkEqual <- function(name, df1, df2) {
   df1 <- as.data.table(df1)
   df2 <- as.data.table(df2)
   expect_equal(length(colnames(df1)), length(colnames(df2)))
-  if (ignore_names)
-  {
+  if (ignore_names) {
     colnames(df2) <- colnames(df1)
-  }
-  else
-  {
+  } else {
     expect_equal(colnames(df1), colnames(df2))
   }
   for (n in sort(colnames(df1)))
   {
-    test_that(paste0(name, '$', n), {
+    test_that(paste0(name, "$", n), {
       actual <- unlist(df1[[n]])
       expected <- unlist(df2[[n]])
       # unsure if this will cause problems, but seems to fix when column is all NA
@@ -229,7 +230,7 @@ checkEqual <- function(name, df1, df2) {
   }
 }
 
-get_data_path <- function(name, suffix="csv") {
+get_data_path <- function(name, suffix = "csv") {
   return(fs::path_abs(sprintf("%s/%s.%s", PATH, name, suffix)))
 }
 
@@ -246,8 +247,7 @@ read_raster <- function(name) {
   return(rast(get_raster_path(name)))
 }
 
-checkResults <- function(name, df1)
-{
+checkResults <- function(name, df1) {
   checkEqual(name, df1, read_data(name))
 }
 
@@ -330,7 +330,7 @@ test_raster <- function(name, input, fct) {
   # # nc seems to prefer negative longitudes
   # ext(actual) <- ext(expected)
   m <- minmax(actual[[out_cols]] - expected[[out_cols]])
-  expect_true(all(abs(m) < (10 ^ -SIG_DIGS)))
+  expect_true(all(abs(m) < (10^-SIG_DIGS)))
 }
 
 saveData(
@@ -1794,15 +1794,15 @@ saveResults(
 ###########################################################################
 # Raster tests
 ###########################################################################
-saveRasters <- function(name, rasters)
-{
+saveRasters <- function(name, rasters) {
   print(paste0("Creating ", name))
-  rounded <- rast(roundRaster(rasters))
+  rounded <- terra::rast(roundRaster(rasters))
   terra::writeRaster(rounded,
-                     get_raster_path(name),
-                     overwrite=T,
-                     gdal=list("COMPRESS=ZSTD", "PREDICTOR=3"),
-                     datatype="FLT4S")
+    get_raster_path(name),
+    overwrite = T,
+    gdal = list("COMPRESS=ZSTD", "PREDICTOR=3"),
+    datatype = "FLT4S"
+  )
   # terra::writeCDF(rounded,
   #                 get_raster_path(name),
   #                 overwrite=T,
@@ -1811,76 +1811,76 @@ saveRasters <- function(name, rasters)
   #                 compression=9)
 }
 
-test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package="cffdrs"))
-input<-test_fbpRaster
+test_fbpRaster <- stack(system.file("extdata", "test_fbpRaster.tif", package = "cffdrs"))
+input <- test_fbpRaster
 # Stack doesn't hold the raster layer names, we have to assign
 # them:
-names(input)<-c("FuelType","LAT","LONG","ELV","FFMC","BUI", "WS","WD","GS","Dj","D0","hr","PC",
-                "PDF","GFL","cc","theta","Accel","Aspect","BUIEff","CBH","CFL","ISI")
+names(input) <- c(
+  "FuelType", "LAT", "LONG", "ELV", "FFMC", "BUI", "WS", "WD", "GS", "Dj", "D0", "hr", "PC",
+  "PDF", "GFL", "cc", "theta", "Accel", "Aspect", "BUIEff", "CBH", "CFL", "ISI"
+)
 # Primary outputs:
-system.time(foo1<-fbpRaster(input = input))
+system.time(foo1 <- cffdrs::fbpRaster(input = input))
 saveRasters("fbpRaster_test1", foo1)
 # Using the "select" option:
-system.time(foo2<-fbpRaster(input = input,select=c("HFI","TFC", "ROS")))
+system.time(foo2 <- cffdrs::fbpRaster(input = input, select = c("HFI", "TFC", "ROS")))
 saveRasters("fbpRaster_test2", foo2)
 # Secondary outputs:
-system.time(foo3<-fbpRaster(input = input,output="S"))
+system.time(foo3 <- cffdrs::fbpRaster(input = input, output = "S"))
 saveRasters("fbpRaster_test3", foo3)
 # All outputs:
-system.time(foo4<-fbpRaster(input = input,output="A"))
+system.time(foo4 <- cffdrs::fbpRaster(input = input, output = "A"))
 saveRasters("fbpRaster_test4", foo4)
 ### Additional, longer running examples  ###
 # Keep only the required input layers, the other layers would be
 # assigned with default values:
 # keep only the required inputs:
-dat0<-input[[c("FuelType","LAT","LONG","FFMC","BUI","WS","GS", "Dj","Aspect")]]
-system.time(foo5<-fbpRaster(input = dat0,output="A"))
+dat0 <- input[[c("FuelType", "LAT", "LONG", "FFMC", "BUI", "WS", "GS", "Dj", "Aspect")]]
+system.time(foo5 <- cffdrs::fbpRaster(input = dat0, output = "A"))
 saveRasters("fbpRaster_test5", foo5)
 
-test_fwiRaster <- stack(system.file("extdata", "test_rast_day01.tif", package="cffdrs"))
+test_fwiRaster <- stack(system.file("extdata", "test_rast_day01.tif", package = "cffdrs"))
 names(test_fwiRaster) <- c("temp", "rh", "ws", "prec")
 
-system.time(foo1 <- fwiRaster(input = test_fwiRaster))
-system.time(foo2 <- fwiRaster(input = test_fwiRaster,out = "all"))
+system.time(foo1 <- cffdrs::fwiRaster(input = test_fwiRaster))
+system.time(foo2 <- cffdrs::fwiRaster(input = test_fwiRaster, out = "all"))
 # no point in saving the same data twice
 print("Ensuring fwiRaster tests 1 and 2 produced the same results")
 expect_equal(foo1, foo2)
 saveRasters("fwiRaster_test1_and_2", foo1)
 
-system.time(foo3 <- fwiRaster(input = test_fwiRaster,out = "fwi"))
+system.time(foo3 <- cffdrs::fwiRaster(input = test_fwiRaster, out = "fwi"))
 saveRasters("fwiRaster_test3", foo3)
 
 test_hffmcRaster <- stack(system.file("extdata", "test_rast_hour01.tif", package = "cffdrs"))
 names(test_hffmcRaster) <- c("temp", "rh", "ws", "prec")
 
-system.time(foo1 <- hffmcRaster(test_hffmcRaster))
+system.time(foo1 <- cffdrs::hffmcRaster(test_hffmcRaster))
 saveRasters("hffmcRaster_test1", foo1)
 
-hour02 <- stack(system.file(  "extdata","test_rast_hour02.tif", package = "cffdrs"))
+hour02 <- stack(system.file("extdata", "test_rast_hour02.tif", package = "cffdrs"))
 # Assign variable names to the layers:
 names(hour02) <- c("temp", "rh", "ws", "prec")
-system.time(foo2 <- hffmcRaster(hour02, ffmc_old = foo1))
+system.time(foo2 <- cffdrs::hffmcRaster(hour02, ffmc_old = foo1))
 saveRasters("hffmcRaster_test2", foo2)
 
-hour02 <- stack(hour02, setValues(hour02$temp,50))
+hour02 <- stack(hour02, setValues(hour02$temp, 50))
 # Re-assign variable names to the layers:
 names(hour02) <- c("temp", "rh", "ws", "prec", "bui")
-system.time(foo3 <- hffmcRaster(hour02, ffmc_old = foo1, hourlyFWI = TRUE))
+system.time(foo3 <- cffdrs::hffmcRaster(hour02, ffmc_old = foo1, hourlyFWI = TRUE))
 saveRasters("hffmcRaster_test3", foo3)
 
 set.seed(666)
-test_gfmc_r <- raster(  nrows = 25,  ncols = 25,  crs = "EPSG:3402",  resolution = 100,  ymn = 5652012,  ymx = 5652012 + (25 * 100),  xmn = 565550,  xmx = 565550 + (25 * 100),  vals = sample(x = 19:27, size = 25 * 25, replace = TRUE))
+test_gfmc_r <- raster(nrows = 25, ncols = 25, crs = "EPSG:3402", resolution = 100, ymn = 5652012, ymx = 5652012 + (25 * 100), xmn = 565550, xmx = 565550 + (25 * 100), vals = sample(x = 19:27, size = 25 * 25, replace = TRUE))
 
-test_gfmc_r <- stack(  test_gfmc_r,  setValues(test_gfmc_r, sample(x = 0:3, size = 25 * 25, replace = TRUE)),  setValues(test_gfmc_r, sample(x = 10:20, size = 25 * 25, replace = TRUE)),  setValues(test_gfmc_r, sample(x = 30:70, size = 25 * 25, replace = TRUE)),  setValues(test_gfmc_r,sample(x = (5:950) / 1000,size = 25 * 25,replace = TRUE)
-  )
-)
+test_gfmc_r <- stack(test_gfmc_r, setValues(test_gfmc_r, sample(x = 0:3, size = 25 * 25, replace = TRUE)), setValues(test_gfmc_r, sample(x = 10:20, size = 25 * 25, replace = TRUE)), setValues(test_gfmc_r, sample(x = 30:70, size = 25 * 25, replace = TRUE)), setValues(test_gfmc_r, sample(x = (5:950) / 1000, size = 25 * 25, replace = TRUE)))
 names(test_gfmc_r) <- c("temp", "prec", "ws", "rh", "isol")
 
-system.time(foo1 <- gfmcRaster(test_gfmc_r))
-saveRasters("hffmcRaster_test1", foo1)
+system.time(foo1 <- cffdrs::gfmcRaster(test_gfmc_r))
+saveRasters("gfmcRaster_test1", foo1)
 
-system.time(foo2 <- gfmcRaster(test_gfmc_r, GFMCold = foo1[["GFMC"]]))
-saveRasters("hffmcRaster_test2", foo2)
+system.time(foo2 <- cffdrs::gfmcRaster(test_gfmc_r, GFMCold = foo1[["GFMC"]]))
+saveRasters("gfmcRaster_test2", foo2)
 
 data("test_fbp", package = "cffdrs")
 test_fbp$FFMC <- as.numeric(test_fbp$FFMC)
